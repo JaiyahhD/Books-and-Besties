@@ -93,6 +93,57 @@
       white-space: pre-wrap;
     }
     .mine .message-bubble { background: #ead0db; }
+    
+/* 🎀 MAIN LOUNGE — MESSAGE REACTIONS */
+
+.message-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.reaction-chip {
+  border: 1px solid #ead0db;
+  background: #fff8fb;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.reaction-chip:hover {
+  transform: translateY(-2px);
+  background: #f8e2ec;
+}
+
+.reaction-chip.active {
+  background: #ead0db;
+  border-color: #c58ba5;
+  font-weight: bold;
+}
+
+.reaction-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.reaction-picker button {
+  border: none;
+  background: transparent;
+  padding: 5px;
+  font-size: 17px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.reaction-picker button:hover {
+  background: #f8e2ec;
+}
+
     .composer {
       display: flex;
       gap: 12px;
@@ -335,9 +386,37 @@
           bubble.className = "message-bubble";
           bubble.textContent = message.content;
 
-          article.append(meta, bubble);
-          messagesEl.appendChild(article);
-        }
+          
+article.append(meta, bubble);
+
+// 🎀 Emoji reaction picker
+const reactionPicker = document.createElement("div");
+reactionPicker.className = "reaction-picker";
+
+const reactionEmojis = ["💗", "☕", "😂", "🔥", "🥹", "👑"];
+
+for (const emoji of reactionEmojis) {
+  const reactionButton = document.createElement("button");
+
+  reactionButton.type = "button";
+  reactionButton.textContent = emoji;
+  reactionButton.title = `React with ${emoji}`;
+  reactionButton.setAttribute(
+    "aria-label",
+    `React with ${emoji}`
+  );
+
+  reactionButton.addEventListener("click", () => {
+    // We'll connect this to Supabase next!
+    console.log("Reaction selected:", emoji, message.id);
+  });
+
+  reactionPicker.appendChild(reactionButton);
+}
+
+article.appendChild(reactionPicker);
+messagesEl.appendChild(article);
+
 
         messagesEl.scrollTop = messagesEl.scrollHeight;
         status.textContent = "💗 Messages saved · Lounge connected";
