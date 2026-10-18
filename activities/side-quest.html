@@ -815,18 +815,20 @@ footer {
             </p>
 
             <div class="actions">
-              <button
-                class="btn secondary"
-                id="resetMonth"
-                type="button"
-              >
-                ↻ Reset This Month
-              </button>
 
-              <a class="btn" href="../activities.html">
-                ← Activity Directory
-              </a>
-            </div>
+            <button
+              class="btn"
+              id="saveDiary"
+              type="button"
+            >
+              💌 Save My Diary
+            </button>
+
+            <a class="btn" href="../activities.html">
+              ← Activity Directory
+            </a>
+
+          </div>
           </div>
         </section>
 
@@ -1250,28 +1252,7 @@ footer {
       save();
     });
 
-    document.getElementById(
-      "resetMonth"
-    ).addEventListener("click",() => {
-      if (
-        !confirm(
-          "Reset missions and journal for this month?"
-        )
-      ) return;
-
-      data[month] = {
-        completed:[],
-        journal:""
-      };
-
-      save();
-      render();
-    });
-
-    render();
-  }
-
-})();
+}})();
 </script>
 
 </body>
