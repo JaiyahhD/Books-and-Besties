@@ -7,446 +7,1080 @@
 <meta name="theme-color" content="#f64fa1">
 <title>Bingo Bulletin | Bestie University</title>
 <link rel="icon" href="../assets/logo.png">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
 :root {
-  --pink:#f64fa1;--hot:#d92c82;--teal:#176e78;
-  --ink:#382336;--blush:#ffe0ed;--cream:#fff8f5;
+  --pink:#f64fa1;
+  --hot:#d92c82;
+  --teal:#176e78;
+  --ink:#382336;
+  --blush:#ffe0ed;
+  --cream:#fff8f5;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;font-family:Nunito,sans-serif;color:var(--ink);
-  background:radial-gradient(circle at 10% 15%,#ffd1e6,transparent 35%),
-  radial-gradient(circle at 95% 80%,#cbeae7,transparent 35%),#fff5fa;
+
+* {box-sizing:border-box}
+[hidden] {display:none!important}
+
+body {
+  margin:0;
+  font-family:Nunito,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 15%,#ffd1e6,transparent 35%),
+    radial-gradient(circle at 95% 80%,#cbeae7,transparent 35%),
+    #fff5fa;
 }
-a{text-decoration:none;color:inherit}
-button{font:inherit;cursor:pointer}
-.top{
-  background:#23383d;color:white;border-bottom:6px solid var(--pink);
-  display:flex;align-items:center;justify-content:space-between;
-  flex-wrap:wrap;gap:15px;padding:14px max(20px,calc((100% - 1250px)/2));
+
+a {text-decoration:none;color:inherit}
+button {font:inherit;cursor:pointer}
+
+.top {
+  background:#23383d;
+  color:white;
+  border-bottom:6px solid var(--pink);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:15px;
+  padding:14px max(20px,calc((100% - 1250px)/2));
 }
-.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:19px}
-.brand img{width:52px;height:52px;object-fit:contain}
-nav{display:flex;gap:9px;flex-wrap:wrap}
-nav a{padding:10px 14px;border-radius:25px;background:#ffffff18;font-weight:900}
-nav a.active{background:var(--pink)}
-.hero{
-  text-align:center;padding:55px 20px 65px;
-  background:repeating-linear-gradient(135deg,transparent 0 35px,#ffffff13 35px 70px),
-  linear-gradient(145deg,#ffd0e5,#f6a4ce 55%,#cdebe8);
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:900;
+  font-size:19px;
+}
+
+.brand img {
+  width:52px;
+  height:52px;
+  object-fit:contain;
+}
+
+nav {
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+}
+
+nav a {
+  padding:10px 14px;
+  border-radius:25px;
+  background:#ffffff18;
+  font-weight:900;
+}
+
+nav a.active {background:var(--pink)}
+
+.hero {
+  text-align:center;
+  padding:55px 20px 65px;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 35px,
+      #ffffff13 35px 70px
+    ),
+    linear-gradient(145deg,#ffd0e5,#f6a4ce 55%,#cdebe8);
   border-bottom:8px solid #23383d;
 }
-.kicker{
-  display:inline-block;background:#ffffffb5;border:2px solid white;
-  border-radius:30px;padding:9px 18px;font-weight:900;
-  letter-spacing:1.5px;color:var(--teal);
+
+.kicker {
+  display:inline-block;
+  background:#ffffffb5;
+  border:2px solid white;
+  border-radius:30px;
+  padding:9px 18px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  color:var(--teal);
 }
-h1{
-  font-family:Bungee,sans-serif;font-size:clamp(35px,7vw,80px);
-  line-height:1.1;margin:23px 0 8px;color:#ff4097;
+
+.hero h1 {
+  font-family:Bungee,sans-serif;
+  font-size:clamp(35px,7vw,80px);
+  line-height:1.1;
+  margin:23px 0 8px;
+  color:#ff4097;
   -webkit-text-stroke:1.5px white;
-  text-shadow:4px 5px 0 #224b53,7px 8px 0 #ffffff88;
+  text-shadow:
+    4px 5px 0 #224b53,
+    7px 8px 0 #ffffff88;
 }
-.script{font:clamp(20px,3vw,29px) Pacifico,cursive;color:var(--teal)}
-.hero p{font-size:19px;font-weight:800;max-width:650px;margin:18px auto}
-.wrap{max-width:1250px;margin:auto;padding:30px 20px 60px}
-.notice{
-  background:white;border:3px solid #e7a5c6;border-radius:20px;
-  padding:19px 23px;margin-bottom:27px;
-  box-shadow:5px 6px 0 #e5acc6;font-weight:800;
+
+.script {
+  font:clamp(20px,3vw,29px) Pacifico,cursive;
+  color:var(--teal);
 }
-.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:28px}
-.panel{
-  background:white;border:3px solid #e7a5c6;border-radius:24px;
-  box-shadow:6px 7px 0 #e5acc6;overflow:hidden;
+
+.hero p {
+  font-size:19px;
+  font-weight:800;
+  max-width:650px;
+  margin:18px auto;
 }
-.panel-head{
-  padding:18px 22px;background:linear-gradient(110deg,#f64fa1,#ee88ba);
-  color:white;font-weight:900;font-size:18px;
+
+.wrap {
+  max-width:1250px;
+  margin:auto;
+  padding:30px 20px 60px;
 }
-.panel-body{padding:22px}
-.board-title{
-  text-align:center;font-family:Bungee,sans-serif;
-  font-size:clamp(20px,3vw,28px);color:var(--teal);margin:4px 0 15px;
+
+.notice {
+  background:white;
+  border:3px solid #e7a5c6;
+  border-radius:20px;
+  padding:19px 23px;
+  margin-bottom:27px;
+  box-shadow:5px 6px 0 #e5acc6;
+  font-weight:800;
 }
-.board{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:7px;max-width:660px;margin:auto;
+
+.layout {
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);
+  gap:28px;
 }
-.letter{
-  text-align:center;font-family:Bungee,sans-serif;
-  font-size:clamp(19px,4vw,35px);color:var(--hot);
+
+.panel {
+  background:white;
+  border:3px solid #e7a5c6;
+  border-radius:24px;
+  box-shadow:6px 7px 0 #e5acc6;
+  overflow:hidden;
 }
-.square{
-  aspect-ratio:1;min-width:0;border:2px solid #e9a4c5;
-  border-radius:12px;background:#fff0f7;
-  display:flex;align-items:center;justify-content:center;
-  padding:7px;text-align:center;font-weight:900;
-  font-size:clamp(9px,1.4vw,13px);line-height:1.2;
-  overflow-wrap:anywhere;position:relative;
+
+.panel-head {
+  padding:18px 22px;
+  background:linear-gradient(110deg,#f64fa1,#ee88ba);
+  color:white;
+  font-weight:900;
+  font-size:18px;
 }
-.square:hover{background:#ffd9eb}
-.square.marked{
+
+.panel-body {padding:22px}
+
+.board-title {
+  text-align:center;
+  font-family:Bungee,sans-serif;
+  font-size:clamp(20px,3vw,28px);
+  color:var(--teal);
+  margin:4px 0 15px;
+}
+
+.board {
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+  max-width:660px;
+  margin:auto;
+}
+
+.letter {
+  text-align:center;
+  font-family:Bungee,sans-serif;
+  font-size:clamp(19px,4vw,35px);
+  color:var(--hot);
+}
+
+.square {
+  aspect-ratio:1;
+  min-width:0;
+  border:2px solid #e9a4c5;
+  border-radius:12px;
+  background:#fff0f7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px;
+  text-align:center;
+  font-weight:900;
+  font-size:clamp(9px,1.4vw,13px);
+  line-height:1.2;
+  overflow-wrap:anywhere;
+  position:relative;
+}
+
+.square:hover {background:#ffd9eb}
+
+.square.marked {
   background:linear-gradient(140deg,#a4e1db,#e0f5ed);
-  border-color:var(--teal);color:#15555e;
+  border-color:var(--teal);
+  color:#15555e;
 }
-.square.marked:after{
-  content:"✓";position:absolute;right:4px;top:2px;
-  color:var(--teal);font-size:17px;
+
+.square.marked:after {
+  content:"✓";
+  position:absolute;
+  right:4px;
+  top:2px;
+  color:var(--teal);
+  font-size:17px;
 }
-.square.free{background:#ffe2a5;border-color:#d9a448}
-.square.free.marked{background:#b8e6d9;border-color:var(--teal)}
-.square:focus-visible,.btn:focus-visible{
-  outline:3px solid #176e78;outline-offset:3px;
+
+.square.free {
+  background:#ffe2a5;
+  border-color:#d9a448;
 }
-.progress-track{
-  background:#ffe1ee;border-radius:30px;height:18px;overflow:hidden;
+
+.square.free.marked {
+  background:#b8e6d9;
+  border-color:var(--teal);
+}
+
+.square:focus-visible,
+.btn:focus-visible {
+  outline:3px solid #176e78;
+  outline-offset:3px;
+}
+
+.progress-track {
+  background:#ffe1ee;
+  border-radius:30px;
+  height:18px;
+  overflow:hidden;
   margin:12px 0;
 }
-.progress-fill{
-  height:100%;width:0;background:linear-gradient(90deg,#f64fa1,#176e78);
+
+.progress-fill {
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#f64fa1,#176e78);
   transition:width .25s;
 }
-.stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0;
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:20px 0;
 }
-.stat{
-  background:#fff0f7;border-radius:15px;padding:14px 8px;text-align:center;
+
+.stat {
+  background:#fff0f7;
+  border-radius:15px;
+  padding:14px 8px;
+  text-align:center;
 }
-.stat strong{
-  display:block;font-family:Bungee,sans-serif;color:var(--teal);font-size:22px;
+
+.stat strong {
+  display:block;
+  font-family:Bungee,sans-serif;
+  color:var(--teal);
+  font-size:22px;
 }
-.stat span{font-size:12px;font-weight:900}
-.btn{
-  border:0;border-radius:30px;background:linear-gradient(#ff83be,#e93288);
-  color:white;font-weight:900;padding:13px 20px;
-  box-shadow:0 4px 0 #a52c67;display:inline-block;text-align:center;
+
+.stat span {
+  font-size:12px;
+  font-weight:900;
 }
-.btn.secondary{background:#236c76;box-shadow:0 4px 0 #17444c}
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
-.small{font-size:13px;color:#685565;line-height:1.6}
-.rules{padding-left:20px;line-height:1.8;font-weight:700}
-.detail{
-  margin-top:22px;background:#fff0f7;border-radius:16px;
-  padding:18px;border-left:5px solid var(--pink);
+
+.btn {
+  border:0;
+  border-radius:30px;
+  background:linear-gradient(#ff83be,#e93288);
+  color:white;
+  font-weight:900;
+  padding:13px 20px;
+  box-shadow:0 4px 0 #a52c67;
+  display:inline-block;
+  text-align:center;
 }
-.detail h3{margin:0 0 8px;color:var(--teal)}
-.event{
-  background:#e5f4f1;border-radius:15px;padding:17px;margin:15px 0;
+
+.btn.secondary {
+  background:#236c76;
+  box-shadow:0 4px 0 #17444c;
 }
-.event h3{margin:0 0 8px;color:var(--teal)}
-.celebrate{
-  margin-top:20px;text-align:center;background:#fff1bd;
-  border:2px dashed #d49e46;border-radius:15px;
-  padding:15px;font-weight:900;
+
+.actions {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
 }
-.hidden{display:none}
-footer{text-align:center;background:#263b40;color:white;padding:30px 20px;font-weight:900}
-@media(max-width:850px){.layout{grid-template-columns:1fr}}
-@media(max-width:500px){
-  .top,nav{justify-content:center}
-  .board{gap:4px}
-  .square{padding:3px;border-radius:7px;font-size:9px}
-  .square.marked:after{font-size:12px}
-  .panel-body{padding:12px}
-  .stats{gap:5px}
+
+.small {
+  font-size:13px;
+  color:#685565;
+  line-height:1.6;
+}
+
+.rules {
+  padding-left:20px;
+  line-height:1.8;
+  font-weight:700;
+}
+
+.detail {
+  margin-top:22px;
+  background:#fff0f7;
+  border-radius:16px;
+  padding:18px;
+  border-left:5px solid var(--pink);
+}
+
+.detail h3 {
+  margin:0 0 8px;
+  color:var(--teal);
+}
+
+.event {
+  background:#e5f4f1;
+  border-radius:15px;
+  padding:17px;
+  margin:15px 0;
+}
+
+.event h3 {
+  margin:0 0 8px;
+  color:var(--teal);
+}
+
+.celebrate {
+  margin-top:20px;
+  text-align:center;
+  background:#fff1bd;
+  border:2px dashed #d49e46;
+  border-radius:15px;
+  padding:15px;
+  font-weight:900;
+}
+
+.hidden {display:none}
+
+.campus-gate {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:25px;
+}
+
+.gate-card {
+  width:min(520px,100%);
+  background:white;
+  border:3px solid #e7a5c6;
+  border-radius:25px;
+  padding:38px 25px;
+  box-shadow:7px 8px 0 #e5acc6;
+  text-align:center;
+}
+
+.gate-card h2 {
+  font-family:Bungee,sans-serif;
+  font-size:clamp(23px,4vw,33px);
+  color:var(--hot);
+}
+
+.gate-card p {
+  line-height:1.8;
+  font-weight:800;
+}
+
+.gate-actions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  margin-top:22px;
+}
+
+.gate-actions a {
+  display:inline-block;
+  background:var(--teal);
+  color:white;
+  padding:13px 20px;
+  border-radius:30px;
+  font-weight:900;
+}
+
+.gate-actions a.secondary {
+  background:#ffe0ed;
+  color:#894365;
+}
+
+footer {
+  text-align:center;
+  background:#263b40;
+  color:white;
+  padding:30px 20px;
+  font-weight:900;
+}
+
+@media(max-width:850px) {
+  .layout {grid-template-columns:1fr}
+}
+
+@media(max-width:500px) {
+  .top,nav {justify-content:center}
+  .board {gap:4px}
+  .square {
+    padding:3px;
+    border-radius:7px;
+    font-size:9px;
+  }
+  .square.marked:after {font-size:12px}
+  .panel-body {padding:12px}
+  .stats {gap:5px}
 }
 </style>
 </head>
+
 <body>
 
-<header class="top">
-  <a class="brand" href="../index.html#home">
-    <img src="../assets/logo.png" alt="Books & Besties logo">
-    <span>BESTIE UNIVERSITY 🎓</span>
-  </a>
-  <nav aria-label="Campus navigation">
-    <a href="../index.html#home">Campus Quad</a>
-    <a href="../activities.html" class="active">Campus Activities</a>
-    <a href="../commons.html">Crown Commons</a>
-    <a href="../index.html#dashboard">Bestie Locker</a>
-  </nav>
-</header>
+<!-- MEMBERSHIP ACCESS GATE -->
 
-<section class="hero">
-  <span class="kicker">✦ THE BESTIE PLAYGROUND PRESENTS ✦</span>
-  <h1>BINGO<br>BULLETIN</h1>
-  <div class="script">A little reading, a little luck, a lot of fun ♡</div>
-  <p>Complete your squares, chase your Bingo lines, and celebrate every little bookish win!</p>
-</section>
+<div id="campusGate" class="campus-gate">
+  <div class="gate-card">
 
-<main class="wrap">
-  <div class="notice">
-    🎀 DESIGN PREVIEW: This is a sample Bingo event, not an official live competition.
-    Your demo board saves in this browser only. Shared events, verified participation,
-    and admin-managed boards will be added when we connect Supabase.
+    <div style="font-size:55px">🎀</div>
+
+    <h2>BINGO BULLETIN</h2>
+
+    <p id="campusGateMessage" role="status">
+      🎓 Checking your campus membership...
+    </p>
+
+    <div class="gate-actions">
+      <a href="../login.html">
+        Campus Login ♡
+      </a>
+
+      <a href="../index.html#home" class="secondary">
+        Campus Quad
+      </a>
+    </div>
+
   </div>
+</div>
 
-  <div class="layout">
+<!-- APPROVED MEMBER CONTENT -->
 
-    <section class="panel">
-      <div class="panel-head">🎀 YOUR BINGO BOARD</div>
-      <div class="panel-body">
-        <h2 class="board-title">THE BESTIE BINGO CLUB ♡</h2>
-        <div class="board" id="board" aria-label="Interactive Bingo board"></div>
+<div id="campusContent" hidden>
 
-        <div class="stats">
-          <div class="stat"><strong id="completed">1</strong><span>SQUARES</span></div>
-          <div class="stat"><strong id="lines">0</strong><span>BINGO LINES</span></div>
-          <div class="stat"><strong id="percent">4%</strong><span>COMPLETE</span></div>
-        </div>
+  <header class="top">
 
-        <div class="progress-track" role="progressbar"
-             aria-label="Bingo board progress"
-             aria-valuemin="0" aria-valuemax="100" aria-valuenow="4"
-             id="progressTrack">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
+    <a class="brand" href="../index.html#home">
+      <img
+        src="../assets/logo.png"
+        alt="Books & Besties logo"
+      >
+      <span>BESTIE UNIVERSITY 🎓</span>
+    </a>
 
-        <p class="small" id="progressMessage" aria-live="polite"></p>
+    <nav aria-label="Campus navigation">
+      <a href="../index.html#home">Campus Quad</a>
+      <a href="../activities.html" class="active">
+        Campus Activities
+      </a>
+      <a href="../commons.html">Crown Commons</a>
+      <a href="../locker.html">Bestie Locker</a>
+    </nav>
 
-        <div class="actions">
-          <button class="btn secondary" id="resetBoard">↻ Reset Demo Board</button>
-          <a class="btn" href="../activities.html">← Activity Directory</a>
-        </div>
+  </header>
 
-        <div class="celebrate hidden" id="celebrate" role="status">
-          👑 BINGOOOO, BESTIE! You've completed at least one line!
-        </div>
-      </div>
-    </section>
+  <section class="hero">
 
-    <aside>
+    <span class="kicker">
+      ✦ THE BESTIE PLAYGROUND PRESENTS ✦
+    </span>
+
+    <h1>BINGO<br>BULLETIN</h1>
+
+    <div class="script">
+      A little reading, a little luck, a lot of fun ♡
+    </div>
+
+    <p>
+      Complete your squares, chase your Bingo lines,
+      and celebrate every little bookish win!
+    </p>
+
+  </section>
+
+  <main class="wrap">
+
+    <div class="notice">
+      🎀 DESIGN PREVIEW: This is a sample Bingo event,
+      not an official live competition. Your demo board
+      saves in this browser only. Shared events, verified
+      participation, and admin-managed boards will be
+      added when we connect Supabase.
+    </div>
+
+    <div class="layout">
+
+      <!-- BINGO BOARD -->
+
       <section class="panel">
-        <div class="panel-head">💌 THE BINGO BRIEF</div>
+
+        <div class="panel-head">
+          🎀 YOUR BINGO BOARD
+        </div>
+
         <div class="panel-body">
-          <div class="event">
-            <h3>🎀 Sample Event</h3>
-            <strong>The Bestie Bingo Club</strong>
-            <p>This practice board is here so you can explore how digital Bingo will work on campus.</p>
-            <span class="small">Status: Design Preview</span>
+
+          <h2 class="board-title">
+            THE BESTIE BINGO CLUB ♡
+          </h2>
+
+          <div
+            class="board"
+            id="board"
+            aria-label="Interactive Bingo board"
+          ></div>
+
+          <div class="stats">
+
+            <div class="stat">
+              <strong id="completed">1</strong>
+              <span>SQUARES</span>
+            </div>
+
+            <div class="stat">
+              <strong id="lines">0</strong>
+              <span>BINGO LINES</span>
+            </div>
+
+            <div class="stat">
+              <strong id="percent">4%</strong>
+              <span>COMPLETE</span>
+            </div>
+
           </div>
 
-          <h3 style="color:var(--teal)">How to Play ♡</h3>
-          <ol class="rules">
-            <li>Tap any square to see its reading mission.</li>
-            <li>Mark a square once you've completed its task.</li>
-            <li>Complete five squares in a row, column, or diagonal for Bingo!</li>
-            <li>Keep going for more lines or a full blackout.</li>
-          </ol>
-
-          <p class="small">
-            Demo markings are self-reported. Future official events may have
-            different rules, verification requirements, and rewards.
-          </p>
-
-          <div class="detail" id="squareDetail" aria-live="polite">
-            <h3>💗 Pick a Square!</h3>
-            <p>Tap a Bingo square to see its full mission here.</p>
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Bingo board progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="4"
+            id="progressTrack"
+          >
+            <div
+              class="progress-fill"
+              id="progressFill"
+            ></div>
           </div>
+
+          <p
+            class="small"
+            id="progressMessage"
+            aria-live="polite"
+          ></p>
+
+          <div class="actions">
+
+            <button
+              class="btn secondary"
+              id="resetBoard"
+              type="button"
+            >
+              ↻ Reset Demo Board
+            </button>
+
+            <a
+              class="btn"
+              href="../activities.html"
+            >
+              ← Activity Directory
+            </a>
+
+          </div>
+
+          <div
+            class="celebrate hidden"
+            id="celebrate"
+            role="status"
+          >
+            👑 BINGOOOO, BESTIE!
+            You've completed at least one line!
+          </div>
+
         </div>
+
       </section>
 
-      <section class="panel" style="margin-top:25px">
-        <div class="panel-head">📣 FROM CAMPUS HQ</div>
-        <div class="panel-body">
-          <h3 style="color:var(--teal)">More Bingo Adventures Coming!</h3>
-          <p>Future events will have their own themes, instructions, participation windows, and digital boards.</p>
-          <p>Admins will eventually create and publish Bingo events from Campus HQ without editing website code.</p>
-        </div>
-      </section>
-    </aside>
+      <!-- BINGO SIDEBAR -->
 
-  </div>
-</main>
+      <aside>
 
-<footer>
-  BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
-  <p>© <span id="year"></span> Bestie University</p>
-</footer>
+        <section class="panel">
+
+          <div class="panel-head">
+            💌 THE BINGO BRIEF
+          </div>
+
+          <div class="panel-body">
+
+            <div class="event">
+
+              <h3>🎀 Sample Event</h3>
+
+              <strong>
+                The Bestie Bingo Club
+              </strong>
+
+              <p>
+                This practice board is here so you
+                can explore how digital Bingo will
+                work on campus.
+              </p>
+
+              <span class="small">
+                Status: Design Preview
+              </span>
+
+            </div>
+
+            <h3 style="color:var(--teal)">
+              How to Play ♡
+            </h3>
+
+            <ol class="rules">
+              <li>
+                Tap any square to see its reading mission.
+              </li>
+              <li>
+                Mark a square once you've completed its task.
+              </li>
+              <li>
+                Complete five squares in a row, column,
+                or diagonal for Bingo!
+              </li>
+              <li>
+                Keep going for more lines or a full blackout.
+              </li>
+            </ol>
+
+            <p class="small">
+              Demo markings are self-reported.
+              Future official events may have different
+              rules, verification requirements, and rewards.
+            </p>
+
+            <div
+              class="detail"
+              id="squareDetail"
+              aria-live="polite"
+            >
+              <h3>💗 Pick a Square!</h3>
+              <p>
+                Tap a Bingo square to see its
+                full mission here.
+              </p>
+            </div>
+
+          </div>
+
+        </section>
+
+        <section
+          class="panel"
+          style="margin-top:25px"
+        >
+
+          <div class="panel-head">
+            📣 FROM CAMPUS HQ
+          </div>
+
+          <div class="panel-body">
+
+            <h3 style="color:var(--teal)">
+              More Bingo Adventures Coming!
+            </h3>
+
+            <p>
+              Future events will have their own
+              themes, instructions, participation
+              windows, and digital boards.
+            </p>
+
+            <p>
+              Admins will eventually create and publish
+              Bingo events from Campus HQ without
+              editing website code.
+            </p>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+    </div>
+
+  </main>
+
+  <footer>
+    BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+    <p>
+      © <span id="year"></span> Bestie University
+    </p>
+  </footer>
+
+</div>
+
+<!-- SUPABASE ACCESS -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/campus-guard.js"></script>
 
 <script>
-(() => {
+(async () => {
   "use strict";
 
-  const STORAGE_KEY = "bb_bingo_demo_v1";
+  const gateMessage =
+    document.getElementById("campusGateMessage");
 
-  const missions = [
-    "Read a romance", "Try a new author", "Read 50 pages",
-    "Share a book quote", "Read a thriller",
+  const year =
+    document.getElementById("year");
 
-    "Read before bed", "Recommend a book", "Read 100 pages",
-    "Try an audiobook", "Read a novella",
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
 
-    "Read a pink cover", "Read outside", "FREE SPACE",
-    "Read a fantasy", "Rate a book",
+  const guard = window.BB_CAMPUS_GUARD;
 
-    "Read for 30 minutes", "Read a library book", "Finish a chapter",
-    "Read a debut novel", "Share your TBR",
-
-    "Read a cozy book", "Read 75 pages", "Read a new genre",
-    "Finish a book", "Celebrate a Bestie"
-  ];
-
-  const board = document.getElementById("board");
-  const completedEl = document.getElementById("completed");
-  const linesEl = document.getElementById("lines");
-  const percentEl = document.getElementById("percent");
-  const fillEl = document.getElementById("progressFill");
-  const trackEl = document.getElementById("progressTrack");
-  const messageEl = document.getElementById("progressMessage");
-  const detailEl = document.getElementById("squareDetail");
-  const celebrateEl = document.getElementById("celebrate");
-
-  let marked = new Set([12]);
-  let selected = null;
+  if (!guard) {
+    gateMessage.textContent =
+      "Campus access verification is unavailable. Please try again.";
+    return;
+  }
 
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(saved)) {
-      marked = new Set(saved.filter(n =>
-        Number.isInteger(n) && n >= 0 && n < 25
-      ));
-      marked.add(12);
-    }
+    const result = await guard.protectPage({
+      level:"approved",
+      gateId:"campusGate",
+      contentId:"campusContent",
+      messageId:"campusGateMessage"
+    });
+
+    if (!result.allowed) return;
+
+    initializeBingo();
+
   } catch (error) {
-    console.warn("Unable to restore Bingo preview:", error);
+    console.error("Bingo access error:", error);
+
+    document.getElementById(
+      "campusContent"
+    ).hidden = true;
+
+    document.getElementById(
+      "campusGate"
+    ).hidden = false;
+
+    gateMessage.textContent =
+      "We couldn't load Bingo Bulletin. Please try again.";
   }
 
-  const winningLines = [];
+  function initializeBingo() {
 
-  for (let row = 0; row < 5; row++) {
-    winningLines.push([0,1,2,3,4].map(col => row * 5 + col));
-  }
+    const STORAGE_KEY = "bb_bingo_demo_v1";
 
-  for (let col = 0; col < 5; col++) {
-    winningLines.push([0,1,2,3,4].map(row => row * 5 + col));
-  }
+    const missions = [
+      "Read a romance",
+      "Try a new author",
+      "Read 50 pages",
+      "Share a book quote",
+      "Read a thriller",
 
-  winningLines.push([0,6,12,18,24]);
-  winningLines.push([4,8,12,16,20]);
+      "Read before bed",
+      "Recommend a book",
+      "Read 100 pages",
+      "Try an audiobook",
+      "Read a novella",
 
-  function save() {
+      "Read a pink cover",
+      "Read outside",
+      "FREE SPACE",
+      "Read a fantasy",
+      "Rate a book",
+
+      "Read for 30 minutes",
+      "Read a library book",
+      "Finish a chapter",
+      "Read a debut novel",
+      "Share your TBR",
+
+      "Read a cozy book",
+      "Read 75 pages",
+      "Read a new genre",
+      "Finish a book",
+      "Celebrate a Bestie"
+    ];
+
+    const board =
+      document.getElementById("board");
+
+    const completedEl =
+      document.getElementById("completed");
+
+    const linesEl =
+      document.getElementById("lines");
+
+    const percentEl =
+      document.getElementById("percent");
+
+    const fillEl =
+      document.getElementById("progressFill");
+
+    const trackEl =
+      document.getElementById("progressTrack");
+
+    const messageEl =
+      document.getElementById("progressMessage");
+
+    const detailEl =
+      document.getElementById("squareDetail");
+
+    const celebrateEl =
+      document.getElementById("celebrate");
+
+    let marked = new Set([12]);
+
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...marked]));
+      const saved = JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      );
+
+      if (Array.isArray(saved)) {
+        marked = new Set(
+          saved.filter(n =>
+            Number.isInteger(n) &&
+            n >= 0 &&
+            n < 25
+          )
+        );
+
+        marked.add(12);
+      }
+
     } catch (error) {
-      console.warn("Unable to save Bingo preview:", error);
+      console.warn(
+        "Unable to restore Bingo preview:",
+        error
+      );
     }
-  }
 
-  function showDetail(index) {
-    selected = index;
-    detailEl.replaceChildren();
+    const winningLines = [];
 
-    const heading = document.createElement("h3");
-    heading.textContent = index === 12
-      ? "⭐ FREE SPACE!"
-      : "🎀 " + missions[index];
+    for (let row = 0; row < 5; row++) {
+      winningLines.push(
+        [0,1,2,3,4].map(
+          col => row * 5 + col
+        )
+      );
+    }
 
-    const description = document.createElement("p");
-    description.textContent = index === 12
-      ? "This square is automatically completed. Enjoy your little freebie, Bestie!"
-      : "Complete this reading mission, then mark your square. This is a sample task for our design preview.";
+    for (let col = 0; col < 5; col++) {
+      winningLines.push(
+        [0,1,2,3,4].map(
+          row => row * 5 + col
+        )
+      );
+    }
 
-    detailEl.append(heading, description);
+    winningLines.push(
+      [0,6,12,18,24]
+    );
 
-    if (index !== 12) {
-      const button = document.createElement("button");
-      button.className = "btn";
-      button.textContent = marked.has(index)
-        ? "↻ Unmark Square"
-        : "✓ Mark Complete";
+    winningLines.push(
+      [4,8,12,16,20]
+    );
 
-      button.addEventListener("click", () => {
-        toggle(index);
+    function save() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify([...marked])
+        );
+
+      } catch (error) {
+        console.warn(
+          "Unable to save Bingo preview:",
+          error
+        );
+      }
+    }
+
+    function showDetail(index) {
+      detailEl.replaceChildren();
+
+      const heading =
+        document.createElement("h3");
+
+      heading.textContent =
+        index === 12
+          ? "⭐ FREE SPACE!"
+          : "🎀 " + missions[index];
+
+      const description =
+        document.createElement("p");
+
+      description.textContent =
+        index === 12
+          ? "This square is automatically completed. Enjoy your little freebie, Bestie!"
+          : "Complete this reading mission, then mark your square. This is a sample task for our design preview.";
+
+      detailEl.append(
+        heading,
+        description
+      );
+
+      if (index !== 12) {
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.className = "btn";
+
+        button.textContent =
+          marked.has(index)
+            ? "↻ Unmark Square"
+            : "✓ Mark Complete";
+
+        button.addEventListener(
+          "click",
+          () => toggle(index)
+        );
+
+        detailEl.append(button);
+      }
+    }
+
+    function toggle(index) {
+      if (index === 12) return;
+
+      if (marked.has(index)) {
+        marked.delete(index);
+      } else {
+        marked.add(index);
+      }
+
+      save();
+      renderBoard();
+      showDetail(index);
+    }
+
+    function updateProgress() {
+      const count = marked.size;
+
+      const percent =
+        Math.round(count / 25 * 100);
+
+      const lines =
+        winningLines.filter(line =>
+          line.every(index =>
+            marked.has(index)
+          )
+        ).length;
+
+      completedEl.textContent = count;
+      linesEl.textContent = lines;
+      percentEl.textContent = percent + "%";
+
+      fillEl.style.width =
+        percent + "%";
+
+      trackEl.setAttribute(
+        "aria-valuenow",
+        String(percent)
+      );
+
+      messageEl.textContent =
+        count === 25
+          ? "👑 BLACKOUT, BESTIE! You've completed the whole board!"
+          : `${count} of 25 squares complete. Keep going, Bestie!`;
+
+      celebrateEl.classList.toggle(
+        "hidden",
+        lines === 0
+      );
+
+      celebrateEl.textContent =
+        count === 25
+          ? "👑 FULL BLACKOUT! You did THAT, Bestie!"
+          : `👑 BINGOOOO! ${lines} completed line${lines === 1 ? "" : "s"}!`;
+    }
+
+    function renderBoard() {
+      board.replaceChildren();
+
+      "BINGO".split("").forEach(letter => {
+        const heading =
+          document.createElement("div");
+
+        heading.className = "letter";
+        heading.textContent = letter;
+
+        board.append(heading);
       });
 
-      detailEl.append(button);
+      missions.forEach((mission,index) => {
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.className = "square";
+
+        if (index === 12) {
+          button.classList.add("free");
+        }
+
+        if (marked.has(index)) {
+          button.classList.add("marked");
+        }
+
+        button.textContent = mission;
+
+        button.setAttribute(
+          "aria-label",
+          `${mission}, ${marked.has(index) ? "completed" : "not completed"}`
+        );
+
+        button.setAttribute(
+          "aria-pressed",
+          String(marked.has(index))
+        );
+
+        button.addEventListener(
+          "click",
+          () => showDetail(index)
+        );
+
+        board.append(button);
+      });
+
+      updateProgress();
     }
-  }
 
-  function toggle(index) {
-    if (index === 12) return;
+    document.getElementById(
+      "resetBoard"
+    ).addEventListener("click", () => {
+      if (!confirm(
+        "Reset your demo Bingo board?"
+      )) return;
 
-    if (marked.has(index)) marked.delete(index);
-    else marked.add(index);
+      marked = new Set([12]);
 
-    save();
-    renderBoard();
-    showDetail(index);
-  }
-
-  function updateProgress() {
-    const count = marked.size;
-    const percent = Math.round(count / 25 * 100);
-    const lines = winningLines.filter(line =>
-      line.every(index => marked.has(index))
-    ).length;
-
-    completedEl.textContent = count;
-    linesEl.textContent = lines;
-    percentEl.textContent = percent + "%";
-    fillEl.style.width = percent + "%";
-    trackEl.setAttribute("aria-valuenow", String(percent));
-
-    messageEl.textContent =
-      count === 25
-      ? "👑 BLACKOUT, BESTIE! You've completed the whole board!"
-      : `${count} of 25 squares complete. Keep going, Bestie!`;
-
-    celebrateEl.classList.toggle("hidden", lines === 0);
-
-    celebrateEl.textContent = count === 25
-      ? "👑 FULL BLACKOUT! You did THAT, Bestie!"
-      : `👑 BINGOOOO! ${lines} completed line${lines === 1 ? "" : "s"}!`;
-  }
-
-  function renderBoard() {
-    board.replaceChildren();
-
-    "BINGO".split("").forEach(letter => {
-      const heading = document.createElement("div");
-      heading.className = "letter";
-      heading.textContent = letter;
-      board.append(heading);
+      save();
+      renderBoard();
+      showDetail(12);
     });
 
-    missions.forEach((mission, index) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "square";
-
-      if (index === 12) button.classList.add("free");
-      if (marked.has(index)) button.classList.add("marked");
-
-      button.textContent = mission;
-      button.setAttribute(
-        "aria-label",
-        `${mission}, ${marked.has(index) ? "completed" : "not completed"}`
-      );
-      button.setAttribute("aria-pressed", String(marked.has(index)));
-
-      button.addEventListener("click", () => showDetail(index));
-      board.append(button);
-    });
-
-    updateProgress();
+    renderBoard();
   }
 
-  document.getElementById("resetBoard").addEventListener("click", () => {
-    if (!confirm("Reset your demo Bingo board?")) return;
-    marked = new Set([12]);
-    save();
-    renderBoard();
-    showDetail(12);
-  });
-
-  document.getElementById("year").textContent =
-    new Date().getFullYear();
-
-  renderBoard();
 })();
 </script>
+
 </body>
 </html>
