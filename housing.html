@@ -171,7 +171,9 @@
       line-height: 1.7;
     }
 
-    #campusContent { display: none; }
+        #campusContent[style*="display: block"] {
+        display: block;
+        }
 
     @media (max-width: 850px) {
       .dorm-grid { grid-template-columns: 1fr; }
