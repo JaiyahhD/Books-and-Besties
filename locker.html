@@ -352,6 +352,87 @@
       margin-top: 30px;
     }
 
+    
+/* =====================================
+   MY CAMPUS DASHBOARD 🎀
+===================================== */
+
+.campus-dashboard {
+  margin: 55px 0 45px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.dashboard-card {
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #fff0f7
+  );
+  border: 3px solid #e7a6c6;
+  border-radius: 24px;
+  padding: 27px;
+  box-shadow: 5px 6px 0 #efd0df;
+  min-width: 0;
+}
+
+.dashboard-icon {
+  display: block;
+  font-size: 35px;
+  margin-bottom: 12px;
+}
+
+.dashboard-card h3 {
+  color: #286e70;
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0 0 12px;
+}
+
+.dashboard-card p {
+  color: #62485a;
+  font-weight: 700;
+  line-height: 1.7;
+  margin: 0 0 15px;
+}
+
+.dashboard-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 900;
+  color: #a64f7f;
+  background: #ffe1ee;
+  border-radius: 20px;
+  padding: 8px 12px;
+}
+
+.dashboard-link {
+  display: inline-block;
+  padding: 10px 17px;
+  background: #286e70;
+  color: white;
+  border-radius: 20px;
+  font-weight: 900;
+}
+
+.dashboard-link:hover {
+  background: #1d5658;
+}
+
+@media (max-width: 650px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-card {
+    padding: 22px;
+  }
+}
+
     /* =====================================
        CAMPUS NAVIGATION
     ===================================== */
@@ -491,6 +572,66 @@
         justify-content: center;
       }
     }
+
+    
+/* CAMPUS NOTIFICATIONS 💌 */
+
+.notification-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.campus-notification {
+  padding: 15px;
+  background: #ffffff;
+  border: 2px solid #edc3d8;
+  border-radius: 15px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.campus-notification.unread {
+  background: #fff3f9;
+  border-color: #d979a8;
+}
+
+.campus-notification strong {
+  display: block;
+  color: #286e70;
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
+.campus-notification p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 8px;
+}
+
+.campus-notification small {
+  color: #91647b;
+  font-size: 11px;
+}
+
+.notification-read-button {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 13px;
+  background: #286e70;
+  color: white;
+  border: 0;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.notification-read-button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
   </style>
 </head>
 
@@ -693,6 +834,74 @@
 
       </section>
 
+      
+<!-- =====================================
+     MY CAMPUS DASHBOARD 🎀
+===================================== -->
+
+<section class="campus-dashboard">
+
+  <h2 class="section-title">
+    🎀 MY CAMPUS DASHBOARD
+  </h2>
+
+  <div class="dashboard-grid">
+
+    <article class="dashboard-card">
+      <span class="dashboard-icon">📚</span>
+      <h3>My Reading Stats</h3>
+      <p id="dashboardReading">
+        Your reading journey is just getting started!
+      </p>
+      <span class="dashboard-label">
+        Monthly Crown integration coming in Phase 5
+      </span>
+    </article>
+
+    <article class="dashboard-card">
+      <span class="dashboard-icon">💌</span>
+      <h3>Campus Notices</h3>
+      <p id="dashboardNotices" role="status">
+        No new campus notices right now. ♡
+      </p>
+      
+      <div
+        id="notificationList"
+        class="notification-list"
+        aria-label="Your campus notifications"
+      ></div>
+
+      <span class="dashboard-label">
+        Personal notifications coming soon
+      </span>
+    </article>
+
+    <article class="dashboard-card">
+      <span class="dashboard-icon">🎮</span>
+      <h3>Campus Activities</h3>
+      <p>
+        Your next bookish adventure is waiting!
+      </p>
+      <a class="dashboard-link" href="activities.html">
+        Explore Activities →
+      </a>
+    </article>
+
+    <article class="dashboard-card">
+      <span class="dashboard-icon">🎓</span>
+      <h3>Campus Membership</h3>
+      <p id="dashboardMembership">
+        Checking your membership...
+      </p>
+      <span class="dashboard-label">
+        Official Bestie University Student
+      </span>
+    </article>
+
+  </div>
+
+</section>
+
       <!-- CAMPUS NAVIGATION -->
 
       <h2 class="section-title">
@@ -838,6 +1047,17 @@
           return;
         }
 
+        
+        // MY CAMPUS DASHBOARD — MEMBERSHIP
+
+        const membershipDisplay =
+          document.getElementById("dashboardMembership");
+
+        if (membershipDisplay) {
+          membershipDisplay.textContent =
+            "💗 Active & Approved Bestie";
+        }
+
         // MEMBER NAME
 
         const name = profile.display_name || "Bestie";
@@ -971,5 +1191,6 @@
     })();
   </script>
 
+  <script src="js/campus-notifications.js"></script>
 </body>
 </html>
