@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Housing | Bestie University</title>
+
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --rose: #b96d91;
+      --cream: #fff8f2;
+      --espresso: #563b3b;
+      --sage: #a3b8a1;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background:
+        radial-gradient(circle at top left, #f8dce8, transparent 45%),
+        linear-gradient(135deg, #fff8f2, #f4e9e3);
+      color: var(--espresso);
+      min-height: 100vh;
+    }
+
+    .housing-header {
+      text-align: center;
+      padding: 65px 20px 35px;
+    }
+
+    .eyebrow {
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      font: 700 11px Arial, sans-serif;
+      color: var(--rose);
+    }
+
+    h1 {
+      font-size: clamp(40px, 7vw, 76px);
+      margin: 15px 0;
+      line-height: 1.05;
+    }
+
+    h1 span { color: var(--rose); }
+
+    .subtitle {
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 16px;
+    }
+
+    .season-pill {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 11px 24px;
+      background: var(--espresso);
+      color: white;
+      border-radius: 50px;
+      font: 700 12px Arial, sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .housing-container {
+      max-width: 1180px;
+      margin: auto;
+      padding: 25px 22px 80px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin: 35px 0;
+    }
+
+    .section-heading h2 {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .section-heading p {
+      font-size: 14px;
+      opacity: .75;
+    }
+
+    .dorm-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .dorm-card {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px #563b3b12;
+      border: 1px solid #e9ddd7;
+      transition: transform .25s;
+    }
+
+    .dorm-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .dorm-banner {
+      min-height: 170px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 72px;
+      background: var(--pink);
+    }
+
+    .dorm-content {
+      padding: 27px;
+      text-align: center;
+    }
+
+    .dorm-content h3 {
+      font-size: 26px;
+      margin: 0 0 9px;
+    }
+
+    .theme-name {
+      font: 700 11px Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--rose);
+    }
+
+    .dorm-description {
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 100px;
+      margin-top: 18px;
+    }
+
+    .dorm-button {
+      display: inline-block;
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 14px;
+      background: var(--espresso);
+      color: white;
+      font: 700 12px Arial, sans-serif;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    .dorm-button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .housing-footer {
+      text-align: center;
+      padding: 25px;
+      font-size: 12px;
+      opacity: .65;
+    }
+
+    .status-message {
+      text-align: center;
+      padding: 35px;
+      line-height: 1.7;
+    }
+
+    #campusContent { display: none; }
+
+    @media (max-width: 850px) {
+      .dorm-grid { grid-template-columns: 1fr; }
+      .dorm-description { min-height: auto; }
+      .housing-header { padding-top: 40px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="campusGate" class="status-message">
+    <p id="campusGateMessage">
+      Checking your Bestie University membership...
+    </p>
+  </div>
+
+  <main id="campusContent">
+
+    <header class="housing-header">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · RESIDENTIAL LIFE
+      </div>
+
+      <h1>Campus <span>Housing</span></h1>
+
+      <p class="subtitle">
+        Welcome home, Bestie! Your dorm is where
+        friendships grow, books are discussed,
+        and the campus memories are made.
+      </p>
+
+      <div class="season-pill">
+        ☕ NOVEMBER 2026 · THE VELVET LATTE LOUNGE
+      </div>
+    </header>
+
+    <div class="housing-container">
+
+      <section class="section-heading">
+        <h2>Meet Your Dorms 🏡</h2>
+        <p>Three teams. Three personalities. One campus.</p>
+      </section>
+
+      <div id="dormGrid" class="dorm-grid">
+        <div class="status-message">
+          Loading your campus dorms...
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="housing-footer">
+      BESTIE UNIVERSITY 🎀
+      · A LITTLE BOOKISH, A LOT ICONIC
+    </footer>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const grid = document.getElementById("dormGrid");
+
+      const guard = window.BB_CAMPUS_GUARD;
+
+      if (!guard) {
+        document.getElementById("campusGateMessage").textContent =
+          "Campus authentication is unavailable.";
+        return;
+      }
+
+      const result = await guard.protectPage({
+        level: "approved",
+        gateId: "campusGate",
+        contentId: "campusContent",
+        messageId: "campusGateMessage"
+      });
+
+      if (!result || !result.user) return;
+
+      const client = result.client || guard.getClient();
+      const userId = result.user.id;
+
+      const { data: season, error: seasonError } =
+        await client
+          .from("crown_seasons")
+          .select("id, name")
+          .eq("name", "November 2026")
+          .maybeSingle();
+
+      if (seasonError || !season) {
+        grid.textContent = "November housing is not available yet.";
+        return;
+      }
+
+      const { data: teams, error: teamsError } =
+        await client
+          .from("crown_teams")
+          .select(`
+            id,
+            name,
+            emoji,
+            housing_dorm_settings (
+              id,
+              description,
+              theme_name,
+              primary_color,
+              secondary_color
+            )
+          `)
+          .eq("season_id", season.id)
+          .order("name");
+
+      if (teamsError) {
+        console.error("Housing load error:", teamsError);
+        grid.textContent = "Unable to load dorms right now.";
+        return;
+      }
+
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("team_id, status")
+          .eq("season_id", season.id)
+          .eq("user_id", userId)
+          .maybeSingle();
+
+      if (enrollmentError) {
+        console.error("Enrollment error:", enrollmentError);
+      }
+
+      const dorms = teams || [];
+      grid.replaceChildren();
+
+      dorms.forEach(team => {
+        const settings = team.housing_dorm_settings;
+        const dorm = Array.isArray(settings)
+          ? settings[0]
+          : settings;
+
+        const isResident =
+          enrollment?.status === "approved" &&
+          enrollment?.team_id === team.id;
+
+        const card = document.createElement("article");
+        card.className = "dorm-card";
+
+        const banner = document.createElement("div");
+        banner.className = "dorm-banner";
+        banner.style.background =
+          dorm?.primary_color || "#e8b4c8";
+        banner.textContent = team.emoji || "🏡";
+
+        const content = document.createElement("div");
+        content.className = "dorm-content";
+
+        const heading = document.createElement("h3");
+        heading.textContent = team.name;
+
+        const theme = document.createElement("div");
+        theme.className = "theme-name";
+        theme.textContent = dorm?.theme_name || "Campus Dorm";
+
+        const description = document.createElement("p");
+        description.className = "dorm-description";
+        description.textContent =
+          dorm?.description || "Your cozy campus home.";
+
+        const button = document.createElement("button");
+        button.className = "dorm-button";
+
+        if (isResident) {
+          button.textContent = "ENTER YOUR DORM →";
+          button.addEventListener("click", () => {
+            window.location.href =
+              "dorm.html?team=" + encodeURIComponent(team.id);
+          });
+        } else {
+          button.textContent = "RESIDENTS ONLY 🔒";
+          button.disabled = true;
+        }
+
+        content.append(
+          heading,
+          theme,
+          description,
+          button
+        );
+
+        card.append(banner, content);
+        grid.appendChild(card);
+      });
+
+      if (!dorms.length) {
+        grid.textContent = "No dorms are available yet.";
+      }
+    })();
+  </script>
+
+</body>
+</html>
