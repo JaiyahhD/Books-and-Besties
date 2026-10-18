@@ -66,38 +66,63 @@
       letter-spacing: 1px;
     }
 
-    
-/* 📣 Campus Announcements */
-.housing-announcements-wrap {
-  margin-top: 24px;
-}
+    /* Campus Navigation */
+    .housing-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      max-width: 1000px;
+      margin: 28px auto 0;
+    }
 
-.housing-announcements-link {
-  display: inline-block;
-  padding: 17px 30px;
-  background: #fff0f6;
-  color: var(--espresso);
-  border: 1px solid var(--pink);
-  border-radius: 18px;
-  text-decoration: none;
-  font: 700 12px Arial, sans-serif;
-  letter-spacing: 1px;
-  box-shadow: 0 8px 25px #563b3b12;
-  transition: transform .2s, box-shadow .2s;
-}
+    .housing-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 240px;
+      max-width: 310px;
+      min-height: 105px;
+      padding: 20px;
+      background: #fff0f6;
+      color: var(--espresso);
+      border: 1px solid var(--pink);
+      border-radius: 18px;
+      text-decoration: none;
+      font: 700 12px Arial, sans-serif;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 25px #563b3b12;
+      transition: transform .2s, box-shadow .2s;
+    }
 
-.housing-announcements-link span {
-  display: block;
-  margin-top: 8px;
-  font: 12px Georgia, serif;
-  letter-spacing: 0;
-  color: var(--rose);
-}
+    .housing-link span {
+      display: block;
+      margin-top: 10px;
+      font: 12px Georgia, serif;
+      letter-spacing: 0;
+      color: var(--rose);
+      line-height: 1.5;
+    }
 
-.housing-announcements-link:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px #563b3b20;
-}
+    .housing-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px #563b3b20;
+    }
+
+    .housing-link.crown-link {
+      background: #fff8e8;
+      border-color: #e4c99d;
+    }
+
+    .housing-link.staff-link {
+      background: #edf3ec;
+      border-color: var(--sage);
+    }
+
+    .housing-link[hidden] {
+      display: none !important;
+    }
 
     .housing-container {
       max-width: 1180px;
@@ -204,14 +229,33 @@
       line-height: 1.7;
     }
 
-        #campusContent[style*="display: block"] {
-        display: block;
-        }
+    #campusContent[style*="display: block"] {
+      display: block;
+    }
 
     @media (max-width: 850px) {
-      .dorm-grid { grid-template-columns: 1fr; }
-      .dorm-description { min-height: auto; }
-      .housing-header { padding-top: 40px; }
+      .dorm-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dorm-description {
+        min-height: auto;
+      }
+
+      .housing-header {
+        padding-top: 40px;
+      }
+
+      .housing-links {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .housing-link {
+        flex: none;
+        width: 100%;
+        max-width: 450px;
+      }
     }
   </style>
 </head>
@@ -227,6 +271,7 @@
   <main id="campusContent">
 
     <header class="housing-header">
+
       <div class="eyebrow">
         BESTIE UNIVERSITY · RESIDENTIAL LIFE
       </div>
@@ -239,17 +284,46 @@
         and the campus memories are made.
       </p>
 
-      
-    <div class="season-pill">
-      ☕ NOVEMBER 2026 · THE VELVET LATTE LOUNGE
-    </div>
+      <div class="season-pill">
+        ☕ NOVEMBER 2026 · THE VELVET LATTE LOUNGE
+      </div>
 
-<div class="housing-announcements-wrap">
-  <a href="announcements.html" class="housing-announcements-link">
-    📣 CAMPUS ANNOUNCEMENTS
-    <span>Catch up on campus news & sweet dorm updates 💌</span>
-  </a>
-</div>
+      <!-- CAMPUS NAVIGATION -->
+      <div class="housing-links">
+
+        <a
+          href="announcements.html"
+          class="housing-link"
+        >
+          📣 CAMPUS ANNOUNCEMENTS
+          <span>
+            Catch up on campus news & sweet dorm updates 💌
+          </span>
+        </a>
+
+        <a
+          href="monthly-crown.html"
+          class="housing-link crown-link"
+        >
+          👑 MONTHLY CROWN HQ
+          <span>
+            Log your reads, earn pages & climb the leaderboard
+          </span>
+        </a>
+
+        <a
+          href="crown-review.html"
+          id="crownReviewLink"
+          class="housing-link staff-link"
+          hidden
+        >
+          🛡️ CROWN REVIEW DESK
+          <span>
+            Staff-only submission reviews & scoring corrections
+          </span>
+        </a>
+
+      </div>
 
     </header>
 
@@ -281,8 +355,8 @@
 
   <script>
     (async function () {
-      const grid = document.getElementById("dormGrid");
 
+      const grid = document.getElementById("dormGrid");
       const guard = window.BB_CAMPUS_GUARD;
 
       if (!guard) {
@@ -303,6 +377,19 @@
       const client = result.client || guard.getClient();
       const userId = result.user.id;
 
+      // STAFF-ONLY CROWN REVIEW LINK
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Campus staff check error:", staffError);
+      }
+
+      if (isStaff === true) {
+        document.getElementById("crownReviewLink").hidden = false;
+      }
+
+      // LOAD NOVEMBER CROWN SEASON
       const { data: season, error: seasonError } =
         await client
           .from("crown_seasons")
@@ -315,6 +402,7 @@
         return;
       }
 
+      // LOAD SEASON TEAMS AND DORM SETTINGS
       const { data: teams, error: teamsError } =
         await client
           .from("crown_teams")
@@ -339,6 +427,7 @@
         return;
       }
 
+      // CHECK RESIDENT'S APPROVED TEAM
       const { data: enrollment, error: enrollmentError } =
         await client
           .from("crown_enrollments")
@@ -355,6 +444,7 @@
       grid.replaceChildren();
 
       dorms.forEach(team => {
+
         const settings = team.housing_dorm_settings;
         const dorm = Array.isArray(settings)
           ? settings[0]
@@ -381,7 +471,8 @@
 
         const theme = document.createElement("div");
         theme.className = "theme-name";
-        theme.textContent = dorm?.theme_name || "Campus Dorm";
+        theme.textContent =
+          dorm?.theme_name || "Campus Dorm";
 
         const description = document.createElement("p");
         description.className = "dorm-description";
@@ -393,10 +484,12 @@
 
         if (isResident) {
           button.textContent = "ENTER YOUR DORM →";
+
           button.addEventListener("click", () => {
             window.location.href =
               "dorm.html?team=" + encodeURIComponent(team.id);
           });
+
         } else {
           button.textContent = "RESIDENTS ONLY 🔒";
           button.disabled = true;
@@ -411,12 +504,18 @@
 
         card.append(banner, content);
         grid.appendChild(card);
+
       });
 
       if (!dorms.length) {
         grid.textContent = "No dorms are available yet.";
       }
-    })();
+
+    })().catch(error => {
+      console.error("Campus Housing error:", error);
+      document.getElementById("dormGrid").textContent =
+        "Unable to load campus housing right now.";
+    });
   </script>
 
 </body>

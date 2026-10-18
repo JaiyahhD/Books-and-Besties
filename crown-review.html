@@ -1,0 +1,511 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crown Review Desk | Bestie University</title>
+
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --rose: #b96d91;
+      --cream: #fff8f2;
+      --espresso: #563b3b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff8f2, #f8dce8);
+      color: var(--espresso);
+      font-family: Georgia, serif;
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    .page {
+      max-width: 1100px;
+      margin: auto;
+      padding: 30px 20px 80px;
+    }
+
+    .gate {
+      max-width: 600px;
+      margin: 100px auto;
+      padding: 25px;
+      text-align: center;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .top-nav a {
+      color: var(--espresso);
+      text-decoration: none;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #e8b4c8, #f7e6db);
+      border-radius: 25px;
+      padding: 45px 25px;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 3px;
+      color: var(--rose);
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 55px);
+      margin: 15px 0;
+    }
+
+    .hero p {
+      line-height: 1.7;
+      margin-bottom: 0;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 22px;
+      box-shadow: 0 10px 30px #563b3b10;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar select {
+      padding: 12px;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      min-width: 200px;
+      background: white;
+    }
+
+    .review-card {
+      padding: 22px 0;
+      border-bottom: 1px solid #f0e5e8;
+    }
+
+    .review-card:last-child { border-bottom: none; }
+
+    .review-card h3 {
+      font-size: 21px;
+      margin: 0 0 10px;
+    }
+
+    .meta {
+      font: 13px Arial, sans-serif;
+      line-height: 1.9;
+      opacity: .8;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #fff0f6;
+      font: 700 11px Arial, sans-serif;
+      margin: 12px 0;
+    }
+
+    .review-fields {
+      display: grid;
+      grid-template-columns: 160px 170px 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .field label {
+      display: block;
+      font: 700 11px Arial, sans-serif;
+      margin-bottom: 7px;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #ddcdd2;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .field textarea {
+      min-height: 44px;
+      resize: vertical;
+    }
+
+    .save-button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      background: var(--espresso);
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .save-button:disabled { opacity: .5; }
+
+    .empty {
+      text-align: center;
+      padding: 35px 15px;
+      opacity: .75;
+    }
+
+    @media (max-width: 700px) {
+      .review-fields {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">
+      Verifying campus staff access...
+    </p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+    <nav class="top-nav">
+      <a href="monthly-crown.html">← MONTHLY CROWN HQ</a>
+      <a href="campus-hq.html">CAMPUS HQ 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · STAFF OPERATIONS
+      </div>
+      <h1>👑 Crown Review Desk</h1>
+      <p>
+        Review completed-book submissions, correct page counts,
+        and void ineligible entries without deleting records.
+      </p>
+    </header>
+
+    <section class="panel toolbar">
+      <div>
+        <h2>Submission Management 💌</h2>
+        <p id="reviewStatus">Loading submissions...</p>
+      </div>
+
+      <select id="statusFilter">
+        <option value="all">All Submissions</option>
+        <option value="eligible">Eligible Only</option>
+        <option value="voided">Voided Only</option>
+      </select>
+    </section>
+
+    <section class="panel">
+      <div id="reviewList">
+        <div class="empty">Loading Crown records...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const $ = id => document.getElementById(id);
+
+      const guard = window.BB_CAMPUS_GUARD;
+
+      function deny(message) {
+        $("campusContent").hidden = true;
+        $("campusContent").style.display = "none";
+        $("campusGate").hidden = false;
+        $("campusGate").style.display = "block";
+        $("campusGateMessage").textContent = message;
+      }
+
+      if (!guard) {
+        deny("Campus authentication unavailable.");
+        return;
+      }
+
+      const result = await guard.protectPage({
+        level: "approved",
+        gateId: "campusGate",
+        contentId: "campusContent",
+        messageId: "campusGateMessage"
+      });
+
+      if (!result?.user) return;
+
+      const client = result.client || guard.getClient();
+
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError || isStaff !== true) {
+        deny("This desk is reserved for campus staff. 💗");
+        return;
+      }
+
+      $("campusGate").style.display = "none";
+      $("campusContent").hidden = false;
+      $("campusContent").style.display = "block";
+
+      const { data: season, error: seasonError } =
+        await client
+          .from("crown_seasons")
+          .select("id, name")
+          .eq("name", "November 2026")
+          .maybeSingle();
+
+      if (seasonError || !season) {
+        $("reviewStatus").textContent =
+          "November Crown season unavailable.";
+        return;
+      }
+
+      let allSubmissions = [];
+
+      async function loadSubmissions() {
+        const { data, error } = await client
+          .from("crown_submissions")
+          .select(
+            "id, user_id, team_id, book_title, book_author, " +
+            "pages_read, rating, completed_on, status, " +
+            "staff_note, created_at"
+          )
+          .eq("season_id", season.id)
+          .order("created_at", { ascending: false })
+          .limit(500);
+
+        if (error) {
+          console.error("Crown review loading error:", error);
+          $("reviewStatus").textContent =
+            "Unable to load submissions.";
+          return;
+        }
+
+        allSubmissions = data || [];
+
+        const userIds = [...new Set(
+          allSubmissions.map(item => item.user_id)
+        )];
+
+        const teamIds = [...new Set(
+          allSubmissions.map(item => item.team_id)
+        )];
+
+        const names = new Map();
+        const teams = new Map();
+
+        if (userIds.length) {
+          const { data: profiles, error: profileError } =
+            await client
+              .from("profiles")
+              .select("id, display_name")
+              .in("id", userIds);
+
+          if (profileError) {
+            console.error("Profile loading error:", profileError);
+          }
+
+          for (const profile of profiles || []) {
+            names.set(profile.id, profile.display_name);
+          }
+        }
+
+        if (teamIds.length) {
+          const { data: teamData, error: teamError } =
+            await client
+              .from("crown_teams")
+              .select("id, name, emoji")
+              .in("id", teamIds);
+
+          if (teamError) {
+            console.error("Team loading error:", teamError);
+          }
+
+          for (const team of teamData || []) {
+            teams.set(
+              team.id,
+              `${team.emoji || "🏡"} ${team.name}`
+            );
+          }
+        }
+
+        const filter = $("statusFilter").value;
+        const visible = allSubmissions.filter(item =>
+          filter === "all" || item.status === filter
+        );
+
+        $("reviewStatus").textContent =
+          `${visible.length} submission(s) · ${season.name}`;
+
+        const container = $("reviewList");
+        container.replaceChildren();
+
+        if (!visible.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent =
+            "No submissions match this filter yet. 💗";
+          container.appendChild(empty);
+          return;
+        }
+
+        for (const item of visible) {
+          const card = document.createElement("article");
+          card.className = "review-card";
+
+          const title = document.createElement("h3");
+          title.textContent = item.book_title;
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent =
+            `${item.book_author} · ${item.pages_read} pages\n` +
+            `${names.get(item.user_id) || "Bestie"} · ` +
+            `${teams.get(item.team_id) || "Crown Team"}\n` +
+            `Completed: ${item.completed_on}`;
+
+          meta.style.whiteSpace = "pre-line";
+
+          const badge = document.createElement("div");
+          badge.className = "status-pill";
+          badge.textContent = item.status === "eligible"
+            ? "👑 Eligible"
+            : "🚫 Voided";
+
+          const fields = document.createElement("div");
+          fields.className = "review-fields";
+
+          const statusField = document.createElement("div");
+          statusField.className = "field";
+
+          const statusLabel = document.createElement("label");
+          statusLabel.textContent = "Submission Status";
+
+          const statusSelect = document.createElement("select");
+
+          for (const value of ["eligible", "voided"]) {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent =
+              value === "eligible" ? "Eligible" : "Voided";
+            statusSelect.appendChild(option);
+          }
+
+          statusSelect.value = item.status;
+          statusField.append(statusLabel, statusSelect);
+
+          const pagesField = document.createElement("div");
+          pagesField.className = "field";
+
+          const pagesLabel = document.createElement("label");
+          pagesLabel.textContent = "Eligible Page Count";
+
+          const pagesInput = document.createElement("input");
+          pagesInput.type = "number";
+          pagesInput.min = "1";
+          pagesInput.max = "10000";
+          pagesInput.value = item.pages_read;
+
+          pagesField.append(pagesLabel, pagesInput);
+
+          const noteField = document.createElement("div");
+          noteField.className = "field";
+
+          const noteLabel = document.createElement("label");
+          noteLabel.textContent = "Staff Note";
+
+          const noteInput = document.createElement("textarea");
+          noteInput.placeholder = "Reason for correction...";
+          noteInput.value = item.staff_note || "";
+
+          noteField.append(noteLabel, noteInput);
+
+          fields.append(
+            statusField,
+            pagesField,
+            noteField
+          );
+
+          const saveButton = document.createElement("button");
+          saveButton.type = "button";
+          saveButton.className = "save-button";
+          saveButton.textContent = "SAVE REVIEW 👑";
+
+          saveButton.addEventListener("click", async () => {
+            const pages = Number(pagesInput.value);
+
+            if (!Number.isInteger(pages) ||
+                pages < 1 || pages > 10000) {
+              alert("Enter a valid page count (1–10000).");
+              return;
+            }
+
+            if (!confirm("Save this submission review?")) return;
+
+            saveButton.disabled = true;
+
+            const { data: saved, error } = await client.rpc(
+              "review_crown_submission",
+              {
+                p_submission_id: item.id,
+                p_status: statusSelect.value,
+                p_pages_read: pages,
+                p_staff_note: noteInput.value.trim()
+              }
+            );
+
+            if (error || saved !== true) {
+              console.error("Crown review error:", error);
+              alert("Couldn't save this review.");
+              saveButton.disabled = false;
+              return;
+            }
+
+            await loadSubmissions();
+          });
+
+          card.append(title, meta, badge, fields, saveButton);
+          container.appendChild(card);
+        }
+      }
+
+      $("statusFilter").addEventListener(
+        "change",
+        loadSubmissions
+      );
+
+      await loadSubmissions();
+
+    })().catch(error => {
+      console.error("Crown Review Desk error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Unable to load the Crown Review Desk.";
+    });
+  </script>
+</body>
+</html>
