@@ -1,0 +1,434 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fff4f7">
+
+  <title>Bestie Login | Bestie University</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    .login-campus {
+      min-height: 100vh;
+      padding: 55px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        radial-gradient(circle at 15% 12%, #ffe0ed, transparent 35%),
+        radial-gradient(circle at 85% 85%, #d8f4ef, transparent 35%),
+        #fff8f6;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border: 2px solid #f1c5d7;
+      border-radius: 28px;
+      padding: 36px;
+      text-align: center;
+      box-shadow: 0 18px 50px #874d6820;
+    }
+
+    .login-logo {
+      width: 85px;
+      height: 85px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .login-kicker {
+      color: #a45a80;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .login-card h1 {
+      color: #65374d;
+      font-size: clamp(29px, 5vw, 39px);
+      margin: 12px 0;
+    }
+
+    .login-subtitle {
+      color: #856a79;
+      line-height: 1.7;
+      margin-bottom: 27px;
+    }
+
+    .login-form {
+      text-align: left;
+    }
+
+    .login-field {
+      margin-bottom: 19px;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: #65374d;
+      margin-bottom: 8px;
+    }
+
+    .login-field input {
+      width: 100%;
+      padding: 15px;
+      border: 1.5px solid #ebcad8;
+      border-radius: 13px;
+      background: #fffafb;
+      color: #49303c;
+      font: inherit;
+    }
+
+    .login-field input:focus {
+      outline: 2px solid #bd7798;
+      outline-offset: 2px;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #d17ba4, #984d79);
+      color: white;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .login-button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .login-message {
+      display: none;
+      padding: 16px;
+      border-radius: 13px;
+      margin: 20px 0;
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .login-message.success {
+      display: block;
+      background: #e5f4ec;
+      color: #285e44;
+    }
+
+    .login-message.pending {
+      display: block;
+      background: #fff4dc;
+      color: #765323;
+    }
+
+    .login-message.error {
+      display: block;
+      background: #fff0f1;
+      color: #993d50;
+    }
+
+    .login-message.info {
+      display: block;
+      background: #edf3fb;
+      color: #365a7a;
+    }
+
+    .login-links {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #846a78;
+      line-height: 2.2;
+    }
+
+    .login-links a {
+      color: #a14d7b;
+      font-weight: 800;
+    }
+
+    .login-status {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #fce5ee;
+      color: #995477;
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="login-campus">
+
+    <section class="login-card">
+
+      <img
+        src="assets/logo.png"
+        alt="Books & Besties logo"
+        class="login-logo"
+      >
+
+      <div class="login-kicker">
+        🎓 BESTIE UNIVERSITY
+      </div>
+
+      <h1>Welcome Back, Bestie! ♡</h1>
+
+      <p class="login-subtitle">
+        Your campus era is calling!
+        Sign in to check your admissions status
+        and continue your bookish journey. 💗
+      </p>
+
+      <div
+        id="loginMessage"
+        class="login-message"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <form id="loginForm" class="login-form">
+
+        <div class="login-field">
+          <label for="loginEmail">Email Address</label>
+          <input
+            id="loginEmail"
+            type="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="login-field">
+          <label for="loginPassword">Password</label>
+          <input
+            id="loginPassword"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button
+          id="loginButton"
+          type="submit"
+          class="login-button"
+        >
+          Enter Bestie University ♡
+        </button>
+
+      </form>
+
+      <div class="login-links">
+        New to campus?
+        <a href="register.html">Apply for Admission</a>
+
+        <div>
+          <a href="index.html#home">
+            ← Back to Campus Quad
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const config = window.BB_CONFIG;
+
+      const form = document.getElementById("loginForm");
+      const button = document.getElementById("loginButton");
+      const messageBox = document.getElementById("loginMessage");
+
+      function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className = "login-message " + type;
+      }
+
+      if (
+        !config?.SUPABASE_URL ||
+        !config?.SUPABASE_ANON_KEY ||
+        !window.supabase
+      ) {
+        showMessage(
+          "Campus login is temporarily unavailable.",
+          "error"
+        );
+        button.disabled = true;
+        return;
+      }
+
+      const client = window.supabase.createClient(
+        config.SUPABASE_URL,
+        config.SUPABASE_ANON_KEY
+      );
+
+      async function checkCampusStatus(userId) {
+        const { data, error } = await client
+          .from("profiles")
+          .select(
+            "id, display_name, membership_status"
+          )
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (error) {
+          throw new Error(
+            "We couldn't verify your campus status. " +
+            "Please try again."
+          );
+        }
+
+        if (!data) {
+          throw new Error(
+            "Your campus profile could not be found. " +
+            "Please contact an administrator."
+          );
+        }
+
+        return data;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const email = document
+          .getElementById("loginEmail")
+          .value.trim();
+
+        const password = document
+          .getElementById("loginPassword")
+          .value;
+
+        button.disabled = true;
+        button.textContent = "Checking campus ID... ♡";
+
+        try {
+          const { data, error } =
+            await client.auth.signInWithPassword({
+              email,
+              password
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          if (!data?.user) {
+            throw new Error(
+              "We couldn't complete your sign-in."
+            );
+          }
+
+          const profile =
+            await checkCampusStatus(data.user.id);
+
+          if (profile.membership_status === "pending") {
+            await client.auth.signOut();
+
+            showMessage(
+              "💌 Heyyy, " +
+              profile.display_name +
+              "! Your email is verified and your " +
+              "application is waiting for the Dean's " +
+              "approval. You're not approved for " +
+              "campus access just yet. ♡",
+              "pending"
+            );
+
+            return;
+          }
+
+          if (profile.membership_status === "declined") {
+            await client.auth.signOut();
+
+            showMessage(
+              "Your campus application is not approved. " +
+              "Please contact the Books & Besties admins " +
+              "if you have questions.",
+              "error"
+            );
+
+            return;
+          }
+
+          if (profile.membership_status === "suspended") {
+            await client.auth.signOut();
+
+            showMessage(
+              "Your campus access is currently suspended. " +
+              "Please contact an administrator.",
+              "error"
+            );
+
+            return;
+          }
+
+          if (profile.membership_status !== "approved") {
+            await client.auth.signOut();
+
+            throw new Error(
+              "Your campus membership could not be verified."
+            );
+          }
+
+          showMessage(
+            "🎓💗 Welcome back, " +
+            profile.display_name +
+            "! Your campus membership is approved.",
+            "success"
+          );
+
+          // This page confirms authentication and membership.
+          // The main website's older auth routes still need
+          // integration before opening member features.
+          // Do not redirect to the old dashboard yet.
+
+        } catch (error) {
+          showMessage(
+            error.message ||
+            "Login failed. Please try again.",
+            "error"
+          );
+
+        } finally {
+          button.disabled = false;
+          button.textContent =
+            "Enter Bestie University ♡";
+        }
+      });
+
+    })();
+  </script>
+
+</body>
+</html>
