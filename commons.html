@@ -758,9 +758,10 @@
 
         <div class="panel">
 
-          <div class="panel-head">
-            📣 CAMPUS BUZZ
-          </div>
+          
+        <div class="panel-body" id="campusBuzz">
+          <p>💗 Loading campus announcements...</p>
+        </div>
 
           <div class="panel-body">
 
@@ -822,6 +823,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/campus-guard.js"></script>
+  <script src="js/commons-reports.js"></script>
+  <script src="js/campus-buzz.js"></script>
   <script src="js/commons-chat.js"></script>
   <script src="js/commons-posts.js"></script>
   <script src="js/commons-comments.js"></script>
@@ -1150,6 +1153,11 @@
         result.client,
         result.user
         );
+        
+      await window.BB_CAMPUS_BUZZ.startCampusBuzz(
+        result.client
+      );
+
               }
 
       initializeCommons().catch(error => {
