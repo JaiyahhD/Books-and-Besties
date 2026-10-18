@@ -485,6 +485,14 @@
       content.hidden = false;
       content.style.display = "block";
 
+      
+    const { data: isStaff, error: staffError } =
+    await client.rpc("is_campus_staff");
+
+    if (staffError) {
+    console.error("Staff verification error:", staffError);
+    }
+
       const names = new Map();
       
       // 💗 Reading Nook reactions
@@ -645,7 +653,71 @@
           body.className = "thread-content";
           body.textContent = thread.content;
 
-          card.append(tag, meta, title, author, body);      
+          card.append(tag, meta, title, author, body);  
+          
+if (isStaff === true && thread.author_id !== result.user.id) {
+  const moderateThreadButton = document.createElement("button");
+  moderateThreadButton.type = "button";
+  moderateThreadButton.className = "nook-edit-button";
+  moderateThreadButton.textContent = "🛡️ Moderate Discussion";
+
+  moderateThreadButton.addEventListener("click", async () => {
+    if (!confirm("Remove this discussion and hide its replies as campus staff?")) {
+      return;
+    }
+
+    moderateThreadButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "moderate_reading_thread",
+      { p_thread_id: thread.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Discussion moderation error:", error);
+      alert("Couldn't moderate this discussion.");
+      moderateThreadButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  card.appendChild(moderateThreadButton);
+}
+
+          
+if (thread.author_id === result.user.id) {
+  const removeThreadButton = document.createElement("button");
+  removeThreadButton.type = "button";
+  removeThreadButton.className = "nook-edit-button";
+  removeThreadButton.textContent = "🗑️ Remove Discussion";
+
+  removeThreadButton.addEventListener("click", async () => {
+    if (!confirm("Remove this discussion and hide its replies?")) {
+      return;
+    }
+
+    removeThreadButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "remove_own_reading_thread",
+      { p_thread_id: thread.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Discussion removal error:", error);
+      alert("Couldn't remove this discussion.");
+      removeThreadButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  card.appendChild(removeThreadButton);
+}
+    
           
 if (thread.author_id === result.user.id) {
   const editThreadButton = document.createElement("button");
@@ -747,6 +819,66 @@ if (thread.author_id === result.user.id) {
               replyText.textContent = reply.content;
 
               replyCard.append(replyAuthor, replyDate, replyText);
+              
+if (isStaff === true && reply.author_id !== result.user.id) {
+  const moderateReplyButton = document.createElement("button");
+  moderateReplyButton.type = "button";
+  moderateReplyButton.className = "nook-edit-button";
+  moderateReplyButton.textContent = "🛡️ Moderate Reply";
+
+  moderateReplyButton.addEventListener("click", async () => {
+    if (!confirm("Remove this reply as campus staff?")) return;
+
+    moderateReplyButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "moderate_reading_reply",
+      { p_reply_id: reply.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Reply moderation error:", error);
+      alert("Couldn't moderate this reply.");
+      moderateReplyButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  replyCard.appendChild(moderateReplyButton);
+}
+
+              
+if (reply.author_id === result.user.id) {
+  const removeReplyButton = document.createElement("button");
+  removeReplyButton.type = "button";
+  removeReplyButton.className = "nook-edit-button";
+  removeReplyButton.textContent = "🗑️ Remove Reply";
+
+  removeReplyButton.addEventListener("click", async () => {
+    if (!confirm("Remove this bookish reply?")) return;
+
+    removeReplyButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "remove_own_reading_reply",
+      { p_reply_id: reply.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Reply removal error:", error);
+      alert("Couldn't remove this reply.");
+      removeReplyButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  replyCard.appendChild(removeReplyButton);
+}
+
               
 if (reply.author_id === result.user.id) {
   const editReplyButton = document.createElement("button");
