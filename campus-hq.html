@@ -526,9 +526,9 @@
 
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
-        Member Admissions, Campus Overview, and Campus Mail
-        announcements are live. Other management tools remain
-        browser-local previews and do not publish changes.
+        Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
+        and Dorm Design Studio are live. Activity, Honors, Pink Ballot,
+        and Bestie Access planners remain browser-local previews.
       </div>
 
       <div class="layout">
@@ -562,6 +562,10 @@
 
           <button class="nav-btn" data-section="crown">
             👑 Monthly Crown
+          </button>
+
+          <button class="nav-btn" data-section="dorm-design">
+            🎨 Dorm Design Studio
           </button>
 
           <button class="nav-btn" data-section="commons">
@@ -950,69 +954,75 @@
             </div>
           </section>
 
-          <!-- MONTHLY CROWN -->
-
+          <!-- LIVE MONTHLY CROWN LINKS -->
           <section class="section" id="section-crown">
-            <h2 class="section-heading">
-              👑 Monthly Crown Management
-            </h2>
-
-            <p class="section-description">
-              Competition administration remains separate
-              from general campus membership.
-            </p>
-
+            <h2 class="section-heading">👑 Monthly Crown Management</h2>
+            <p class="section-description">Your live Monthly Crown and Campus Housing tools. Season records, submissions, and teams are stored in Supabase.</p>
             <div class="grid">
-
               <div class="panel">
-                <div class="panel-head">
-                  🏠 CAMPUS HOUSING
-                </div>
-
+                <div class="panel-head">🏡 CAMPUS HOUSING</div>
                 <div class="panel-body">
-                  <div class="item">
-                    <h4>💋 Vicious Vixens</h4>
-                    <p>Admin-assigned competition team</p>
+                  <p>Explore your real seasonal dorms and resident spaces.</p>
+                  <div class="actions">
+                    <a class="btn secondary" href="housing.html">🏡 View Campus Housing ↗</a>
+                    <button class="btn" type="button" data-jump="dorm-design">🎨 Customize Dorms</button>
                   </div>
-
-                  <div class="item">
-                    <h4>👻 The Ghoulfriends</h4>
-                    <p>Admin-assigned competition team</p>
-                  </div>
-
-                  <div class="item">
-                    <h4>🔮 Pretty Little Hexes</h4>
-                    <p>Admin-assigned competition team</p>
-                  </div>
-
-                  <p class="mini">
-                    Season assignments and team transfers
-                    will connect to Supabase later.
-                  </p>
                 </div>
               </div>
-
               <div class="panel">
-                <div class="panel-head">
-                  📚 READING SUBMISSIONS
-                </div>
-
+                <div class="panel-head">📚 MONTHLY CROWN HQ</div>
                 <div class="panel-body">
-                  <p>
-                    Future tools will include submission review,
-                    score adjustments, season management,
-                    and team standings.
-                  </p>
-
-                  <a
-                    class="btn secondary"
-                    href="index.html#crown"
-                  >
-                    Visit Monthly Crown ↗
-                  </a>
+                  <p>Visit the live reading log, leaderboards, and staff submission review desk.</p>
+                  <div class="actions">
+                    <a class="btn secondary" href="monthly-crown.html">👑 Monthly Crown HQ ↗</a>
+                    <a class="btn light" href="crown-review.html">🛡️ Review Submissions ↗</a>
+                  </div>
                 </div>
               </div>
+            </div>
+          </section>
 
+          <!-- LIVE SEASONAL DORM CUSTOMIZATION -->
+          <section class="section" id="section-dorm-design">
+            <h2 class="section-heading">🎨 Dorm Design Studio</h2>
+            <p class="section-description">Give every seasonal dorm its own personality! Admins can save these settings directly to Supabase. Moderators can view the current designs.</p>
+            <div class="panel">
+              <div class="panel-head">💌 CHOOSE YOUR SEASON & DORM</div>
+              <div class="panel-body">
+                <p id="dormDesignStatus" role="status" aria-live="polite" class="mini">Loading seasonal dorms...</p>
+                <div class="form-grid">
+                  <label class="field"><span>Monthly Crown Season</span><select id="designSeason"><option value="">Loading seasons...</option></select></label>
+                  <label class="field"><span>Team / Dorm</span><select id="designTeam"><option value="">Choose a season first</option></select></label>
+                </div>
+              </div>
+            </div>
+            <div class="panel" id="dormDesignEditor" hidden>
+              <div class="panel-head">✨ THE DORM MAKEOVER</div>
+              <div class="panel-body">
+                <form id="dormDesignForm">
+                  <label class="field"><span>Dorm Theme Name</span><input id="designThemeName" maxlength="100" required placeholder="Mocha Muse Manor"></label>
+                  <label class="field"><span>Welcome Description</span><textarea id="designDescription" maxlength="1500" placeholder="Welcome home, Besties!"></textarea></label>
+                  <div class="form-grid">
+                    <label class="field"><span>Primary Color</span><input id="designPrimary" type="color" value="#e8b4c8"></label>
+                    <label class="field"><span>Secondary Color</span><input id="designSecondary" type="color" value="#fff3e6"></label>
+                    <label class="field"><span>Accent Color</span><input id="designAccent" type="color" value="#c76b91"></label>
+                    <label class="field"><span>Banner Image URL (optional)</span><input id="designBanner" type="url" maxlength="2000" placeholder="https://example.com/dorm-banner.jpg"></label>
+                  </div>
+                  <div id="designPreview" style="padding:25px;border-radius:18px;border:3px solid #fff;margin:22px 0;box-shadow:0 5px 15px #0001">
+                    <div class="kicker" style="font-size:11px">BESTIE UNIVERSITY · RESIDENTIAL LIFE</div>
+                    <h3 id="designPreviewName" style="font-size:28px;margin:14px 0 7px">Your Dorm</h3>
+                    <p id="designPreviewDescription" style="font-weight:800;line-height:1.6"></p>
+                    <img id="designPreviewBanner" alt="Dorm banner preview" style="width:100%;max-height:240px;object-fit:cover;border-radius:13px;margin-top:12px" hidden>
+                  </div>
+                  <div class="actions">
+                    <button id="designSave" class="btn secondary" type="submit">💗 Save Dorm Makeover</button>
+                    <button id="designReset" class="btn light" type="button">↩️ Reset Unsaved Changes</button>
+                    <a id="designVisit" class="btn light" href="housing.html">🏡 Visit Dorm</a>
+                  </div>
+                  <p id="designSaveMessage" class="mini" role="status" aria-live="polite"></p>
+                </form>
+                <p class="mini">The existing dorm page already displays the saved primary color and description. Theme names, secondary/accent colors and banners are saved now; displaying all of them on the resident page is the next visual integration.</p>
+              </div>
             </div>
           </section>
 
@@ -1734,6 +1744,142 @@
   <script src="js/campus-overview.js"></script>
   <script src="js/campus-announcements.js"></script>
   <script src="js/campus-moderation.js"></script>
+  <script>
+    // Dorm Design Studio: uses existing HQ staff authentication and
+    // a database-enforced admin-only update RPC.
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      let client, admin = false, current = null, teams = [];
+      const hex = (v, fallback) => /^#[0-9a-fA-F]{6}$/.test(v || "") ? v : fallback;
+      const setStatus = message => { $("dormDesignStatus").textContent = message; };
+      const errorText = error => error?.message || "Unknown database error";
+
+      function preview() {
+        const primary = $("designPrimary").value;
+        const secondary = $("designSecondary").value;
+        const accent = $("designAccent").value;
+        const box = $("designPreview");
+        box.style.background = `linear-gradient(135deg, ${primary}, ${secondary})`;
+        box.style.borderColor = accent;
+        $("designPreviewName").textContent = $("designThemeName").value || "Your Dorm";
+        $("designPreviewDescription").textContent = $("designDescription").value || "Your cozy campus home";
+        const url = $("designBanner").value.trim();
+        const img = $("designPreviewBanner");
+        if (/^https:\/\//i.test(url)) {
+          img.src = url;
+          img.hidden = false;
+        } else {
+          img.hidden = true;
+          img.removeAttribute("src");
+        }
+      }
+
+      function fill() {
+        if (!current) return;
+        $("designThemeName").value = current.theme_name || "";
+        $("designDescription").value = current.description || "";
+        $("designPrimary").value = hex(current.primary_color, "#e8b4c8");
+        $("designSecondary").value = hex(current.secondary_color, "#fff3e6");
+        $("designAccent").value = hex(current.accent_color, "#c76b91");
+        $("designBanner").value = current.banner_url || "";
+        $("designSaveMessage").textContent = "";
+        preview();
+      }
+
+      async function selectTeam() {
+        const id = $("designTeam").value;
+        current = null;
+        $("dormDesignEditor").hidden = true;
+        if (!id) return;
+        setStatus("Loading this dorm's saved design...");
+        const { data, error } = await client.from("housing_dorm_settings")
+          .select("id,team_id,theme_name,description,primary_color,secondary_color,accent_color,banner_url")
+          .eq("team_id", id).maybeSingle();
+        if (error) { setStatus("Unable to load dorm settings: " + errorText(error)); return; }
+        if (!data) { setStatus("This team has no dorm settings yet."); return; }
+        current = data;
+        fill();
+        $("designVisit").href = `dorm.html?team=${encodeURIComponent(id)}`;
+        $("dormDesignEditor").hidden = false;
+        setStatus(admin ? "Ready to customize! Changes save to Supabase." : "Viewing existing dorm design. Admin access required to save.");
+      }
+
+      async function selectSeason() {
+        const seasonId = $("designSeason").value;
+        $("dormDesignEditor").hidden = true;
+        $("designTeam").replaceChildren(new Option("Choose a dorm", ""));
+        if (!seasonId) return;
+        setStatus("Loading season teams...");
+        const { data, error } = await client.from("crown_teams")
+          .select("id,name,emoji").eq("season_id", seasonId).order("name");
+        if (error) { setStatus("Unable to load teams: " + errorText(error)); return; }
+        teams = data || [];
+        teams.forEach(t => $("designTeam").add(new Option(`${t.emoji || "🏡"} ${t.name}`, t.id)));
+        setStatus(teams.length ? "Choose a team to customize its dorm." : "No teams for this season yet.");
+      }
+
+      async function initialize() {
+        // Existing campus-hq-auth.js fires this event only after staff approval.
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) {
+          setStatus("Campus staff connection is unavailable. Refresh Campus HQ.");
+          return;
+        }
+        const { data: isAdmin, error: roleError } = await client.rpc("is_campus_admin");
+        if (roleError) { setStatus("Unable to verify admin role: " + errorText(roleError)); return; }
+        admin = isAdmin === true;
+        $("designSave").disabled = !admin;
+        $("designSave").textContent = admin ? "💗 Save Dorm Makeover" : "🔒 Admin Only";
+        ["designThemeName","designDescription","designPrimary","designSecondary","designAccent","designBanner"]
+          .forEach(id => { $(id).disabled = !admin; });
+        $("designReset").disabled = !admin;
+        const { data: seasons, error } = await client.from("crown_seasons")
+          .select("id,name,starts_on").order("starts_on", { ascending: false });
+        if (error) { setStatus("Unable to load seasons: " + errorText(error)); return; }
+        $("designSeason").replaceChildren(new Option("Choose a season", ""));
+        (seasons || []).forEach(s => $("designSeason").add(new Option(s.name, s.id)));
+        const november = (seasons || []).find(s => s.name === "November 2026");
+        if (november) { $("designSeason").value = november.id; await selectSeason(); }
+        else setStatus("Select a season to begin.");
+      }
+
+      $("designSeason").addEventListener("change", selectSeason);
+      $("designTeam").addEventListener("change", selectTeam);
+      ["designThemeName","designDescription","designPrimary","designSecondary","designAccent","designBanner"]
+        .forEach(id => $(id).addEventListener("input", preview));
+      $("designReset").addEventListener("click", fill);
+      $("dormDesignForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        if (!admin || !current) return;
+        const name = $("designThemeName").value.trim();
+        const banner = $("designBanner").value.trim();
+        if (!name) { $("designSaveMessage").textContent = "Please enter a dorm theme name."; return; }
+        if (banner && !/^https:\/\//i.test(banner)) {
+          $("designSaveMessage").textContent = "Banner URLs must begin with https://"; return;
+        }
+        const button = $("designSave");
+        button.disabled = true;
+        $("designSaveMessage").textContent = "Saving your dorm makeover...";
+        const values = {
+          p_team_id: current.team_id,
+          p_theme_name: name,
+          p_description: $("designDescription").value.trim(),
+          p_primary_color: $("designPrimary").value,
+          p_secondary_color: $("designSecondary").value,
+          p_accent_color: $("designAccent").value,
+          p_banner_url: banner || null
+        };
+        const { error } = await client.rpc("save_dorm_design", values);
+        button.disabled = false;
+        if (error) { $("designSaveMessage").textContent = "Save failed: " + errorText(error); return; }
+        $("designSaveMessage").textContent = "💗 Dorm makeover saved to Supabase!";
+        await selectTeam();
+        $("designSaveMessage").textContent = "💗 Dorm makeover saved to Supabase!";
+      });
+      document.addEventListener("bb:campus-hq-ready", initialize, { once: true });
+    })();
+  </script>
 
 </body>
 </html>

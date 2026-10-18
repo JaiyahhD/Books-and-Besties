@@ -624,7 +624,7 @@ feed.appendChild(card);
           await loadAnnouncements();
         });
       }
-    })().catch(error => {
+    }().catch(error => {
       console.error("Campus announcements error:", error);
       document.getElementById("campusGateMessage").textContent =
         "Something went wrong loading announcements.";
