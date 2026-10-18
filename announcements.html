@@ -111,6 +111,35 @@
       opacity: .5;
     }
 
+    
+/* 📣 Announcement Management */
+.announcement-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.announcement-action {
+  border: 1px solid #e8b4c8;
+  border-radius: 10px;
+  background: #fff0f6;
+  color: #563b3b;
+  padding: 10px 14px;
+  cursor: pointer;
+  font: 700 12px Arial, sans-serif;
+}
+
+.announcement-action:hover {
+  background: #f8dce8;
+}
+
+.announcement-action:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+
     .announcement-tag {
       display: inline-block;
       background: #fff0f6;
@@ -345,11 +374,11 @@
             "id, dorm_id, title, content, is_pinned, " +
             "is_published, published_at, expires_at"
           )
-          .eq("is_published", true)
-          .lte("published_at", new Date().toISOString())
-          .order("is_pinned", { ascending: false })
-          .order("published_at", { ascending: false })
-          .limit(100);
+          
+        .order("is_pinned", { ascending: false })
+        .order("published_at", { ascending: false })
+        .limit(100);
+
 
         if (error) {
           console.error("Announcements error:", error);
@@ -361,10 +390,18 @@
 
         const now = new Date();
 
-        const visible = (announcements || []).filter(item =>
-          !item.expires_at ||
-          new Date(item.expires_at) > now
+        
+        const visible = (announcements || []).filter(item => {
+        if (isStaff === true) return true;
+
+        return (
+            item.is_published === true &&
+            item.published_at &&
+            new Date(item.published_at) <= now &&
+            (!item.expires_at || new Date(item.expires_at) > now)
         );
+        });
+
 
         if (!visible.length) {
           status.textContent =
@@ -384,6 +421,11 @@
           tag.textContent = item.dorm_id
             ? dormNames.get(item.dorm_id) || "🏡 Dorm News"
             : "🎓 Campus-Wide";
+            
+        if (isStaff === true && !item.is_published) {
+        tag.textContent += " · 🗂️ UNPUBLISHED";
+        }
+
 
           const title = document.createElement("h3");
           title.textContent =
@@ -399,9 +441,139 @@
           body.className = "announcement-content";
           body.textContent = item.content;
 
-          card.append(tag, title, meta, body);
-          feed.appendChild(card);
-        }
+          
+card.append(tag, title, meta, body);
+
+if (isStaff === true) {
+  const actions = document.createElement("div");
+  actions.className = "announcement-actions";
+
+  function createAction(label, handler) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "announcement-action";
+    button.textContent = label;
+
+    button.addEventListener("click", async () => {
+      const buttons = actions.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+
+      try {
+        await handler();
+      } finally {
+        buttons.forEach(btn => btn.disabled = false);
+      }
+    });
+
+    actions.appendChild(button);
+  }
+
+  // ✏️ Edit announcement
+  createAction("✏️ Edit", async () => {
+    const newTitle = prompt("Edit announcement title:", item.title);
+    if (newTitle === null) return;
+
+    const cleanTitle = newTitle.trim();
+    if (!cleanTitle || cleanTitle.length > 200) {
+      alert("Title must contain 1–200 characters.");
+      return;
+    }
+
+    const newContent = prompt(
+      "Edit announcement content:",
+      item.content
+    );
+
+    if (newContent === null) return;
+
+    const cleanContent = newContent.trim();
+    if (!cleanContent || cleanContent.length > 5000) {
+      alert("Content must contain 1–5000 characters.");
+      return;
+    }
+
+    const { error } = await client
+      .from("housing_announcements")
+      .update({
+        title: cleanTitle,
+        content: cleanContent
+      })
+      .eq("id", item.id);
+
+    if (error) {
+      console.error("Announcement edit error:", error);
+      alert("Couldn't update this announcement.");
+      return;
+    }
+
+    await loadAnnouncements();
+  });
+
+  // 📌 Pin or unpin
+  createAction(
+    item.is_pinned ? "📌 Unpin" : "📌 Pin",
+    async () => {
+      const { error } = await client
+        .from("housing_announcements")
+        .update({ is_pinned: !item.is_pinned })
+        .eq("id", item.id);
+
+      if (error) {
+        console.error("Announcement pin error:", error);
+        alert("Couldn't update the pin.");
+        return;
+      }
+
+      await loadAnnouncements();
+    }
+  );
+
+  
+if (!item.is_published) {
+  createAction("📣 Republish", async () => {
+    const { error } = await client
+      .from("housing_announcements")
+      .update({
+        is_published: true,
+        published_at: new Date().toISOString()
+      })
+      .eq("id", item.id);
+
+    if (error) {
+      console.error("Announcement republish error:", error);
+      alert("Couldn't republish this announcement.");
+      return;
+    }
+
+    await loadAnnouncements();
+  });
+}
+
+  // 🗂️ Unpublish without deleting
+  createAction("🗂️ Unpublish", async () => {
+    if (!confirm(
+      "Unpublish this announcement? Residents will no longer see it."
+    )) return;
+
+    const { error } = await client
+      .from("housing_announcements")
+      .update({ is_published: false })
+      .eq("id", item.id);
+
+    if (error) {
+      console.error("Announcement unpublish error:", error);
+      alert("Couldn't unpublish this announcement.");
+      return;
+    }
+
+    await loadAnnouncements();
+  });
+
+  card.appendChild(actions);
+}
+
+feed.appendChild(card);
+
       }
 
       await loadAnnouncements();
