@@ -1,0 +1,1158 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5a8c8">
+
+  <title>Profile Settings | Bestie University</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    :root {
+      --pink: #ec79ae;
+      --hot-pink: #d74488;
+      --teal: #286f70;
+      --dark: #493345;
+      --muted: #856b7b;
+      --border: #edbfd3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      color: var(--dark);
+      font-family: Nunito, sans-serif;
+      background:
+        radial-gradient(circle at 8% 10%, #ffd7e8, transparent 35%),
+        radial-gradient(circle at 90% 85%, #d4f0eb, transparent 35%),
+        #fff7fa;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar {
+      padding: 17px 6%;
+      background: #302c35;
+      border-bottom: 6px solid var(--pink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      color: white;
+    }
+
+    .brand {
+      font-weight: 900;
+      font-size: 19px;
+    }
+
+    .back-link {
+      background: #ffffff20;
+      border: 1px solid #ffffff60;
+      padding: 10px 16px;
+      border-radius: 25px;
+      font-weight: 900;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 48px 20px;
+      background: linear-gradient(
+        135deg,
+        #ffd0e3,
+        #f3a5c8,
+        #b9e0d9
+      );
+      border-bottom: 6px solid var(--dark);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #ffffffbb;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .hero h1 {
+      font: clamp(30px, 5vw, 56px) Bungee, sans-serif;
+      color: #f44c9c;
+      -webkit-text-stroke: 1px white;
+      text-shadow: 4px 5px 0 #70475e;
+      margin: 17px 0 8px;
+    }
+
+    .hero p {
+      font: 23px Pacifico, cursive;
+      color: #70475e;
+      margin: 0;
+    }
+
+    .container {
+      width: min(950px, 100%);
+      margin: 0 auto;
+      padding: 35px 20px 75px;
+    }
+
+    .panel {
+      background: white;
+      border: 3px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 25px;
+      box-shadow: 6px 7px 0 #efd0de;
+    }
+
+    .panel h2 {
+      margin: 0 0 15px;
+      color: var(--teal);
+      font: 21px Bungee, sans-serif;
+    }
+
+    .panel p {
+      line-height: 1.7;
+    }
+
+    .avatar-section {
+      text-align: center;
+    }
+
+    .avatar-frame {
+      width: 160px;
+      height: 160px;
+      margin: 20px auto;
+      border: 6px solid white;
+      outline: 4px solid var(--pink);
+      border-radius: 50%;
+      background: #ffe2ef;
+      box-shadow: 0 8px 25px #8a426035;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .avatar-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-placeholder {
+      font-size: 65px;
+    }
+
+    .avatar-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 18px 0;
+    }
+
+    .upload-label,
+    .secondary-button {
+      display: inline-block;
+      border: 2px solid var(--pink);
+      background: #fff0f7;
+      color: #93416e;
+      border-radius: 25px;
+      padding: 12px 19px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .upload-label:focus-within {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+
+    .upload-label input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .field {
+      margin-bottom: 21px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 9px;
+      color: #6d405a;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #f0d3df;
+      border-radius: 13px;
+      background: #fffafb;
+      color: var(--dark);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: 2px solid var(--teal);
+      outline-offset: 2px;
+    }
+
+    .counter {
+      display: block;
+      text-align: right;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 11px;
+    }
+
+    .genre-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px;
+      border: 2px solid #f1d3df;
+      border-radius: 14px;
+      background: #fff9fc;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .genre-option:has(input:checked) {
+      background: #fce2ee;
+      border-color: var(--hot-pink);
+    }
+
+    .genre-option input {
+      accent-color: var(--hot-pink);
+      width: 17px;
+      height: 17px;
+    }
+
+    .save-button {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 17px;
+      background: linear-gradient(
+        135deg,
+        var(--hot-pink),
+        #9a4c82
+      );
+      color: white;
+      padding: 18px;
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .save-button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .message {
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 14px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    .message.success {
+      background: #e2f4e9;
+      color: #276346;
+    }
+
+    .message.error {
+      background: #fff0f1;
+      color: #993d50;
+    }
+
+    .message.info {
+      background: #edf3fb;
+      color: #365a7a;
+    }
+
+    .gate {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .gate .panel {
+      width: min(500px, 100%);
+      text-align: center;
+    }
+
+    .gate a {
+      display: inline-block;
+      background: var(--teal);
+      color: white;
+      border-radius: 25px;
+      padding: 12px 22px;
+      font-weight: 900;
+    }
+
+    footer {
+      text-align: center;
+      background: #302c35;
+      color: white;
+      padding: 25px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 700px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .genre-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .panel {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .genre-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="profileGate" class="gate">
+    <section class="panel">
+      <h2>🎀 CAMPUS ID CHECK</h2>
+
+      <p id="gateMessage" role="status">
+        Checking your Bestie membership...
+      </p>
+
+      <a href="login.html">Campus Login ♡</a>
+    </section>
+  </div>
+
+  <div id="profileContent" hidden>
+
+    <header class="topbar">
+      <a href="locker.html" class="brand">
+        🎓 BESTIE UNIVERSITY
+      </a>
+
+      <a href="locker.html" class="back-link">
+        ← My Bestie Locker
+      </a>
+    </header>
+
+    <section class="hero">
+      <span class="eyebrow">
+        ✦ THE BESTIE IDENTITY STUDIO ✦
+      </span>
+
+      <h1>PROFILE SETTINGS</h1>
+
+      <p>Your campus era, your rules! ♡</p>
+    </section>
+
+    <main class="container">
+
+      <form id="profileForm">
+
+        <section class="panel avatar-section">
+
+          <h2>📸 YOUR CAMPUS PORTRAIT</h2>
+
+          <p>
+            Give your campus ID a little personality!
+          </p>
+
+          <div class="avatar-frame">
+            <img
+              id="avatarPreview"
+              alt="Your profile picture preview"
+              hidden
+            >
+
+            <span
+              id="avatarPlaceholder"
+              class="avatar-placeholder"
+            >🎀</span>
+          </div>
+
+          <div class="avatar-buttons">
+
+            <label class="upload-label">
+              📷 Upload Photo
+              <input
+                id="avatarInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                aria-label="Upload profile picture"
+              >
+            </label>
+
+            <button
+              type="button"
+              class="secondary-button"
+              id="removeAvatar"
+            >
+              🗑️ Remove Photo
+            </button>
+
+          </div>
+
+          <p id="avatarFileName" class="hint"></p>
+
+          <p class="hint">
+            JPG, PNG, or WebP only. Maximum 5 MB.
+            Your profile picture will be publicly
+            viewable by anyone with its image URL.
+          </p>
+
+        </section>
+
+        <section class="panel">
+
+          <h2>💗 MEET THE BESTIE</h2>
+
+          <div class="field">
+            <label for="displayName">
+              Campus Display Name *
+            </label>
+
+            <input
+              id="displayName"
+              type="text"
+              minlength="2"
+              maxlength="50"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="bestieBio">
+              Your Bestie Bio
+            </label>
+
+            <textarea
+              id="bestieBio"
+              maxlength="300"
+              placeholder="A little about me, my books, and my fictional obsessions..."
+            ></textarea>
+
+            <span class="counter" id="bioCounter">
+              0 / 300
+            </span>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="field">
+              <label for="favoriteBook">
+                📖 All-Time Favorite Book
+              </label>
+
+              <input
+                id="favoriteBook"
+                type="text"
+                maxlength="150"
+                placeholder="Your forever favorite..."
+              >
+            </div>
+
+            <div class="field">
+              <label for="readingPersonality">
+                ✨ Reading Personality
+              </label>
+
+              <select id="readingPersonality">
+                <option value="">
+                  Choose your reading era...
+                </option>
+
+                <option value="Mood Reader">
+                  🌙 Mood Reader
+                </option>
+
+                <option value="Binge Reader">
+                  📚 Binge Reader
+                </option>
+
+                <option value="Audiobook Bestie">
+                  🎧 Audiobook Bestie
+                </option>
+
+                <option value="Slow & Cozy Reader">
+                  ☕ Slow & Cozy Reader
+                </option>
+
+                <option value="Series Devourer">
+                  🐉 Series Devourer
+                </option>
+
+                <option value="Romance Enthusiast">
+                  💋 Romance Enthusiast
+                </option>
+
+                <option value="Thrill Seeker">
+                  🔪 Thrill Seeker
+                </option>
+
+                <option value="Genre Hopper">
+                  🌈 Genre Hopper
+                </option>
+
+                <option value="Night Owl Reader">
+                  🌙 Night Owl Reader
+                </option>
+
+                <option value="Book Collector">
+                  🎀 Book Collector
+                </option>
+              </select>
+            </div>
+
+          </div>
+
+        </section>
+
+        <section class="panel">
+
+          <h2>📚 MY BOOKISH OBSESSIONS</h2>
+
+          <p>
+            Pick your favorite genres!
+            You can select up to 10.
+          </p>
+
+          <div class="genre-grid" id="genreGrid">
+
+            <label class="genre-option">
+              <input type="checkbox" value="Romance">
+              💗 Romance
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Dark Romance">
+              🖤 Dark Romance
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Fantasy">
+              🐉 Fantasy
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Romantasy">
+              ✨ Romantasy
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Thriller">
+              🔪 Thriller
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Mystery">
+              🔍 Mystery
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Horror">
+              👻 Horror
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Contemporary Fiction">
+              ☕ Contemporary
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Historical Fiction">
+              🕰️ Historical Fiction
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Science Fiction">
+              🚀 Sci-Fi
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Young Adult">
+              🌸 Young Adult
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Literary Fiction">
+              📝 Literary Fiction
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Nonfiction">
+              📘 Nonfiction
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Memoir">
+              🦋 Memoir
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Paranormal">
+              🔮 Paranormal
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Suspense">
+              🗝️ Suspense
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Women's Fiction">
+              🌷 Women's Fiction
+            </label>
+
+            <label class="genre-option">
+              <input type="checkbox" value="Graphic Novels">
+              🎨 Graphic Novels
+            </label>
+
+          </div>
+
+          <p class="hint" id="genreCount">
+            0 of 10 genres selected
+          </p>
+
+        </section>
+
+        <div
+          id="saveMessage"
+          class="message"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+        <button
+          type="submit"
+          id="saveButton"
+          class="save-button"
+        >
+          💗 SAVE MY CAMPUS ID ♡
+        </button>
+
+      </form>
+
+    </main>
+
+    <footer>
+      BOOKS &amp; BESTIES ♡ YOUR STORY, YOUR CAMPUS
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const config = window.BB_CONFIG;
+
+      const gate = document.getElementById("profileGate");
+      const content = document.getElementById("profileContent");
+      const gateMessage = document.getElementById("gateMessage");
+
+      const form = document.getElementById("profileForm");
+      const saveButton = document.getElementById("saveButton");
+      const saveMessage = document.getElementById("saveMessage");
+
+      const displayName = document.getElementById("displayName");
+      const bestieBio = document.getElementById("bestieBio");
+      const favoriteBook = document.getElementById("favoriteBook");
+      const readingPersonality =
+        document.getElementById("readingPersonality");
+
+      const avatarInput = document.getElementById("avatarInput");
+      const avatarPreview = document.getElementById("avatarPreview");
+      const avatarPlaceholder =
+        document.getElementById("avatarPlaceholder");
+
+      const avatarFileName =
+        document.getElementById("avatarFileName");
+
+      const genreInputs = Array.from(
+        document.querySelectorAll(
+          '#genreGrid input[type="checkbox"]'
+        )
+      );
+
+      let client = null;
+      let currentUser = null;
+      let currentAvatarPath = null;
+      let selectedFile = null;
+      let removeCurrentAvatar = false;
+      let previewUrl = null;
+
+      function showSaveMessage(text, type) {
+        saveMessage.textContent = text;
+        saveMessage.className = "message " + type;
+        saveMessage.hidden = false;
+      }
+
+      function clearPreviewUrl() {
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = null;
+        }
+      }
+
+      function showAvatar(url) {
+        if (!url) {
+          avatarPreview.hidden = true;
+          avatarPreview.removeAttribute("src");
+          avatarPlaceholder.hidden = false;
+          return;
+        }
+
+        avatarPreview.src = url;
+        avatarPreview.hidden = false;
+        avatarPlaceholder.hidden = true;
+      }
+
+      function publicAvatarUrl(path) {
+        if (!path) return null;
+
+        const { data } = client.storage
+          .from("bestie-avatars")
+          .getPublicUrl(path);
+
+        return data.publicUrl;
+      }
+
+      function updateGenreCount() {
+        const checked = genreInputs.filter(
+          input => input.checked
+        );
+
+        document.getElementById("genreCount").textContent =
+          checked.length + " of 10 genres selected";
+
+        return checked.length;
+      }
+
+      function updateBioCounter() {
+        document.getElementById("bioCounter").textContent =
+          bestieBio.value.length + " / 300";
+      }
+
+      bestieBio.addEventListener("input", updateBioCounter);
+
+      genreInputs.forEach(input => {
+        input.addEventListener("change", () => {
+          const count = updateGenreCount();
+
+          if (count > 10) {
+            input.checked = false;
+            updateGenreCount();
+
+            showSaveMessage(
+              "Bestie, you can select up to 10 favorite genres! 💗",
+              "info"
+            );
+          }
+        });
+      });
+
+      avatarInput.addEventListener("change", () => {
+        const file = avatarInput.files[0];
+
+        if (!file) return;
+
+        const allowedTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+          avatarInput.value = "";
+
+          showSaveMessage(
+            "Please choose a JPG, PNG, or WebP image.",
+            "error"
+          );
+
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          avatarInput.value = "";
+
+          showSaveMessage(
+            "Your profile picture must be 5 MB or smaller.",
+            "error"
+          );
+
+          return;
+        }
+
+        clearPreviewUrl();
+
+        selectedFile = file;
+        removeCurrentAvatar = false;
+
+        previewUrl = URL.createObjectURL(file);
+
+        showAvatar(previewUrl);
+
+        avatarFileName.textContent =
+          "Selected: " + file.name +
+          " — Save your profile to upload.";
+
+        saveMessage.hidden = true;
+      });
+
+      document.getElementById("removeAvatar")
+        .addEventListener("click", () => {
+          clearPreviewUrl();
+
+          selectedFile = null;
+          removeCurrentAvatar = true;
+          avatarInput.value = "";
+
+          showAvatar(null);
+
+          avatarFileName.textContent =
+            "Profile picture will be removed when you save.";
+
+          saveMessage.hidden = true;
+        });
+
+      function fileExtension(file) {
+        if (file.type === "image/jpeg") return "jpg";
+        if (file.type === "image/png") return "png";
+        if (file.type === "image/webp") return "webp";
+        throw new Error("Unsupported image type.");
+      }
+
+      async function initializeProfile() {
+        if (
+          !window.supabase ||
+          !config?.SUPABASE_URL ||
+          !config?.SUPABASE_ANON_KEY
+        ) {
+          gateMessage.textContent =
+            "Campus configuration is unavailable.";
+
+          return;
+        }
+
+        client = window.supabase.createClient(
+          config.SUPABASE_URL,
+          config.SUPABASE_ANON_KEY
+        );
+
+        const { data: { user }, error: authError } =
+          await client.auth.getUser();
+
+        if (authError || !user) {
+          gateMessage.textContent =
+            "Please sign in to customize your campus profile.";
+
+          return;
+        }
+
+        const { data: profile, error: profileError } =
+          await client
+            .from("profiles")
+            .select(
+              "display_name, membership_status, bio, " +
+              "favorite_book, favorite_genres, " +
+              "reading_personality, avatar_path"
+            )
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        if (
+          !profile ||
+          profile.membership_status !== "approved"
+        ) {
+          gateMessage.textContent =
+            "Your campus membership must be approved " +
+            "before you can customize your profile.";
+
+          return;
+        }
+
+        currentUser = user;
+
+        displayName.value = profile.display_name || "";
+        bestieBio.value = profile.bio || "";
+        favoriteBook.value = profile.favorite_book || "";
+
+        const savedPersonality =
+          profile.reading_personality || "";
+
+        const personalityExists = Array.from(
+          readingPersonality.options
+        ).some(option => option.value === savedPersonality);
+
+        if (savedPersonality && !personalityExists) {
+          const option = document.createElement("option");
+          option.value = savedPersonality;
+          option.textContent = savedPersonality;
+          readingPersonality.appendChild(option);
+        }
+
+        readingPersonality.value = savedPersonality;
+
+        const savedGenres = Array.isArray(
+          profile.favorite_genres
+        ) ? profile.favorite_genres : [];
+
+        genreInputs.forEach(input => {
+          input.checked = savedGenres.includes(input.value);
+        });
+
+        currentAvatarPath = profile.avatar_path || null;
+
+        if (currentAvatarPath) {
+          showAvatar(publicAvatarUrl(currentAvatarPath));
+        } else {
+          showAvatar(null);
+        }
+
+        updateBioCounter();
+        updateGenreCount();
+
+        gate.hidden = true;
+        content.hidden = false;
+      }
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (!currentUser || !client) return;
+
+        const genres = genreInputs
+          .filter(input => input.checked)
+          .map(input => input.value);
+
+        if (genres.length > 10) {
+          showSaveMessage(
+            "Please select no more than 10 genres.",
+            "error"
+          );
+
+          return;
+        }
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving your campus ID... ♡";
+        saveMessage.hidden = true;
+
+        let newUploadedPath = null;
+
+        try {
+          let nextAvatarPath = currentAvatarPath;
+
+          if (removeCurrentAvatar) {
+            nextAvatarPath = null;
+          }
+
+          if (selectedFile) {
+            const extension = fileExtension(selectedFile);
+
+            const uniqueName =
+              crypto.randomUUID().replaceAll("-", "");
+
+            const filePath =
+              currentUser.id + "/" +
+              uniqueName + "." + extension;
+
+            const { error: uploadError } =
+              await client.storage
+                .from("bestie-avatars")
+                .upload(filePath, selectedFile, {
+                  contentType: selectedFile.type,
+                  upsert: false
+                });
+
+            if (uploadError) throw uploadError;
+
+            newUploadedPath = filePath;
+            nextAvatarPath = filePath;
+          }
+
+          const { error: saveError } = await client.rpc(
+            "update_bestie_profile",
+            {
+              p_display_name: displayName.value.trim(),
+              p_bio: bestieBio.value.trim(),
+              p_favorite_book: favoriteBook.value.trim(),
+              p_favorite_genres: genres,
+              p_reading_personality:
+                readingPersonality.value,
+              p_avatar_path: nextAvatarPath
+            }
+          );
+
+          if (saveError) throw saveError;
+
+          const previousAvatarPath = currentAvatarPath;
+
+          currentAvatarPath = nextAvatarPath;
+          selectedFile = null;
+          removeCurrentAvatar = false;
+          avatarInput.value = "";
+
+          clearPreviewUrl();
+
+          showAvatar(
+            currentAvatarPath
+              ? publicAvatarUrl(currentAvatarPath)
+              : null
+          );
+
+          avatarFileName.textContent = currentAvatarPath
+            ? "Your campus portrait is saved! 💗"
+            : "No profile picture selected.";
+
+          showSaveMessage(
+            "🎓💗 Your Bestie profile has been saved! " +
+            "Your campus identity is looking GOOD!",
+            "success"
+          );
+
+          // Clean up an old image only after the new
+          // profile information has saved successfully.
+          if (
+            previousAvatarPath &&
+            previousAvatarPath !== currentAvatarPath
+          ) {
+            const { error: cleanupError } =
+              await client.storage
+                .from("bestie-avatars")
+                .remove([previousAvatarPath]);
+
+            if (cleanupError) {
+              console.warn(
+                "Old avatar cleanup:",
+                cleanupError
+              );
+            }
+          }
+
+        } catch (error) {
+          console.error("Profile save:", error);
+
+          // If the new upload succeeded but saving the
+          // profile failed, try to remove the unused file.
+          if (newUploadedPath) {
+            const { error: cleanupError } =
+              await client.storage
+                .from("bestie-avatars")
+                .remove([newUploadedPath]);
+
+            if (cleanupError) {
+              console.warn(
+                "Unused avatar cleanup:",
+                cleanupError
+              );
+            }
+          }
+
+          showSaveMessage(
+            "We couldn't save your profile. " +
+            (error.message || "Please try again."),
+            "error"
+          );
+
+        } finally {
+          saveButton.disabled = false;
+          saveButton.textContent =
+            "💗 SAVE MY CAMPUS ID ♡";
+        }
+      });
+
+      window.addEventListener("pagehide", clearPreviewUrl);
+
+      initializeProfile().catch(error => {
+        console.error("Profile initialization:", error);
+
+        gateMessage.textContent =
+          "Unable to load your profile. Please try again.";
+      });
+
+    })();
+  </script>
+
+</body>
+</html>

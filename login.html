@@ -404,14 +404,15 @@
           showMessage(
             "🎓💗 Welcome back, " +
             profile.display_name +
-            "! Your campus membership is approved.",
+            "! Taking you to your Bestie Locker... ♡",
             "success"
           );
 
-          // This page confirms authentication and membership.
-          // The main website's older auth routes still need
-          // integration before opening member features.
-          // Do not redirect to the old dashboard yet.
+          // Approved members enter their personal Locker.
+          // The Locker independently verifies their
+          // authenticated account and approval status.
+          window.location.replace("locker.html");
+          return;
 
         } catch (error) {
           showMessage(

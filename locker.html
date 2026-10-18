@@ -1,0 +1,408 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ee70a8">
+  <title>Bestie Locker | Bestie University</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    :root {
+      --pink:#ee70a8;
+      --hot:#d84088;
+      --teal:#286e70;
+      --ink:#402c3b;
+      --cream:#fff9f7;
+    }
+
+    * { box-sizing:border-box; }
+
+    [hidden] { display:none !important; }
+
+    body {
+      margin:0;
+      font-family:Nunito,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 12% 10%,#ffd7e9,transparent 35%),
+        radial-gradient(circle at 90% 80%,#d4ece8,transparent 35%),
+        #fff5fa;
+    }
+
+    a { text-decoration:none; color:inherit; }
+    button { font:inherit; cursor:pointer; }
+
+    .top {
+      background:#302c35;
+      color:white;
+      padding:15px 6%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:15px;
+      border-bottom:6px solid var(--pink);
+    }
+
+    .brand {
+      font-weight:900;
+      font-size:20px;
+    }
+
+    .top a, .top button {
+      color:white;
+      font-weight:900;
+    }
+
+    .signout {
+      border:2px solid #ffffff66;
+      background:transparent;
+      padding:9px 16px;
+      border-radius:25px;
+    }
+
+    .hero {
+      text-align:center;
+      padding:65px 20px;
+      background:linear-gradient(135deg,#ffd1e4,#f1a3c8,#b5dbd6);
+      border-bottom:7px solid #473845;
+    }
+
+    .kicker {
+      display:inline-block;
+      background:#ffffffbb;
+      border-radius:30px;
+      padding:9px 18px;
+      font-weight:900;
+    }
+
+    h1 {
+      font:clamp(32px,6vw,65px) Bungee,sans-serif;
+      color:#f34b99;
+      -webkit-text-stroke:1px white;
+      text-shadow:4px 5px 0 #70485d;
+      margin:20px 0 8px;
+    }
+
+    .script {
+      font:25px Pacifico,cursive;
+      color:#70485d;
+    }
+
+    .wrap {
+      max-width:1150px;
+      margin:auto;
+      padding:35px 20px 70px;
+    }
+
+    .panel {
+      background:white;
+      border:3px solid #e8abc8;
+      border-radius:23px;
+      box-shadow:6px 7px 0 #e9bfd2;
+      padding:25px;
+      margin-bottom:25px;
+    }
+
+    .panel h2 {
+      color:var(--teal);
+      font:22px Bungee,sans-serif;
+      margin-top:0;
+    }
+
+    .status {
+      display:inline-block;
+      background:#dff3e8;
+      color:#286a55;
+      padding:9px 16px;
+      border-radius:25px;
+      font-weight:900;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:20px;
+    }
+
+    .card {
+      display:block;
+      background:white;
+      border:3px solid #e8abc8;
+      border-radius:22px;
+      padding:27px 20px;
+      box-shadow:5px 6px 0 #e9bfd2;
+      transition:transform .2s;
+    }
+
+    .card:hover { transform:translateY(-4px); }
+
+    .emoji { font-size:35px; }
+
+    .card h3 {
+      color:var(--teal);
+      margin-bottom:9px;
+    }
+
+    .card p { line-height:1.6; }
+
+    .note {
+      background:#fff0f7;
+      padding:18px;
+      border-radius:15px;
+      font-weight:800;
+      margin-top:25px;
+    }
+
+    .gate {
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .gate .panel {
+      max-width:520px;
+      width:100%;
+      text-align:center;
+    }
+
+    .btn {
+      display:inline-block;
+      border:0;
+      background:var(--teal);
+      color:white;
+      border-radius:25px;
+      padding:12px 20px;
+      font-weight:900;
+      margin-top:15px;
+    }
+
+    footer {
+      text-align:center;
+      padding:25px;
+      background:#302c35;
+      color:white;
+      font-weight:900;
+    }
+
+    @media(max-width:800px) {
+      .grid { grid-template-columns:repeat(2,1fr); }
+    }
+
+    @media(max-width:560px) {
+      .grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="lockerGate" class="gate">
+    <div class="panel">
+      <h2>🎀 BESTIE LOCKER</h2>
+      <p id="gateMessage" role="status">
+        Checking your campus membership...
+      </p>
+      <a class="btn" href="login.html">Campus Login</a>
+    </div>
+  </div>
+
+  <div id="lockerContent" hidden>
+
+    <header class="top">
+      <a class="brand" href="index.html#home">
+        🎓 BESTIE UNIVERSITY
+      </a>
+
+      <button class="signout" id="signOut">
+        Sign Out ♡
+      </button>
+    </header>
+
+    <section class="hero">
+      <span class="kicker">✦ YOUR CAMPUS, YOUR CORNER ✦</span>
+      <h1>BESTIE LOCKER</h1>
+      <div class="script" id="welcomeName">
+        Heyyy, Bestie! ♡
+      </div>
+    </section>
+
+    <main class="wrap">
+
+      <section class="panel">
+        <h2>🎀 YOUR CAMPUS ID</h2>
+        <p id="memberName"></p>
+        <span class="status">
+          ✓ APPROVED BESTIE
+        </span>
+        <p>
+          Welcome to the campus, gorgeous!
+          Your Books & Besties membership is active.
+        </p>
+      </section>
+
+      <h2>💗 EXPLORE YOUR CAMPUS</h2>
+
+      <div class="grid">
+
+        <a class="card" href="commons.html">
+          <div class="emoji">👑</div>
+          <h3>Crown Commons</h3>
+          <p>
+            Chat, connect, share posts,
+            and catch campus announcements.
+          </p>
+        </a>
+
+        <a class="card" href="activities.html">
+          <div class="emoji">🎮</div>
+          <h3>Campus Activities</h3>
+          <p>
+            Bingo, Side Quests, Alphabet Rush,
+            and other Bestie adventures.
+          </p>
+        </a>
+
+        <a class="card" href="index.html#book-pick">
+          <div class="emoji">📚</div>
+          <h3>Campus Library</h3>
+          <p>
+            Book picks, reading discussions,
+            and community voting.
+          </p>
+        </a>
+
+        <a class="card" href="index.html#crown">
+          <div class="emoji">🏆</div>
+          <h3>Monthly Crown</h3>
+          <p>
+            Explore our optional reading
+            competition and team challenges.
+          </p>
+        </a>
+
+        <a class="card" href="honors.html">
+          <div class="emoji">💎</div>
+          <h3>Honors Society</h3>
+          <p>
+            Exclusive VIP experiences
+            for invited Besties.
+          </p>
+        </a>
+
+        <a class="card" href="index.html#home">
+          <div class="emoji">🎓</div>
+          <h3>Campus Quad</h3>
+          <p>
+            Return to the main Bestie
+            University homepage.
+          </p>
+        </a>
+
+      </div>
+
+      <div class="note">
+        🎀 Being an approved Bestie gives you general campus
+        membership. Monthly Crown enrollment and Honors
+        Society invitations are separate.
+      </div>
+
+    </main>
+
+    <footer>
+      BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+    </footer>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+
+  <script>
+    (async () => {
+      "use strict";
+
+      const gate = document.getElementById("lockerGate");
+      const content = document.getElementById("lockerContent");
+      const message = document.getElementById("gateMessage");
+
+      const config = window.BB_CONFIG;
+
+      if (
+        !window.supabase ||
+        !config?.SUPABASE_URL ||
+        !config?.SUPABASE_ANON_KEY
+      ) {
+        message.textContent =
+          "Campus configuration is unavailable.";
+        return;
+      }
+
+      const client = window.supabase.createClient(
+        config.SUPABASE_URL,
+        config.SUPABASE_ANON_KEY
+      );
+
+      try {
+        const { data: { user }, error: authError } =
+          await client.auth.getUser();
+
+        if (authError || !user) {
+          message.textContent =
+            "Please sign in to enter your Bestie Locker.";
+          return;
+        }
+
+        const { data: profile, error: profileError } =
+          await client
+            .from("profiles")
+            .select("display_name, membership_status")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        if (!profile || profile.membership_status !== "approved") {
+          message.textContent =
+            "Your campus membership must be approved before you can enter.";
+          return;
+        }
+
+        const name = profile.display_name || "Bestie";
+
+        document.getElementById("welcomeName").textContent =
+          `Heyyy, ${name}! ♡`;
+
+        document.getElementById("memberName").textContent =
+          `Campus Member: ${name}`;
+
+        gate.hidden = true;
+        content.hidden = false;
+
+        document.getElementById("signOut")
+          .addEventListener("click", async () => {
+            const { error } = await client.auth.signOut();
+
+            if (error) {
+              alert("Unable to sign out: " + error.message);
+              return;
+            }
+
+            window.location.href = "login.html";
+          });
+
+      } catch (error) {
+        console.error("Bestie Locker:", error);
+        message.textContent =
+          "Unable to load your Locker. Please try again.";
+      }
+    })();
+  </script>
+
+</body>
+</html>
