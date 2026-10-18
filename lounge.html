@@ -144,6 +144,11 @@
   background: #f8e2ec;
 }
 
+.reaction-picker button.active {
+  background: #ead0db;
+  box-shadow: 0 0 0 1px #c58ba5;
+}
+
     .composer {
       display: flex;
       gap: 12px;
@@ -344,6 +349,31 @@
         }
 
         currentMessages = data || [];
+        
+const reactionsByMessage = new Map();
+
+if (currentMessages.length) {
+  const messageIds = currentMessages.map(message => message.id);
+
+  const { data: savedReactions, error: reactionsError } =
+    await client
+      .from("housing_reactions")
+      .select("message_id, user_id, emoji")
+      .in("message_id", messageIds);
+
+  if (reactionsError) {
+    console.error("Unable to load reactions:", reactionsError);
+  } else {
+    for (const reaction of savedReactions || []) {
+      if (!reactionsByMessage.has(reaction.message_id)) {
+        reactionsByMessage.set(reaction.message_id, []);
+      }
+
+      reactionsByMessage.get(reaction.message_id).push(reaction);
+    }
+  }
+}
+
 
         const ids = [...new Set(
           currentMessages.map(m => m.sender_id)
@@ -400,23 +430,118 @@ for (const emoji of reactionEmojis) {
 
   reactionButton.type = "button";
   reactionButton.textContent = emoji;
+  
+const myReaction = (
+  reactionsByMessage.get(message.id) || []
+).some(reaction =>
+  reaction.user_id === result.user.id &&
+  reaction.emoji === emoji
+);
+
+if (myReaction) {
+  reactionButton.classList.add("active");
+  reactionButton.setAttribute("aria-pressed", "true");
+} else {
+  reactionButton.setAttribute("aria-pressed", "false");
+}
+
   reactionButton.title = `React with ${emoji}`;
   reactionButton.setAttribute(
     "aria-label",
     `React with ${emoji}`
   );
 
-  reactionButton.addEventListener("click", () => {
-    // We'll connect this to Supabase next!
-    console.log("Reaction selected:", emoji, message.id);
-  });
+  
+reactionButton.addEventListener("click", async () => {
+  reactionButton.disabled = true;
+
+  
+const { data: existingReaction, error: lookupError } =
+  await client
+    .from("housing_reactions")
+    .select("id")
+    .eq("user_id", result.user.id)
+    .eq("message_id", message.id)
+    .eq("emoji", emoji)
+    .maybeSingle();
+
+if (lookupError) {
+  reactionButton.disabled = false;
+  console.error("Reaction lookup error:", lookupError);
+  alert("Couldn't check your reaction. Please try again.");
+  return;
+}
+
+let error;
+
+if (existingReaction) {
+  // Clicking an existing reaction removes it.
+  ({ error } = await client
+    .from("housing_reactions")
+    .delete()
+    .eq("id", existingReaction.id));
+} else {
+  // Clicking a new reaction saves it.
+  ({ error } = await client
+    .from("housing_reactions")
+    .insert({
+      user_id: result.user.id,
+      message_id: message.id,
+      emoji: emoji
+    }));
+}
+
+
+  reactionButton.disabled = false;
+
+  if (error) {
+    console.error("Reaction error:", error);
+    alert("Couldn't save your reaction. Please try again.");
+    return;
+  }
+
+  
+console.log("💗 Reaction saved!", emoji);
+
+// Refresh the displayed messages and reaction counts
+await loadMessages();
+
+});
+
 
   reactionPicker.appendChild(reactionButton);
 }
 
+
+// 🎀 Display saved reaction counts
+const messageReactions =
+  reactionsByMessage.get(message.id) || [];
+
+const reactionCounts = new Map();
+
+for (const reaction of messageReactions) {
+  const current = reactionCounts.get(reaction.emoji) || 0;
+  reactionCounts.set(reaction.emoji, current + 1);
+}
+
+if (reactionCounts.size > 0) {
+  const reactionDisplay = document.createElement("div");
+  reactionDisplay.className = "message-reactions";
+
+  for (const [emoji, count] of reactionCounts) {
+    const chip = document.createElement("span");
+    chip.className = "reaction-chip";
+    chip.textContent = `${emoji} ${count}`;
+
+    reactionDisplay.appendChild(chip);
+  }
+
+  article.appendChild(reactionDisplay);
+}
+
 article.appendChild(reactionPicker);
 messagesEl.appendChild(article);
-
+        }
 
         messagesEl.scrollTop = messagesEl.scrollHeight;
         status.textContent = "💗 Messages saved · Lounge connected";
