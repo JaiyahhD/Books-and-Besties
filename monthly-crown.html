@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monthly Crown HQ | Bestie University</title>
+
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --rose: #b96d91;
+      --cream: #fff8f2;
+      --espresso: #563b3b;
+      --sage: #a3b8a1;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, #f8dce8, transparent 45%),
+        linear-gradient(135deg, #fff8f2, #f4e9e3);
+      color: var(--espresso);
+      font-family: Georgia, serif;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .gate {
+      max-width: 600px;
+      margin: 90px auto;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .page {
+      max-width: 1150px;
+      margin: auto;
+      padding: 28px 20px 80px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 28px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .top-nav a {
+      color: var(--espresso);
+      text-decoration: none;
+    }
+
+    .hero {
+      padding: 55px 25px;
+      border-radius: 26px;
+      text-align: center;
+      background: linear-gradient(135deg, #e8b4c8, #f7e6db);
+      box-shadow: 0 12px 35px #563b3b12;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 3px;
+      color: var(--rose);
+    }
+
+    h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      margin: 15px 0;
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto 20px;
+      line-height: 1.8;
+    }
+
+    .season-pill {
+      display: inline-block;
+      padding: 11px 22px;
+      border-radius: 50px;
+      background: var(--espresso);
+      color: white;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card, .panel {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 22px;
+      padding: 25px;
+      box-shadow: 0 10px 30px #563b3b10;
+    }
+
+    .stat-label {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 1px;
+      color: var(--rose);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 35px;
+      font-weight: bold;
+      margin: 12px 0 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      margin-bottom: 24px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 27px;
+    }
+
+    .panel-description {
+      font-size: 14px;
+      line-height: 1.7;
+      opacity: .8;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font: 700 12px Arial, sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      background: white;
+    }
+
+    .primary-button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--espresso);
+      color: white;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .primary-button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      font: 13px Arial, sans-serif;
+      line-height: 1.6;
+      margin: 15px 0;
+    }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 45px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0e5e8;
+    }
+
+    .rank {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--rose);
+    }
+
+    .leaderboard-name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .leaderboard-detail {
+      font: 12px Arial, sans-serif;
+      opacity: .7;
+      margin-top: 6px;
+    }
+
+    .leaderboard-score {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .score-label {
+      font: 10px Arial, sans-serif;
+      opacity: .7;
+      margin-top: 4px;
+    }
+
+    .submission {
+      border-bottom: 1px solid #f0e5e8;
+      padding: 15px 0;
+    }
+
+    .submission-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .submission-meta {
+      font: 12px Arial, sans-serif;
+      opacity: .75;
+      line-height: 1.8;
+      margin-top: 5px;
+    }
+
+    .empty {
+      padding: 25px 10px;
+      text-align: center;
+      font-size: 14px;
+      opacity: .75;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 30px;
+      font: 11px Arial, sans-serif;
+      letter-spacing: 2px;
+      opacity: .6;
+    }
+
+    @media (max-width: 800px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 40px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">
+      Checking Monthly Crown access...
+    </p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+
+    <nav class="top-nav">
+      <a href="housing.html">← CAMPUS HOUSING</a>
+      <a href="locker.html">MY BESTIE LOCKER 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · READING COMPETITION
+      </div>
+
+      <h1>👑 Monthly Crown HQ</h1>
+
+      <p>
+        Every finished book brings your team one step closer
+        to the crown. Log your reads, collect your pages,
+        and watch the leaderboard come alive!
+      </p>
+
+      <div id="seasonPill" class="season-pill">
+        Loading Crown season...
+      </div>
+    </header>
+
+    <section class="dashboard">
+      <div class="stat-card">
+        <div class="stat-label">My Eligible Pages</div>
+        <div id="myPages" class="stat-value">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Books Logged</div>
+        <div id="myBooks" class="stat-value">0</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">My Crown Team</div>
+        <div id="myTeam" class="stat-value"
+          style="font-size:22px">Not Assigned</div>
+      </div>
+    </section>
+
+    <div class="layout">
+
+      <div>
+        <section id="submissionPanel" class="panel" hidden>
+          <h2>📚 Log a Finished Book</h2>
+
+          <p class="panel-description">
+            Eligible submissions automatically count toward
+            your personal pages and your team's total.
+          </p>
+
+          <form id="bookForm">
+
+            <div class="field">
+              <label for="bookTitle">Book Title</label>
+              <input id="bookTitle" maxlength="250" required>
+            </div>
+
+            <div class="field">
+              <label for="bookAuthor">Author</label>
+              <input id="bookAuthor" maxlength="250" required>
+            </div>
+
+            <div class="field">
+              <label for="bookPages">Pages Read</label>
+              <input id="bookPages" type="number"
+                min="1" max="10000" required>
+            </div>
+
+            <div class="field">
+              <label for="bookRating">Rating (Optional)</label>
+              <input id="bookRating" type="number"
+                min="0" max="5" step="0.5">
+            </div>
+
+            <div class="field">
+              <label for="bookDate">Date Completed</label>
+              <input id="bookDate" type="date" required>
+            </div>
+
+            <button id="submitBookButton"
+              class="primary-button" type="submit">
+              SUBMIT MY BOOK 👑
+            </button>
+
+          </form>
+
+          <p id="submissionStatus" class="status"></p>
+        </section>
+
+        <section class="panel">
+          <h2>📖 My Reading Log</h2>
+          <div id="myReadingLog">
+            <div class="empty">Loading your books...</div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <section class="panel">
+          <h2>🏆 Team Leaderboard</h2>
+          <p class="panel-description">
+            Every eligible page counts!
+          </p>
+          <div id="teamLeaderboard">
+            <div class="empty">Loading teams...</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>✨ Individual Standings</h2>
+          <p class="panel-description">
+            The Besties climbing toward the crown.
+          </p>
+          <div id="memberLeaderboard">
+            <div class="empty">Loading Besties...</div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      BESTIE UNIVERSITY 🎀 · READ, SLAY, REIGN
+    </footer>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+
+      const guard = window.BB_CAMPUS_GUARD;
+
+      if (!guard) {
+        document.getElementById("campusGateMessage")
+          .textContent = "Campus authentication unavailable.";
+        return;
+      }
+
+      const result = await guard.protectPage({
+        level: "approved",
+        gateId: "campusGate",
+        contentId: "campusContent",
+        messageId: "campusGateMessage"
+      });
+
+      if (!result?.user) return;
+
+      const client = result.client || guard.getClient();
+      const userId = result.user.id;
+
+      const $ = id => document.getElementById(id);
+
+      const { data: season, error: seasonError } =
+        await client
+          .from("crown_seasons")
+          .select("id, name, starts_on, ends_on, status")
+          .eq("name", "November 2026")
+          .maybeSingle();
+
+      if (seasonError || !season) {
+        $("seasonPill").textContent =
+          "Crown season unavailable";
+        return;
+      }
+
+      $("seasonPill").textContent =
+        `☕ ${season.name.toUpperCase()} · THE VELVET LATTE LOUNGE`;
+
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("id, team_id, status")
+          .eq("season_id", season.id)
+          .eq("user_id", userId)
+          .maybeSingle();
+
+      if (enrollmentError) {
+        console.error("Enrollment error:", enrollmentError);
+      }
+
+      const isEnrolled =
+        enrollment?.status === "approved" &&
+        !!enrollment.team_id;
+
+      const { data: teams, error: teamsError } =
+        await client
+          .from("crown_teams")
+          .select("id, name, emoji")
+          .eq("season_id", season.id);
+
+      if (teamsError) {
+        console.error("Teams error:", teamsError);
+      }
+
+      const teamMap = new Map(
+        (teams || []).map(team => [team.id, team])
+      );
+
+      if (isEnrolled) {
+        const team = teamMap.get(enrollment.team_id);
+
+        $("myTeam").textContent = team
+          ? `${team.emoji || "🏡"} ${team.name}`
+          : "Assigned";
+
+        $("submissionPanel").hidden = false;
+      } else {
+        $("myTeam").textContent = "Not Enrolled";
+        $("myReadingLog").textContent =
+          "You're not enrolled in this Crown season yet.";
+      }
+
+      // Season dates are enforced by the database.
+      $("bookDate").min = season.starts_on;
+      $("bookDate").max = season.ends_on;
+
+      async function loadTeamLeaderboard() {
+        const { data, error } = await client.rpc(
+          "get_crown_team_leaderboard",
+          { p_season_id: season.id }
+        );
+
+        if (error) {
+          console.error("Team leaderboard error:", error);
+          $("teamLeaderboard").textContent =
+            "Unable to load team standings.";
+          return;
+        }
+
+        const container = $("teamLeaderboard");
+        container.replaceChildren();
+
+        if (!data?.length) {
+          container.textContent = "No teams yet.";
+          return;
+        }
+
+        data.forEach((team, index) => {
+          const row = document.createElement("div");
+          row.className = "leaderboard-row";
+
+          const rank = document.createElement("div");
+          rank.className = "rank";
+          rank.textContent =
+            ["🥇", "🥈", "🥉"][index] || `#${index + 1}`;
+
+          const info = document.createElement("div");
+
+          const name = document.createElement("div");
+          name.className = "leaderboard-name";
+          name.textContent =
+            `${team.team_emoji || "🏡"} ${team.team_name}`;
+
+          const detail = document.createElement("div");
+          detail.className = "leaderboard-detail";
+          detail.textContent =
+            `${team.books_logged} books · ` +
+            `${team.contributing_members} contributing Besties`;
+
+          info.append(name, detail);
+
+          const score = document.createElement("div");
+          score.className = "leaderboard-score";
+          score.textContent =
+            Number(team.total_pages || 0).toLocaleString();
+
+          const label = document.createElement("div");
+          label.className = "score-label";
+          label.textContent = "PAGES";
+          score.appendChild(label);
+
+          row.append(rank, info, score);
+          container.appendChild(row);
+        });
+      }
+
+      async function loadMemberLeaderboard() {
+        const { data, error } = await client.rpc(
+          "get_crown_member_leaderboard",
+          { p_season_id: season.id }
+        );
+
+        if (error) {
+          console.error("Member leaderboard error:", error);
+          $("memberLeaderboard").textContent =
+            "Unable to load individual standings.";
+          return;
+        }
+
+        const container = $("memberLeaderboard");
+        container.replaceChildren();
+
+        if (!data?.length) {
+          container.textContent =
+            "No approved participants yet.";
+          return;
+        }
+
+        data.forEach((member, index) => {
+          const row = document.createElement("div");
+          row.className = "leaderboard-row";
+
+          const rank = document.createElement("div");
+          rank.className = "rank";
+          rank.textContent =
+            ["🥇", "🥈", "🥉"][index] || `#${index + 1}`;
+
+          const info = document.createElement("div");
+
+          const name = document.createElement("div");
+          name.className = "leaderboard-name";
+          name.textContent = member.display_name;
+
+          const detail = document.createElement("div");
+          detail.className = "leaderboard-detail";
+          detail.textContent =
+            `${member.team_name} · ` +
+            `${member.books_logged} books`;
+
+          info.append(name, detail);
+
+          const score = document.createElement("div");
+          score.className = "leaderboard-score";
+          score.textContent =
+            Number(member.total_pages || 0).toLocaleString();
+
+          const label = document.createElement("div");
+          label.className = "score-label";
+          label.textContent = "PAGES";
+          score.appendChild(label);
+
+          row.append(rank, info, score);
+          container.appendChild(row);
+        });
+
+        const mine = data.find(
+          member => member.user_id === userId
+        );
+
+        $("myPages").textContent =
+          Number(mine?.total_pages || 0).toLocaleString();
+
+        $("myBooks").textContent =
+          Number(mine?.books_logged || 0).toLocaleString();
+      }
+
+      async function loadReadingLog() {
+        if (!isEnrolled) return;
+
+        const { data, error } = await client
+          .from("crown_submissions")
+          .select(
+            "id, book_title, book_author, pages_read, " +
+            "rating, completed_on, status"
+          )
+          .eq("season_id", season.id)
+          .eq("user_id", userId)
+          .order("completed_on", { ascending: false })
+          .limit(100);
+
+        const container = $("myReadingLog");
+        container.replaceChildren();
+
+        if (error) {
+          console.error("Reading log error:", error);
+          container.textContent = "Unable to load reading log.";
+          return;
+        }
+
+        if (!data?.length) {
+          container.innerHTML =
+            '<div class="empty">No books logged yet. ' +
+            'Your crown journey starts here! 💗</div>';
+          return;
+        }
+
+        for (const book of data) {
+          const card = document.createElement("div");
+          card.className = "submission";
+
+          const title = document.createElement("div");
+          title.className = "submission-title";
+          title.textContent = book.book_title;
+
+          const meta = document.createElement("div");
+          meta.className = "submission-meta";
+          meta.textContent =
+            `${book.book_author} · ${book.pages_read} pages · ` +
+            `${book.completed_on} · ` +
+            `${book.status === "eligible" ? "👑 Eligible" : "🚫 Voided"}` +
+            (book.rating === null ? "" : ` · ⭐ ${book.rating}/5`);
+
+          card.append(title, meta);
+          container.appendChild(card);
+        }
+      }
+
+      async function refreshCrown() {
+        await Promise.all([
+          loadTeamLeaderboard(),
+          loadMemberLeaderboard(),
+          loadReadingLog()
+        ]);
+      }
+
+      await refreshCrown();
+
+      $("bookForm").addEventListener("submit", async event => {
+        event.preventDefault();
+
+        if (!isEnrolled) return;
+
+        const button = $("submitBookButton");
+        const message = $("submissionStatus");
+
+        button.disabled = true;
+        message.textContent = "Submitting your book...";
+
+        const ratingValue = $("bookRating").value;
+
+        const { error } = await client.rpc(
+          "submit_crown_book",
+          {
+            p_season_id: season.id,
+            p_book_title: $("bookTitle").value.trim(),
+            p_book_author: $("bookAuthor").value.trim(),
+            p_pages_read: Number($("bookPages").value),
+            p_rating: ratingValue === ""
+              ? null
+              : Number(ratingValue),
+            p_completed_on: $("bookDate").value
+          }
+        );
+
+        button.disabled = false;
+
+        if (error) {
+          console.error("Book submission error:", error);
+          message.textContent = error.message;
+          return;
+        }
+
+        $("bookForm").reset();
+        message.textContent =
+          "👑 Book submitted! Your eligible pages are counted.";
+
+        await refreshCrown();
+      });
+
+    })().catch(error => {
+      console.error("Monthly Crown error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Unable to load Monthly Crown HQ.";
+    });
+  </script>
+</body>
+</html>
