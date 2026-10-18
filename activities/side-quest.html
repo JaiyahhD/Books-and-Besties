@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f64fa1">
-<title>Monthly Side Quest | Bestie University</title>
+<title>The Velvet Quest Diaries | Bestie University</title>
 <link rel="icon" href="../assets/logo.png">
 
 <style>
@@ -391,6 +391,250 @@ textarea:focus-visible {
   .panel-body {padding:15px}
   .stamps {gap:6px}
 }
+
+
+/* ==========================================
+   NOVEMBER 2026 — THE VELVET QUEST DIARIES
+   THE VELVET LATTE LOUNGE COLLECTION
+   ========================================== */
+
+:root {
+  --pink:#c58fa6;
+  --teal:#587c69;
+  --ink:#4c302d;
+  --blush:#f2dfe5;
+  --espresso:#4c302d;
+  --mocha:#785047;
+  --sage:#a8bdaa;
+  --sage-dark:#587c69;
+  --mauve:#b88fa6;
+  --vanilla:#fff8f0;
+  --caramel:#c18a67;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 15%,#e0e9d9,transparent 35%),
+    radial-gradient(circle at 92% 80%,#efdbe5,transparent 35%),
+    #fff8f0;
+}
+
+.top {
+  background:#4c302d;
+  border-bottom-color:#a8bdaa;
+}
+
+nav a.active {
+  background:#a8bdaa;
+  color:#4c302d;
+}
+
+.hero {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 35px,
+      #ffffff15 35px 70px
+    ),
+    linear-gradient(
+      135deg,
+      #c3d4be 0%,
+      #a8bdaa 30%,
+      #d7c4cd 67%,
+      #efd7c5 100%
+    );
+  border-bottom-color:#785047;
+}
+
+.kicker {
+  background:#fff8f0e8;
+  border-color:#fff8f0;
+  color:#785047;
+}
+
+.hero h1 {
+  color:#fff8f0;
+  -webkit-text-stroke:1.5px #785047;
+  text-shadow:
+    4px 5px 0 #785047,
+    7px 8px 0 #ffffff88;
+}
+
+.script {
+  color:#4c302d;
+}
+
+.notice,
+.panel {
+  background:#fffdf9;
+  border-color:#b9c9b3;
+  box-shadow:6px 7px 0 #d6dfcf;
+}
+
+.panel-head {
+  background:linear-gradient(
+    110deg,
+    #587c69,
+    #819d83,
+    #b88fa6
+  );
+  color:#fffaf5;
+}
+
+.month {
+  background:#f0e7e7;
+  border-color:#c9a6b4;
+  color:#4c302d;
+}
+
+.month.active {
+  background:#587c69;
+  border-color:#587c69;
+  color:white;
+}
+
+h2,
+h3 {
+  color:#587c69;
+}
+
+.month-title {
+  color:#785047;
+}
+
+.mission {
+  background:#fffaf5;
+  border-color:#d4c4bd;
+}
+
+.mission.done {
+  background:#e6eee1;
+  border-color:#a8bdaa;
+}
+
+.mission-icon {
+  background:#eedee6;
+}
+
+.mission.done .mission-icon {
+  background:#c7dac1;
+}
+
+.stamp {
+  color:#a26983;
+}
+
+.mission.done .stamp {
+  color:#476a54;
+}
+
+.check {
+  background:#b88fa6;
+  color:#fff;
+}
+
+.mission.done .check {
+  background:#587c69;
+}
+
+.track {
+  background:#e9e2d9;
+}
+
+.fill {
+  background:linear-gradient(
+    90deg,
+    #b88fa6,
+    #c18a67,
+    #a8bdaa
+  );
+}
+
+.stat {
+  background:#edf1e8;
+}
+
+.stat strong {
+  color:#785047;
+}
+
+.journal {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fffdf9 0,
+      #fffdf9 31px,
+      #e8e1da 32px
+    );
+  border-color:#b88fa6;
+  color:#4c302d;
+  line-height:32px;
+}
+
+.journal:focus {
+  outline:3px solid #a8bdaa;
+  outline-offset:2px;
+}
+
+.btn {
+  background:linear-gradient(
+    #d6b0c0,
+    #b88fa6
+  );
+  color:#4c302d;
+  box-shadow:0 4px 0 #956d83;
+}
+
+.btn.secondary {
+  background:#785047;
+  color:white;
+  box-shadow:0 4px 0 #4c302d;
+}
+
+.stamp-card {
+  background:#f6eaf0;
+  border-color:#c9a6b4;
+}
+
+.stamp-card.earned {
+  background:#e4efdf;
+  border-color:#819d83;
+}
+
+.celebrate {
+  background:#f7e9d2;
+  border-color:#c18a67;
+}
+
+.gate-card {
+  background:#fffdf9;
+  border-color:#a8bdaa;
+  box-shadow:7px 8px 0 #d6dfcf;
+}
+
+.gate-card h2 {
+  color:#587c69;
+}
+
+.gate-actions a {
+  background:#587c69;
+}
+
+.gate-actions a.secondary {
+  background:#f2dfe5;
+  color:#785047;
+}
+
+button:focus-visible,
+a:focus-visible,
+textarea:focus-visible {
+  outline-color:#587c69;
+}
+
+footer {
+  background:#4c302d;
+}
+
 </style>
 </head>
 
@@ -401,7 +645,7 @@ textarea:focus-visible {
 <div id="campusGate" class="campus-gate">
   <div class="gate-card">
     <div style="font-size:55px">💌</div>
-    <h2>MONTHLY SIDE QUEST</h2>
+    <h2>THE VELVET QUEST DIARIES</h2>
 
     <p id="campusGateMessage" role="status">
       🎓 Checking your campus membership...
@@ -438,11 +682,11 @@ textarea:focus-visible {
 
   <section class="hero">
     <span class="kicker">
-      ✦ THE BESTIE PLAYGROUND PRESENTS ✦
+      ✦ THE VELVET LATTE LOUNGE PRESENTS ✦
     </span>
     <h1>MONTHLY<br>SIDE QUEST</h1>
     <div class="script">
-      Little missions. Big main-character energy. ♡
+      Dear Diary, Let's Make Some Memories ♡
     </div>
     <p>
       Pick your quests, collect your stamps, and make
@@ -464,7 +708,7 @@ textarea:focus-visible {
       <!-- QUEST BOARD -->
 
       <section class="panel">
-        <div class="panel-head">💌 THE QUEST BOARD</div>
+        <div class="panel-head">🌿 THE VELVET QUEST BOARD</div>
 
         <div class="panel-body">
 
@@ -519,11 +763,11 @@ textarea:focus-visible {
 
         <section class="panel">
           <div class="panel-head">
-            🏅 YOUR QUEST STAMP BOOK
+            ☕ YOUR CAFÉ STAMP COLLECTION
           </div>
 
           <div class="panel-body">
-            <h3>Collect Your Little Wins!</h3>
+            <h3>Every Little Sip Counts!</h3>
 
             <p>
               Complete missions to unlock these cute
@@ -541,11 +785,11 @@ textarea:focus-visible {
 
         <section class="panel" style="margin-top:25px">
           <div class="panel-head">
-            📓 THE BESTIE QUEST JOURNAL
+            📓 THE VELVET DIARIES
           </div>
 
           <div class="panel-body">
-            <h3>Dear Diary... ♡</h3>
+            <h3>Dear Diary, Today Was Lovely... ♡</h3>
 
             <p>
               Keep your favorite moments, mini reviews,
@@ -553,7 +797,7 @@ textarea:focus-visible {
             </p>
 
             <label for="journal">
-              <strong>Your private demo journal</strong>
+              <strong>Your private Velvet Diary</strong>
             </label>
 
             <textarea
