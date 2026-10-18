@@ -1,694 +1,1213 @@
 
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f8b8d5">
-<title>Crown Commons | Bestie University</title>
-<link rel="icon" href="assets/logo.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8b8d5">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+  <title>Crown Commons | Bestie University</title>
 
-:root {
-    --pink:#f64fa1;
-    --hot:#dc267c;
-    --blush:#ffe0ed;
-    --cream:#fff8f5;
-    --teal:#176e78;
-    --ink:#382336;
-    --line:#e9a4c4;
-}
+  <link rel="icon" href="assets/logo.png">
 
-* {box-sizing:border-box}
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
 
-body {
-    margin:0;
-    color:var(--ink);
-    font-family:Nunito,sans-serif;
-    background:
-      radial-gradient(circle at 12% 15%,#ffc0dc 0,transparent 28%),
-      radial-gradient(circle at 88% 35%,#c1e5e2 0,transparent 26%),
-      #fff4f9;
-}
+    :root {
+      --pink:#f64fa1;
+      --hot:#dc267c;
+      --blush:#ffe0ed;
+      --cream:#fff8f5;
+      --teal:#176e78;
+      --ink:#382336;
+      --line:#e9a4c4;
+    }
 
-a {color:inherit;text-decoration:none}
-button,input,textarea {font:inherit}
-button {cursor:pointer}
-button:disabled {opacity:.55;cursor:not-allowed}
+    * { box-sizing:border-box; }
 
-.top {
-    background:#23383d;
-    color:white;
-    padding:14px max(18px,calc((100% - 1250px)/2));
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:15px;
-    flex-wrap:wrap;
-    border-bottom:6px solid var(--pink);
-}
+    [hidden] { display:none!important; }
 
-.brand {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-weight:900;
-    font-size:19px;
-}
+    body {
+      margin:0;
+      color:var(--ink);
+      font-family:Nunito,sans-serif;
+      background:
+        radial-gradient(circle at 12% 15%,#ffc0dc 0,transparent 28%),
+        radial-gradient(circle at 88% 35%,#c1e5e2 0,transparent 26%),
+        #fff4f9;
+    }
 
-.brand img {
-    width:55px;
-    height:55px;
-    object-fit:contain;
-}
+    a { color:inherit;text-decoration:none; }
+    button,input,textarea { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { opacity:.55;cursor:not-allowed; }
 
-.top nav {
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
+    .top {
+      background:#23383d;
+      color:white;
+      padding:14px max(18px,calc((100% - 1250px)/2));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:15px;
+      flex-wrap:wrap;
+      border-bottom:6px solid var(--pink);
+    }
 
-.top nav a {
-    padding:10px 16px;
-    border-radius:30px;
-    font-weight:900;
-    background:#ffffff18;
-}
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:900;
+      font-size:19px;
+    }
 
-.top nav a.active {
-    background:var(--pink);
-    color:white;
-}
+    .brand img {
+      width:55px;
+      height:55px;
+      object-fit:contain;
+    }
 
-.hero {
-    position:relative;
-    text-align:center;
-    padding:72px 18px 80px;
-    overflow:hidden;
-    background:
-      repeating-linear-gradient(135deg,transparent 0 30px,#ffffff13 30px 60px),
-      linear-gradient(145deg,#ffc6e0,#f69dca 50%,#d4e9e6);
-    border-bottom:9px solid #253e42;
-}
+    .top nav {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.hero:before,.hero:after {
-    content:"✦";
-    position:absolute;
-    font-size:110px;
-    color:#ffffff95;
-}
+    .top nav a {
+      padding:10px 16px;
+      border-radius:30px;
+      font-weight:900;
+      background:#ffffff18;
+    }
 
-.hero:before {left:8%;top:15%}
-.hero:after {right:8%;bottom:8%}
+    .top nav a.active {
+      background:var(--pink);
+      color:white;
+    }
 
-.kicker {
-    display:inline-block;
-    padding:9px 23px;
-    background:#fff8;
-    border:2px solid white;
-    border-radius:40px;
-    font-weight:900;
-    color:var(--teal);
-    letter-spacing:2px;
-}
+    .hero {
+      position:relative;
+      text-align:center;
+      padding:72px 18px 80px;
+      overflow:hidden;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          transparent 0 30px,
+          #ffffff13 30px 60px
+        ),
+        linear-gradient(145deg,#ffc6e0,#f69dca 50%,#d4e9e6);
+      border-bottom:9px solid #253e42;
+    }
 
-.hero h1 {
-    font-family:Bungee,sans-serif;
-    font-size:clamp(38px,7.5vw,96px);
-    line-height:1.06;
-    margin:25px 0 12px;
-    color:#ff4097;
-    -webkit-text-stroke:1.5px #fff;
-    text-shadow:4px 5px 0 #224b53,7px 8px 0 #ffffff88;
-}
+    .hero:before,
+    .hero:after {
+      content:"✦";
+      position:absolute;
+      font-size:110px;
+      color:#ffffff95;
+      pointer-events:none;
+    }
 
-.hero p {
-    max-width:700px;
-    margin:15px auto;
-    font-size:clamp(17px,2vw,23px);
-    font-weight:900;
-}
+    .hero:before { left:8%;top:15%; }
+    .hero:after { right:8%;bottom:8%; }
 
-.script {
-    font-family:Pacifico,cursive;
-    color:var(--teal);
-    font-size:28px;
-}
+    .kicker {
+      display:inline-block;
+      padding:9px 23px;
+      background:#fff8;
+      border:2px solid white;
+      border-radius:40px;
+      font-weight:900;
+      color:var(--teal);
+      letter-spacing:2px;
+    }
 
-.demo-notice {
-    max-width:1220px;
-    margin:25px auto 0;
-    padding:14px 20px;
-    border:2px dashed #d66a9c;
-    border-radius:16px;
-    background:#fff;
-    font-size:14px;
-    font-weight:800;
-}
+    .hero h1 {
+      font-family:Bungee,sans-serif;
+      font-size:clamp(38px,7.5vw,96px);
+      line-height:1.06;
+      margin:25px 0 12px;
+      color:#ff4097;
+      -webkit-text-stroke:1.5px #fff;
+      text-shadow:
+        4px 5px 0 #224b53,
+        7px 8px 0 #ffffff88;
+    }
 
-.layout {
-    max-width:1260px;
-    margin:28px auto 70px;
-    padding:0 20px;
-    display:grid;
-    grid-template-columns:245px minmax(0,1fr) 265px;
-    gap:22px;
-    align-items:start;
-}
+    .hero p {
+      max-width:700px;
+      margin:15px auto;
+      font-size:clamp(17px,2vw,23px);
+      font-weight:900;
+    }
 
-.panel {
-    border:3px solid #e7a5c6;
-    border-radius:22px;
-    background:white;
-    box-shadow:6px 7px 0 #e5acc6;
-    overflow:hidden;
-    margin-bottom:22px;
-}
+    .script {
+      font-family:Pacifico,cursive;
+      color:var(--teal);
+      font-size:28px;
+    }
 
-.panel-head {
-    background:linear-gradient(110deg,#f64fa1,#ee88ba);
-    color:white;
-    font-weight:900;
-    font-size:16px;
-    padding:15px 19px;
-    border-bottom:3px solid #bf3578;
-}
+    .demo-notice {
+      max-width:1220px;
+      margin:25px auto 0;
+      padding:14px 20px;
+      border:2px dashed #d66a9c;
+      border-radius:16px;
+      background:#fff;
+      font-size:14px;
+      font-weight:800;
+    }
 
-.panel-body {padding:19px}
+    .layout {
+      max-width:1260px;
+      margin:28px auto 70px;
+      padding:0 20px;
+      display:grid;
+      grid-template-columns:245px minmax(0,1fr) 265px;
+      gap:22px;
+      align-items:start;
+    }
 
-.side-link {
-    display:block;
-    padding:13px 12px;
-    margin-bottom:9px;
-    border-radius:12px;
-    background:#fff0f7;
-    font-weight:900;
-}
+    .panel {
+      border:3px solid #e7a5c6;
+      border-radius:22px;
+      background:white;
+      box-shadow:6px 7px 0 #e5acc6;
+      overflow:hidden;
+      margin-bottom:22px;
+    }
 
-.side-link:hover {background:#ffd5e9}
+    .panel-head {
+      background:linear-gradient(110deg,#f64fa1,#ee88ba);
+      color:white;
+      font-weight:900;
+      font-size:16px;
+      padding:15px 19px;
+      border-bottom:3px solid #bf3578;
+    }
 
-.side-link.teal {
-    background:#e0f3f2;
-    color:var(--teal);
-}
+    .panel-body { padding:19px; }
 
-.member-id {
-    text-align:center;
-    padding:22px 15px;
-    background:linear-gradient(140deg,#ffd0e7,#fff,#d5eeee);
-}
+    .side-link {
+      display:block;
+      padding:13px 12px;
+      margin-bottom:9px;
+      border-radius:12px;
+      background:#fff0f7;
+      font-weight:900;
+    }
 
-.member-id .avatar {
-    width:82px;
-    height:82px;
-    display:grid;
-    place-items:center;
-    border-radius:50%;
-    background:white;
-    margin:auto;
-    border:4px solid var(--pink);
-    font-size:40px;
-}
+    .side-link:hover { background:#ffd5e9; }
 
-.member-id strong {
-    display:block;
-    font-size:22px;
-    margin-top:10px;
-}
+    .side-link.teal {
+      background:#e0f3f2;
+      color:var(--teal);
+    }
 
-.member-id small {
-    font-weight:900;
-    color:var(--teal);
-}
+    .member-id {
+      text-align:center;
+      padding:22px 15px;
+      background:linear-gradient(140deg,#ffd0e7,#fff,#d5eeee);
+    }
 
-.tabs {
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-bottom:18px;
-}
+    .member-id .avatar {
+      width:82px;
+      height:82px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:white;
+      margin:auto;
+      border:4px solid var(--pink);
+      font-size:40px;
+      overflow:hidden;
+    }
 
-.tabs button {
-    border:2px solid #d989b1;
-    border-radius:50px;
-    background:white;
-    color:var(--ink);
-    padding:11px 17px;
-    font-weight:900;
-}
+    .member-id .avatar img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
 
-.tabs button.active {
-    color:white;
-    background:var(--teal);
-    border-color:var(--teal);
-}
+    .member-id strong {
+      display:block;
+      font-size:22px;
+      margin-top:10px;
+      overflow-wrap:anywhere;
+    }
 
-.composer textarea,
-.chat-input input,
-.composer input {
-    display:block;
-    width:100%;
-    border:2px solid #edb4d0;
-    background:#fff9fc;
-    border-radius:14px;
-    padding:14px;
-    outline:none;
-}
+    .member-id small {
+      font-weight:900;
+      color:var(--teal);
+    }
 
-.composer textarea {
-    resize:vertical;
-    min-height:105px;
-}
+    .tabs {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
+    }
 
-.composer textarea:focus,
-.chat-input input:focus {
-    border-color:var(--pink);
-}
+    .tabs button {
+      border:2px solid #d989b1;
+      border-radius:50px;
+      background:white;
+      color:var(--ink);
+      padding:11px 17px;
+      font-weight:900;
+    }
 
-.btn {
-    display:inline-block;
-    border:0;
-    border-radius:40px;
-    background:linear-gradient(#ff83be,#e93288);
-    color:white;
-    font-weight:900;
-    padding:12px 23px;
-    margin-top:12px;
-    box-shadow:0 4px 0 #a52c67;
-}
+    .tabs button.active {
+      color:white;
+      background:var(--teal);
+      border-color:var(--teal);
+    }
 
-.btn.teal {
-    background:linear-gradient(#48b1b4,#19737e);
-    box-shadow:0 4px 0 #14525b;
-}
+    .composer textarea,
+    .chat-input input,
+    .composer input {
+      display:block;
+      width:100%;
+      border:2px solid #edb4d0;
+      background:#fff9fc;
+      border-radius:14px;
+      padding:14px;
+      outline:none;
+    }
 
-.post {
-    border-top:2px solid #f5d9e6;
-    padding:22px 0 5px;
-}
+    .composer textarea {
+      resize:vertical;
+      min-height:105px;
+    }
 
-.post:first-child {border-top:0}
+    .composer textarea:focus,
+    .chat-input input:focus {
+      border-color:var(--pink);
+    }
 
-.post-top {
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
+    .btn {
+      display:inline-block;
+      border:0;
+      border-radius:40px;
+      background:linear-gradient(#ff83be,#e93288);
+      color:white;
+      font-weight:900;
+      padding:12px 23px;
+      margin-top:12px;
+      box-shadow:0 4px 0 #a52c67;
+    }
 
-.post-avatar {
-    background:#ffe1ef;
-    border:2px solid #f2a0c7;
-    border-radius:50%;
-    width:46px;
-    height:46px;
-    display:grid;
-    place-items:center;
-    font-size:23px;
-}
+    .btn.teal {
+      background:linear-gradient(#48b1b4,#19737e);
+      box-shadow:0 4px 0 #14525b;
+    }
 
-.post-name {font-weight:900}
-.post-time {font-size:12px;color:#8e6b80}
-.post p {line-height:1.65;white-space:pre-wrap}
+    .post {
+      border-top:2px solid #f5d9e6;
+      padding:22px 0 5px;
+    }
 
-.reaction {
-    background:#fff0f7;
-    border:1px solid #efbfd5;
-    border-radius:20px;
-    padding:7px 13px;
-    font-weight:900;
-}
+    .post:first-child { border-top:0; }
 
-.chat-window {
-    height:350px;
-    overflow-y:auto;
-    padding:16px;
-    background:
-      radial-gradient(#efc5d9 1px,transparent 1px),
-      #fff8fc;
-    background-size:20px 20px;
-}
+    .post-top {
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
 
-.bubble {
-    width:fit-content;
-    max-width:90%;
-    background:white;
-    border:2px solid #edc2d7;
-    padding:11px 14px;
-    border-radius:16px 16px 16px 4px;
-    margin:0 0 12px;
-    overflow-wrap:anywhere;
-}
+    .post-avatar {
+      background:#ffe1ef;
+      border:2px solid #f2a0c7;
+      border-radius:50%;
+      width:46px;
+      height:46px;
+      display:grid;
+      place-items:center;
+      font-size:23px;
+    }
 
-.bubble.mine {
-    background:#fbd2e7;
-    border-color:#ec8bb9;
-    border-radius:16px 16px 4px 16px;
-    margin-left:auto;
-}
+    .post-name { font-weight:900; }
+    .post-time { font-size:12px;color:#8e6b80; }
 
-.bubble strong {
-    display:block;
-    font-size:12px;
-    color:var(--teal);
-    margin-bottom:4px;
-}
+    .post p {
+      line-height:1.65;
+      white-space:pre-wrap;
+    }
 
-.chat-input {padding:15px}
-.chat-input input {margin-bottom:2px}
+    .reaction {
+      background:#fff0f7;
+      border:1px solid #efbfd5;
+      border-radius:20px;
+      padding:7px 13px;
+      font-weight:900;
+    }
 
-.announcement {
-    background:#fff1f7;
-    border-left:5px solid var(--pink);
-    padding:14px;
-    margin-bottom:13px;
-    border-radius:0 12px 12px 0;
-    font-weight:800;
-    line-height:1.5;
-}
+    .chat-window {
+      height:350px;
+      overflow-y:auto;
+      padding:16px;
+      background:
+        radial-gradient(#efc5d9 1px,transparent 1px),
+        #fff8fc;
+      background-size:20px 20px;
+    }
 
-.pill {
-    display:inline-block;
-    padding:7px 12px;
-    border-radius:30px;
-    background:#e0f3f1;
-    color:var(--teal);
-    font-size:12px;
-    font-weight:900;
-}
+    .bubble {
+      width:fit-content;
+      max-width:90%;
+      background:white;
+      border:2px solid #edc2d7;
+      padding:11px 14px;
+      border-radius:16px 16px 16px 4px;
+      margin:0 0 12px;
+      overflow-wrap:anywhere;
+    }
 
-.hidden {display:none!important}
+    .bubble.mine {
+      background:#fbd2e7;
+      border-color:#ec8bb9;
+      border-radius:16px 16px 4px 16px;
+      margin-left:auto;
+    }
 
-footer {
-    background:#263b40;
-    color:white;
-    text-align:center;
-    padding:32px 15px;
-    font-weight:800;
-}
+    .bubble strong {
+      display:block;
+      font-size:12px;
+      color:var(--teal);
+      margin-bottom:4px;
+    }
 
-@media(max-width:1100px) {
-    .layout {grid-template-columns:220px minmax(0,1fr)}
-    .right-col {grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-}
+    .chat-input { padding:15px; }
+    .chat-input input { margin-bottom:2px; }
 
-@media(max-width:720px) {
-    .layout {display:block}
-    .right-col {display:block}
-    .hero {padding:48px 14px}
-    .hero h1 {-webkit-text-stroke:1px white}
-    .top {justify-content:center}
-    .top nav {justify-content:center}
-}
-</style>
+    .announcement {
+      background:#fff1f7;
+      border-left:5px solid var(--pink);
+      padding:14px;
+      margin-bottom:13px;
+      border-radius:0 12px 12px 0;
+      font-weight:800;
+      line-height:1.5;
+    }
+
+    .pill {
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:30px;
+      background:#e0f3f1;
+      color:var(--teal);
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .hidden { display:none!important; }
+
+    /* MEMBERSHIP ACCESS SCREEN */
+
+    .campus-gate {
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:25px;
+    }
+
+    .gate-card {
+      width:min(510px,100%);
+      text-align:center;
+      background:white;
+      border:3px solid #e7a5c6;
+      border-radius:25px;
+      padding:35px 25px;
+      box-shadow:7px 8px 0 #e5acc6;
+    }
+
+    .gate-card h1 {
+      font-family:Bungee,sans-serif;
+      font-size:clamp(22px,4vw,32px);
+      color:var(--hot);
+    }
+
+    .gate-card p {
+      line-height:1.8;
+      font-weight:800;
+    }
+
+    .gate-actions {
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:20px;
+    }
+
+    .gate-actions a {
+      background:var(--teal);
+      color:white;
+      padding:12px 20px;
+      border-radius:30px;
+      font-weight:900;
+    }
+
+    .gate-actions a.secondary {
+      background:#ffe0ed;
+      color:#894365;
+    }
+
+    footer {
+      background:#263b40;
+      color:white;
+      text-align:center;
+      padding:32px 15px;
+      font-weight:800;
+    }
+
+    @media(max-width:1100px) {
+      .layout {
+        grid-template-columns:220px minmax(0,1fr);
+      }
+
+      .right-col {
+        grid-column:1/-1;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:20px;
+      }
+    }
+
+    @media(max-width:720px) {
+      .layout { display:block; }
+      .right-col { display:block; }
+      .hero { padding:48px 14px; }
+      .hero h1 { -webkit-text-stroke:1px white; }
+      .top { justify-content:center; }
+      .top nav { justify-content:center; }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="top">
-    <a class="brand" href="index.html#home">
+  <!-- ACCESS CHECK: VISIBLE UNTIL APPROVED -->
+
+  <div id="campusGate" class="campus-gate">
+    <div class="gate-card">
+
+      <div style="font-size:55px">👑</div>
+
+      <h1>CROWN COMMONS</h1>
+
+      <p id="campusGateMessage" role="status">
+        🎓 Checking your campus membership...
+      </p>
+
+      <div class="gate-actions">
+        <a href="login.html">Campus Login ♡</a>
+        <a href="index.html#home" class="secondary">
+          Campus Quad
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APPROVED MEMBER CONTENT: HIDDEN BY DEFAULT -->
+
+  <div id="campusContent" hidden>
+
+    <header class="top">
+
+      <a class="brand" href="index.html#home">
         <img src="assets/logo.png" alt="Books & Besties logo">
         <span>BESTIE UNIVERSITY 🎓</span>
-    </a>
+      </a>
 
-    <nav>
+      <nav>
         <a href="index.html#home">Campus Quad</a>
         <a href="commons.html" class="active">Crown Commons</a>
         <a href="index.html#crown">Monthly Crown</a>
-        <a href="index.html#dashboard">Bestie Locker</a>
-    </nav>
-</header>
+        <a href="locker.html">Bestie Locker</a>
+      </nav>
 
-<section class="hero">
-    <span class="kicker">✦ THE HEART OF CAMPUS ✦</span>
-    <h1>CROWN<br>COMMONS</h1>
-    <div class="script">Where every Bestie belongs ♡</div>
-    <p>Your bookish besties, campus conversations, and all the tea — together in one fabulous lounge.</p>
-    <span class="pill">💗 OPEN TO ALL BESTIES</span>
-</section>
+    </header>
 
-<div class="demo-notice">
-    🎀 DESIGN PREVIEW — Posts and messages are saved in this browser only.
-    They are not visible to other Besties yet. Shared chat, accounts,
-    moderation, and live updates will be connected later.
-</div>
+    <section class="hero">
 
-<div class="layout">
+      <span class="kicker">
+        ✦ THE HEART OF CAMPUS ✦
+      </span>
 
-    <aside class="left-col">
+      <h1>CROWN<br>COMMONS</h1>
+
+      <div class="script">
+        Where every Bestie belongs ♡
+      </div>
+
+      <p>
+        Your bookish besties, campus conversations,
+        and all the tea — together in one fabulous lounge.
+      </p>
+
+      <span class="pill">
+        💗 OPEN TO ALL APPROVED BESTIES
+      </span>
+
+    </section>
+
+    <div class="demo-notice">
+      🎀 DESIGN PREVIEW — Posts and messages are saved
+      in this browser only. They are not visible to other
+      Besties yet. Shared chat, moderation, and live
+      updates will be connected later.
+    </div>
+
+    <div class="layout">
+
+      <!-- LEFT SIDEBAR -->
+
+      <aside class="left-col">
+
         <div class="panel">
-            <div class="panel-head">🎓 CAMPUS DIRECTORY</div>
-            <div class="panel-body">
-                <a class="side-link" href="index.html#home">🏫 Campus Quad</a>
-                <a class="side-link" href="index.html#book-pick">📚 Campus Library</a>
-                <a class="side-link" href="index.html#crown">🏆 Monthly Crown</a>
-                <a class="side-link" href="index.html#dashboard">🎀 Bestie Locker</a>
-                <a class="side-link teal" href="https://www.facebook.com/share/g/1DQiL7jpnA/" target="_blank" rel="noopener noreferrer">💌 Facebook Group ↗</a>
-            </div>
+
+          <div class="panel-head">
+            🎓 CAMPUS DIRECTORY
+          </div>
+
+          <div class="panel-body">
+
+            <a class="side-link" href="index.html#home">
+              🏫 Campus Quad
+            </a>
+
+            <a class="side-link" href="index.html#book-pick">
+              📚 Campus Library
+            </a>
+
+            <a class="side-link" href="index.html#crown">
+              🏆 Monthly Crown
+            </a>
+
+            <a class="side-link" href="locker.html">
+              🎀 Bestie Locker
+            </a>
+
+            <a
+              class="side-link teal"
+              href="https://www.facebook.com/share/g/1DQiL7jpnA/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              💌 Facebook Group ↗
+            </a>
+
+          </div>
+
         </div>
 
         <div class="panel">
-            <div class="member-id">
-                <div class="avatar">💋</div>
-                <strong>Heyyy, Bestie!</strong>
-                <small>YOUR CAMPUS SOCIAL LOUNGE</small>
-                <p>Every reader has a seat at our table. ♡</p>
-            </div>
-        </div>
-    </aside>
 
-    <div class="center-col">
+          <div class="member-id">
+
+            <div class="avatar" id="commonsAvatar">
+              💋
+            </div>
+
+            <strong id="commonsMemberName">
+              Heyyy, Bestie!
+            </strong>
+
+            <small>
+              VERIFIED CAMPUS BESTIE ♡
+            </small>
+
+            <p>
+              Every reader has a seat at our table. ♡
+            </p>
+
+            <a
+              class="side-link"
+              href="profile.html"
+              style="margin-top:15px"
+            >
+              🎀 Edit My Profile
+            </a>
+
+          </div>
+
+        </div>
+
+      </aside>
+
+      <!-- MAIN CONTENT -->
+
+      <div class="center-col">
 
         <div class="tabs">
-            <button id="feedTab" class="active" type="button">💌 Bestie Bulletin</button>
-            <button id="chatTab" type="button">💬 Bestie Chat</button>
+
+          <button
+            id="feedTab"
+            class="active"
+            type="button"
+          >
+            💌 Bestie Bulletin
+          </button>
+
+          <button id="chatTab" type="button">
+            💬 Bestie Chat
+          </button>
+
         </div>
+
+        <!-- BULLETIN -->
 
         <section id="feedSection">
 
-            <div class="panel">
-                <div class="panel-head">💗 WHAT'S THE TEA, BESTIE?</div>
-                <div class="panel-body composer">
-                    <label for="postText"><strong>Share something with the lounge ♡</strong></label>
-                    <textarea id="postText" maxlength="1000" placeholder="What are you reading? Any fictional crushes? Bookish hot takes? 👀"></textarea>
-                    <button id="publishPost" class="btn" type="button">Post to My Demo Feed 💌</button>
-                </div>
+          <div class="panel">
+
+            <div class="panel-head">
+              💗 WHAT'S THE TEA, BESTIE?
             </div>
 
-            <div class="panel">
-                <div class="panel-head">🎀 THE BESTIE BULLETIN</div>
-                <div class="panel-body" id="posts"></div>
+            <div class="panel-body composer">
+
+              <label for="postText">
+                <strong>
+                  Share something with the lounge ♡
+                </strong>
+              </label>
+
+              <textarea
+                id="postText"
+                maxlength="1000"
+                placeholder="What are you reading? Any fictional crushes? Bookish hot takes? 👀"
+              ></textarea>
+
+              <button
+                id="publishPost"
+                class="btn"
+                type="button"
+              >
+                Post to My Demo Feed 💌
+              </button>
+
             </div>
+
+          </div>
+
+          <div class="panel">
+
+            <div class="panel-head">
+              🎀 THE BESTIE BULLETIN
+            </div>
+
+            <div class="panel-body" id="posts"></div>
+
+          </div>
 
         </section>
+
+        <!-- CHAT -->
 
         <section id="chatSection" class="hidden">
-            <div class="panel">
-                <div class="panel-head">💬 THE BESTIE CHAT · DEMO</div>
-                <div id="chatMessages" class="chat-window" aria-live="polite"></div>
-                <div class="chat-input">
-                    <label for="chatText"><strong>Say something cute ♡</strong></label>
-                    <input id="chatText" maxlength="500" placeholder="Type your message here…">
-                    <button id="sendChat" class="btn teal" type="button">Send Demo Message ↗</button>
-                </div>
+
+          <div class="panel">
+
+            <div class="panel-head">
+              💬 THE BESTIE CHAT · DEMO
             </div>
+
+            <div
+              id="chatMessages"
+              class="chat-window"
+              aria-live="polite"
+            ></div>
+
+            <div class="chat-input">
+
+              <label for="chatText">
+                <strong>Say something cute ♡</strong>
+              </label>
+
+              <input
+                id="chatText"
+                maxlength="500"
+                placeholder="Type your message here…"
+              >
+
+              <button
+                id="sendChat"
+                class="btn teal"
+                type="button"
+              >
+                Send Demo Message ↗
+              </button>
+
+            </div>
+
+          </div>
+
         </section>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+
+      <aside class="right-col">
+
+        <div class="panel">
+
+          <div class="panel-head">
+            📣 CAMPUS BUZZ
+          </div>
+
+          <div class="panel-body">
+
+            <div class="announcement">
+              📚 October Bestie Book Pick:
+              <strong>Misery</strong> by Stephen King.
+            </div>
+
+            <div class="announcement">
+              👻 October campus theme:
+              <strong>Boo &amp; Boujee</strong>.
+            </div>
+
+            <div class="announcement">
+              ☕ Coming in November:
+              <strong>The Velvet Latte Lounge</strong>.
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-head">
+            ✨ A LITTLE CAMPUS REMINDER
+          </div>
+
+          <div class="panel-body">
+
+            <p>
+              <strong>You belong here!</strong>
+              You don't have to participate in
+              Monthly Crown to hang out in Crown Commons.
+            </p>
+
+            <p>
+              Read at your own pace. Make friends.
+              Share your thoughts. Be kind. 💗
+            </p>
+
+          </div>
+
+        </div>
+
+      </aside>
 
     </div>
 
-    <aside class="right-col">
-        <div class="panel">
-            <div class="panel-head">📣 CAMPUS BUZZ</div>
-            <div class="panel-body">
-                <div class="announcement">📚 October Bestie Book Pick: <strong>Misery</strong> by Stephen King.</div>
-                <div class="announcement">👻 October campus theme: <strong>Boo & Boujee</strong>.</div>
-                <div class="announcement">☕ Coming in November: <strong>The Velvet Latte Lounge</strong>.</div>
-            </div>
-        </div>
+    <footer>
+      BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+      <p>© <span id="year"></span> Bestie University</p>
+    </footer>
 
-        <div class="panel">
-            <div class="panel-head">✨ A LITTLE CAMPUS REMINDER</div>
-            <div class="panel-body">
-                <p><strong>You belong here!</strong> You don't have to participate in Monthly Crown to hang out in Crown Commons.</p>
-                <p>Read at your own pace. Make friends. Share your thoughts. Be kind. 💗</p>
-            </div>
-        </div>
-    </aside>
+  </div>
 
-</div>
+  <!-- SUPABASE + CAMPUS GUARD -->
 
-<footer>
-    BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
-    <p>© <span id="year"></span> Bestie University</p>
-</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
 
-<script>
-(() => {
-    'use strict';
+  <script>
+    (() => {
+      "use strict";
 
-    const $ = selector => document.querySelector(selector);
+      const $ = selector => document.querySelector(selector);
 
-    const POSTS_KEY = 'bb_commons_demo_posts_v1';
-    const CHAT_KEY = 'bb_commons_demo_chat_v1';
+      const POSTS_KEY = "bb_commons_demo_posts_v1";
+      const CHAT_KEY = "bb_commons_demo_chat_v1";
 
-    const readSaved = key => {
+      const readSaved = key => {
         try {
-            const data = JSON.parse(localStorage.getItem(key));
-            return Array.isArray(data) ? data : [];
+          const data = JSON.parse(
+            localStorage.getItem(key)
+          );
+
+          return Array.isArray(data) ? data : [];
+
         } catch {
-            return [];
+          return [];
         }
-    };
+      };
 
-    let posts = readSaved(POSTS_KEY);
-    let chats = readSaved(CHAT_KEY);
+      let posts = readSaved(POSTS_KEY);
+      let chats = readSaved(CHAT_KEY);
 
-    const save = (key, data) => {
+      let currentBestieName = "Bestie";
+      let initialized = false;
+
+      const save = (key, data) => {
         try {
-            localStorage.setItem(key, JSON.stringify(data));
-        } catch {
-            alert('Your browser could not save this demo entry.');
-        }
-    };
+          localStorage.setItem(
+            key,
+            JSON.stringify(data)
+          );
 
-    const make = (tag, className, content) => {
+        } catch {
+          alert(
+            "Your browser could not save this demo entry."
+          );
+        }
+      };
+
+      const make = (tag, className, content) => {
         const element = document.createElement(tag);
-        if (className) element.className = className;
-        if (content !== undefined) element.textContent = content;
+
+        if (className) {
+          element.className = className;
+        }
+
+        if (content !== undefined) {
+          element.textContent = content;
+        }
+
         return element;
-    };
+      };
 
-    const time = timestamp =>
-        new Date(timestamp).toLocaleString('en-US', {
-            month:'short',
-            day:'numeric',
-            hour:'numeric',
-            minute:'2-digit'
-        });
+      const time = timestamp =>
+        new Date(timestamp).toLocaleString(
+          "en-US",
+          {
+            month:"short",
+            day:"numeric",
+            hour:"numeric",
+            minute:"2-digit"
+          }
+        );
 
-    function renderPosts() {
-        const root = $('#posts');
+      function renderPosts() {
+        const root = $("#posts");
         root.replaceChildren();
 
         if (!posts.length) {
-            root.append(
-                make('p', '', '💗 Your demo bulletin is waiting! Share your first bookish thought above.')
-            );
-            return;
+          root.append(
+            make(
+              "p",
+              "",
+              "💗 Your demo bulletin is waiting! Share your first bookish thought above."
+            )
+          );
+
+          return;
         }
 
         posts.forEach(post => {
-            const article = make('article', 'post');
-            const header = make('div', 'post-top');
-            const avatar = make('span', 'post-avatar', '💋');
-            const info = make('div');
-            info.append(
-                make('div', 'post-name', 'You · Demo Bestie'),
-                make('div', 'post-time', time(post.created))
-            );
+          const article = make("article", "post");
+          const header = make("div", "post-top");
+          const avatar = make(
+            "span",
+            "post-avatar",
+            "💋"
+          );
 
-            header.append(avatar, info);
+          const info = make("div");
 
-            const body = make('p', '', post.text);
-            const like = make('button', 'reaction', `💗 ${post.liked ? 'Liked' : 'Like'} · ${post.liked ? 1 : 0}`);
-            like.type = 'button';
+          info.append(
+            make(
+              "div",
+              "post-name",
+              currentBestieName + " · Demo"
+            ),
+            make(
+              "div",
+              "post-time",
+              time(post.created)
+            )
+          );
 
-            like.addEventListener('click', () => {
-                post.liked = !post.liked;
-                save(POSTS_KEY, posts);
-                renderPosts();
-            });
+          header.append(avatar, info);
 
-            article.append(header, body, like);
-            root.append(article);
+          const body = make(
+            "p",
+            "",
+            post.text
+          );
+
+          const like = make(
+            "button",
+            "reaction",
+            `💗 ${post.liked ? "Liked" : "Like"} · ${post.liked ? 1 : 0}`
+          );
+
+          like.type = "button";
+
+          like.addEventListener("click", () => {
+            post.liked = !post.liked;
+            save(POSTS_KEY, posts);
+            renderPosts();
+          });
+
+          article.append(header, body, like);
+          root.append(article);
         });
-    }
+      }
 
-    function renderChat() {
-        const root = $('#chatMessages');
+      function renderChat() {
+        const root = $("#chatMessages");
         root.replaceChildren();
 
         if (!chats.length) {
-            const bubble = make('div', 'bubble');
-            bubble.append(
-                make('strong', '', 'Campus Welcome · Demo'),
-                make('span', '', 'Heyyy Bestie! 🎀 This is a private browser demo. Try sending a message!')
-            );
-            root.append(bubble);
+          const bubble = make("div", "bubble");
+
+          bubble.append(
+            make(
+              "strong",
+              "",
+              "Campus Welcome · Demo"
+            ),
+            make(
+              "span",
+              "",
+              "Heyyy Bestie! 🎀 This is a private browser demo. Try sending a message!"
+            )
+          );
+
+          root.append(bubble);
         }
 
         chats.forEach(chat => {
-            const bubble = make('div', 'bubble mine');
-            bubble.append(
-                make('strong', '', `You · ${time(chat.created)}`),
-                make('span', '', chat.text)
-            );
-            root.append(bubble);
+          const bubble = make(
+            "div",
+            "bubble mine"
+          );
+
+          bubble.append(
+            make(
+              "strong",
+              "",
+              `${currentBestieName} · ${time(chat.created)}`
+            ),
+            make(
+              "span",
+              "",
+              chat.text
+            )
+          );
+
+          root.append(bubble);
         });
 
         root.scrollTop = root.scrollHeight;
-    }
+      }
 
-    function showTab(tab) {
-        const feed = tab === 'feed';
+      function showTab(tab) {
+        const feed = tab === "feed";
 
-        $('#feedSection').classList.toggle('hidden', !feed);
-        $('#chatSection').classList.toggle('hidden', feed);
+        $("#feedSection").classList.toggle(
+          "hidden",
+          !feed
+        );
 
-        $('#feedTab').classList.toggle('active', feed);
-        $('#chatTab').classList.toggle('active', !feed);
-    }
+        $("#chatSection").classList.toggle(
+          "hidden",
+          feed
+        );
 
-    $('#feedTab').addEventListener('click', () => showTab('feed'));
-    $('#chatTab').addEventListener('click', () => showTab('chat'));
+        $("#feedTab").classList.toggle(
+          "active",
+          feed
+        );
 
-    $('#publishPost').addEventListener('click', () => {
-        const text = $('#postText').value.trim();
-        if (!text) return;
+        $("#chatTab").classList.toggle(
+          "active",
+          !feed
+        );
+      }
 
-        posts.unshift({
-            id:crypto.randomUUID(),
-            text,
-            created:Date.now(),
-            liked:false
-        });
+      function initializeDemo() {
+        if (initialized) return;
 
-        save(POSTS_KEY, posts);
-        $('#postText').value = '';
-        renderPosts();
-    });
+        initialized = true;
 
-    function sendMessage() {
-        const text = $('#chatText').value.trim();
-        if (!text) return;
+        $("#feedTab").addEventListener(
+          "click",
+          () => showTab("feed")
+        );
 
-        chats.push({
+        $("#chatTab").addEventListener(
+          "click",
+          () => showTab("chat")
+        );
+
+        $("#publishPost").addEventListener(
+          "click",
+          () => {
+            const text = $("#postText").value.trim();
+
+            if (!text) return;
+
+            posts.unshift({
+              id:crypto.randomUUID(),
+              text,
+              created:Date.now(),
+              liked:false
+            });
+
+            save(POSTS_KEY, posts);
+
+            $("#postText").value = "";
+
+            renderPosts();
+          }
+        );
+
+        function sendMessage() {
+          const text = $("#chatText").value.trim();
+
+          if (!text) return;
+
+          chats.push({
             id:crypto.randomUUID(),
             text,
             created:Date.now()
+          });
+
+          save(CHAT_KEY, chats);
+
+          $("#chatText").value = "";
+
+          renderChat();
+        }
+
+        $("#sendChat").addEventListener(
+          "click",
+          sendMessage
+        );
+
+        $("#chatText").addEventListener(
+          "keydown",
+          event => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              sendMessage();
+            }
+          }
+        );
+
+        $("#year").textContent =
+          new Date().getFullYear();
+
+        renderPosts();
+        renderChat();
+      }
+
+      async function initializeCommons() {
+        const guard = window.BB_CAMPUS_GUARD;
+
+        if (!guard) {
+          $("#campusGateMessage").textContent =
+            "Campus access verification is unavailable. Please try again.";
+
+          return;
+        }
+
+        // Verify approval before displaying page content.
+        const result = await guard.protectPage({
+          level:"approved",
+          gateId:"campusGate",
+          contentId:"campusContent",
+          messageId:"campusGateMessage"
         });
 
-        save(CHAT_KEY, chats);
-        $('#chatText').value = '';
-        renderChat();
-    }
+        if (!result.allowed) return;
 
-    $('#sendChat').addEventListener('click', sendMessage);
+        const memberName =
+          result.profile.display_name || "Bestie";
 
-    $('#chatText').addEventListener('keydown', event => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            sendMessage();
+        currentBestieName = memberName;
+
+        $("#commonsMemberName").textContent =
+          "Heyyy, " + memberName + "!";
+
+        // Load the member's saved campus portrait.
+        const {
+          data:profile,
+          error:profileError
+        } = await result.client
+          .from("profiles")
+          .select("avatar_path")
+          .eq("id",result.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.warn(
+            "Commons portrait:",
+            profileError
+          );
         }
-    });
 
-    $('#year').textContent = new Date().getFullYear();
+        if (profile?.avatar_path) {
+          const expectedPrefix =
+            result.user.id + "/";
 
-    renderPosts();
-    renderChat();
-})();
-</script>
+          if (
+            profile.avatar_path.startsWith(
+              expectedPrefix
+            )
+          ) {
+            const { data:avatarData } =
+              result.client.storage
+                .from("bestie-avatars")
+                .getPublicUrl(profile.avatar_path);
+
+            if (avatarData?.publicUrl) {
+              const avatar =
+                $("#commonsAvatar");
+
+              const image =
+                document.createElement("img");
+
+              image.alt =
+                memberName + "'s profile picture";
+
+              image.addEventListener(
+                "error",
+                () => {
+                  avatar.textContent = "💋";
+                },
+                { once:true }
+              );
+
+              image.src = avatarData.publicUrl;
+
+              avatar.replaceChildren(image);
+            }
+          }
+        }
+
+        initializeDemo();
+      }
+
+      initializeCommons().catch(error => {
+        console.error(
+          "Crown Commons initialization:",
+          error
+        );
+
+        $("#campusContent").hidden = true;
+        $("#campusGate").hidden = false;
+
+        $("#campusGateMessage").textContent =
+          "We couldn't load Crown Commons. Please try again.";
+      });
+
+    })();
+  </script>
 
 </body>
 </html>
