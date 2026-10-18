@@ -1,0 +1,463 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus Announcements | Bestie University</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff8f2, #f8dce8);
+      color: #563b3b;
+      font-family: Georgia, serif;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    .gate {
+      max-width: 600px;
+      margin: 90px auto;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .page {
+      max-width: 950px;
+      margin: auto;
+      padding: 30px 20px 70px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 30px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .top-nav a {
+      color: #563b3b;
+      text-decoration: none;
+    }
+
+    .hero {
+      padding: 45px 25px;
+      border-radius: 25px;
+      background: #e8b4c8;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .eyebrow {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 52px);
+      margin: 15px 0;
+    }
+
+    .hero p { line-height: 1.7; }
+
+    .panel, .announcement {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px #563b3b10;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      font: 700 12px Arial, sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      background: white;
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .primary-button {
+      background: #563b3b;
+      color: white;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 22px;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .primary-button:disabled {
+      opacity: .5;
+    }
+
+    .announcement-tag {
+      display: inline-block;
+      background: #fff0f6;
+      border-radius: 20px;
+      padding: 7px 12px;
+      font: 700 11px Arial, sans-serif;
+    }
+
+    .announcement h3 {
+      font-size: 23px;
+      margin: 14px 0 8px;
+    }
+
+    .announcement-meta {
+      font: 12px Arial, sans-serif;
+      opacity: .7;
+    }
+
+    .announcement-content {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.8;
+      margin-top: 18px;
+    }
+
+    .status {
+      font-size: 14px;
+      margin: 15px 0 25px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">
+      Checking campus announcement access...
+    </p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+    <nav class="top-nav">
+      <a href="housing.html">← CAMPUS HOUSING</a>
+      <a href="locker.html">MY BESTIE LOCKER 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · CAMPUS NEWS
+      </div>
+      <h1>📣 The Campus Bulletin</h1>
+      <p>
+        Sweet little updates, important announcements,
+        and all the latest dorm news.
+      </p>
+    </header>
+
+    <section id="staffPanel" class="panel" hidden>
+      <h2>Publish an Announcement 💌</h2>
+      <p>Campus staff publishing desk.</p>
+
+      <form id="announcementForm">
+        <div class="field">
+          <label for="announcementScope">Who should see this?</label>
+          <select id="announcementScope" required>
+            <option value="">Loading destinations...</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="announcementTitle">Announcement Title</label>
+          <input id="announcementTitle" maxlength="200" required>
+        </div>
+
+        <div class="field">
+          <label for="announcementContent">Announcement</label>
+          <textarea id="announcementContent"
+            maxlength="5000" required></textarea>
+        </div>
+
+        <div class="field">
+          <label>
+            <input id="announcementPinned" type="checkbox"
+              style="width:auto">
+            📌 Pin this announcement
+          </label>
+        </div>
+
+        <button id="publishButton"
+          class="primary-button" type="submit">
+          PUBLISH ANNOUNCEMENT 📣
+        </button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Latest Campus News ✨</h2>
+      <p id="announcementStatus" class="status">
+        Loading announcements...
+      </p>
+      <div id="announcementFeed"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const guard = window.BB_CAMPUS_GUARD;
+      const gate = document.getElementById("campusGate");
+      const gateMessage =
+        document.getElementById("campusGateMessage");
+      const content = document.getElementById("campusContent");
+      const staffPanel = document.getElementById("staffPanel");
+      const form = document.getElementById("announcementForm");
+      const scope = document.getElementById("announcementScope");
+      const feed = document.getElementById("announcementFeed");
+      const status =
+        document.getElementById("announcementStatus");
+      const publishButton =
+        document.getElementById("publishButton");
+
+      function deny(message) {
+        content.hidden = true;
+        content.style.display = "none";
+        gate.hidden = false;
+        gate.style.display = "block";
+        gateMessage.textContent = message;
+      }
+
+      if (!guard) {
+        deny("Campus authentication is unavailable.");
+        return;
+      }
+
+      let result;
+
+      try {
+        result = await guard.protectPage({
+          level: "approved",
+          gateId: "campusGate",
+          contentId: "campusContent",
+          messageId: "campusGateMessage"
+        });
+      } catch (error) {
+        console.error(error);
+        deny("Unable to verify campus membership.");
+        return;
+      }
+
+      if (!result?.user) return;
+
+      const client = result.client || guard.getClient();
+
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Staff check failed:", staffError);
+      }
+
+      gate.hidden = true;
+      gate.style.display = "none";
+      content.hidden = false;
+      content.style.display = "block";
+
+      const dormNames = new Map();
+
+      // Load dorm names for announcement labels.
+      const { data: dorms, error: dormError } = await client
+        .from("housing_dorm_settings")
+        .select("id, team_id");
+
+      if (dormError) {
+        console.error("Dorm loading error:", dormError);
+      }
+
+      const teamIds = [...new Set(
+        (dorms || []).map(dorm => dorm.team_id)
+      )];
+
+      const teamNames = new Map();
+
+      if (teamIds.length) {
+        const { data: teams, error: teamsError } = await client
+          .from("crown_teams")
+          .select("id, name, emoji")
+          .in("id", teamIds);
+
+        if (teamsError) {
+          console.error("Team loading error:", teamsError);
+        }
+
+        for (const team of teams || []) {
+          teamNames.set(
+            team.id,
+            `${team.emoji || "🏡"} ${team.name}`
+          );
+        }
+      }
+
+      for (const dorm of dorms || []) {
+        dormNames.set(
+          dorm.id,
+          teamNames.get(dorm.team_id) || "Dorm Announcement"
+        );
+      }
+
+      if (isStaff === true) {
+        staffPanel.hidden = false;
+
+        scope.replaceChildren();
+
+        const campusOption = document.createElement("option");
+        campusOption.value = "campus";
+        campusOption.textContent = "🎓 Entire Campus";
+        scope.appendChild(campusOption);
+
+        for (const dorm of dorms || []) {
+          const option = document.createElement("option");
+          option.value = dorm.id;
+          option.textContent = dormNames.get(dorm.id);
+          scope.appendChild(option);
+        }
+      }
+
+      async function loadAnnouncements() {
+        const { data: announcements, error } = await client
+          .from("housing_announcements")
+          .select(
+            "id, dorm_id, title, content, is_pinned, " +
+            "is_published, published_at, expires_at"
+          )
+          .eq("is_published", true)
+          .lte("published_at", new Date().toISOString())
+          .order("is_pinned", { ascending: false })
+          .order("published_at", { ascending: false })
+          .limit(100);
+
+        if (error) {
+          console.error("Announcements error:", error);
+          status.textContent = "Unable to load announcements.";
+          return;
+        }
+
+        feed.replaceChildren();
+
+        const now = new Date();
+
+        const visible = (announcements || []).filter(item =>
+          !item.expires_at ||
+          new Date(item.expires_at) > now
+        );
+
+        if (!visible.length) {
+          status.textContent =
+            "No announcements yet. Check back soon! 💗";
+          return;
+        }
+
+        status.textContent =
+          `${visible.length} announcement(s)`;
+
+        for (const item of visible) {
+          const card = document.createElement("article");
+          card.className = "announcement";
+
+          const tag = document.createElement("div");
+          tag.className = "announcement-tag";
+          tag.textContent = item.dorm_id
+            ? dormNames.get(item.dorm_id) || "🏡 Dorm News"
+            : "🎓 Campus-Wide";
+
+          const title = document.createElement("h3");
+          title.textContent =
+            `${item.is_pinned ? "📌 " : ""}${item.title}`;
+
+          const meta = document.createElement("div");
+          meta.className = "announcement-meta";
+          meta.textContent = item.published_at
+            ? new Date(item.published_at).toLocaleString()
+            : "";
+
+          const body = document.createElement("div");
+          body.className = "announcement-content";
+          body.textContent = item.content;
+
+          card.append(tag, title, meta, body);
+          feed.appendChild(card);
+        }
+      }
+
+      await loadAnnouncements();
+
+      if (isStaff === true) {
+        form.addEventListener("submit", async event => {
+          event.preventDefault();
+
+          const title =
+            document.getElementById("announcementTitle")
+              .value.trim();
+
+          const text =
+            document.getElementById("announcementContent")
+              .value.trim();
+
+          const destination = scope.value;
+
+          if (!title || !text || !destination) return;
+
+          publishButton.disabled = true;
+
+          const { error } = await client
+            .from("housing_announcements")
+            .insert({
+              dorm_id: destination === "campus"
+                ? null
+                : destination,
+              author_id: result.user.id,
+              title,
+              content: text,
+              is_published: true,
+              is_pinned:
+                document.getElementById("announcementPinned")
+                  .checked,
+              published_at: new Date().toISOString()
+            });
+
+          publishButton.disabled = false;
+
+          if (error) {
+            console.error("Publishing error:", error);
+            alert("Couldn't publish the announcement.");
+            return;
+          }
+
+          form.reset();
+          await loadAnnouncements();
+        });
+      }
+    })().catch(error => {
+      console.error("Campus announcements error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Something went wrong loading announcements.";
+      document.getElementById("campusGate").style.display = "block";
+    });
+  </script>
+</body>
+</html>
