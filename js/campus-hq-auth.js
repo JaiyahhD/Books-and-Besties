@@ -1,112 +1,89 @@
 
 /* ==========================================
    BESTIE UNIVERSITY 🎓💗
-   CAMPUS HQ — AUTHENTICATION GATE
+   CAMPUS OVERVIEW — LIVE STATISTICS
    ========================================== */
 
 (() => {
   "use strict";
 
-  const config = window.BB_CONFIG;
+  const $ = (id) => document.getElementById(id);
 
-  const gate = document.getElementById("campusAuthGate");
-  const dashboard = document.getElementById("campusDashboard");
-  const message = document.getElementById("campusAuthMessage");
+  let initialized = false;
 
-  function showGate(text) {
-    if (gate) gate.hidden = false;
-    if (dashboard) dashboard.hidden = true;
-    if (message) message.textContent = text;
-  }
+  async function loadCampusOverview() {
+    // Reuse the authenticated Campus HQ client.
+    const client = window.BB_CAMPUS_CLIENT;
 
-  function showDashboard() {
-    if (gate) gate.hidden = true;
-    if (dashboard) dashboard.hidden = false;
-  }
-
-  async function initialize() {
-    if (
-      !window.supabase ||
-      !config?.SUPABASE_URL ||
-      !config?.SUPABASE_ANON_KEY
-    ) {
-      showGate("Campus HQ configuration is unavailable.");
+    if (!client) {
+      console.error(
+        "Campus Overview: Supabase client unavailable."
+      );
       return;
     }
 
-    const client = window.supabase.createClient(
-      config.SUPABASE_URL,
-      config.SUPABASE_ANON_KEY
+    const { data, error } = await client.rpc(
+      "get_campus_overview_stats"
     );
 
-    window.BB_CAMPUS_CLIENT = client;
-
-    const {
-      data: { user },
-      error: authError
-    } = await client.auth.getUser();
-
-    if (authError || !user) {
-      showGate(
-        "🗝️ The Dean's Office is reserved for campus staff. " +
-        "Please sign in with your approved staff account."
+    if (error) {
+      console.error(
+        "Campus Overview: " + error.message
       );
       return;
     }
 
-    const { data: profile, error: profileError } =
-      await client
-        .from("profiles")
-        .select("display_name, membership_status")
-        .eq("id", user.id)
-        .maybeSingle();
+    const stats = Array.isArray(data) ? data[0] : data;
 
-    if (
-      profileError ||
-      !profile ||
-      profile.membership_status !== "approved"
-    ) {
-      showGate("Your campus membership is not approved.");
-      return;
-    }
-
-    const { data: staff, error: staffError } =
-      await client
-        .from("campus_staff")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-    if (
-      staffError ||
-      !staff ||
-      !["admin", "moderator"].includes(staff.role)
-    ) {
-      showGate(
-        "This office is reserved for authorized campus staff."
+    if (!stats) {
+      console.warn(
+        "Campus Overview: No statistics returned."
       );
       return;
     }
 
-    window.BB_CAMPUS_STAFF = {
-      id: user.id,
-      displayName: profile.display_name,
-      role: staff.role
+    const values = {
+      statMembers: stats.approved_besties,
+      statPending: stats.pending_applications,
+      statActivities: stats.published_activities,
+      statVIP: stats.active_vips
     };
 
-    showDashboard();
+    for (const [id, value] of Object.entries(values)) {
+      const element = $(id);
 
-    document.dispatchEvent(
-      new CustomEvent("bb:campus-hq-ready", {
-        detail: {
-          role: staff.role
-        }
-      })
+      if (element) {
+        element.textContent = Number(
+          value ?? 0
+        ).toLocaleString();
+      }
+    }
+
+    console.log(
+      "👑 Campus Overview statistics loaded:",
+      stats
     );
   }
 
-  initialize().catch(error => {
-    console.error("Campus HQ authentication:", error);
-    showGate("Unable to verify campus staff access.");
-  });
+  function initialize() {
+    if (initialized) return;
+    initialized = true;
+
+    loadCampusOverview();
+
+    // Refresh statistics when returning to this tab.
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (!document.hidden) {
+          loadCampusOverview();
+        }
+      }
+    );
+  }
+
+  document.addEventListener(
+    "bb:campus-hq-ready",
+    initialize
+  );
 })();
