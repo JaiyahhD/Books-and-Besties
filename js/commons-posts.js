@@ -204,6 +204,13 @@
         }
 
         postsRoot.append(article);
+
+        await window.BB_COMMONS_COMMENTS.addComments(
+        article,
+        post,
+        client,
+        user
+        );
       }
     }
 
