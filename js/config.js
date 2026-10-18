@@ -19,7 +19,7 @@ window.BB_CONFIG = {
   // SUPABASE PROJECT CONNECTION
   // Supabase → Project Settings → API
 
-  SUPABASE_URL: 'https://kmhmspcyelazxzeohczv.supabase.co/rest/v1/',
+  SUPABASE_URL: 'https://kmhmspcyelazxzeohczv.supabase.co',
 
   // Supabase → Project Settings → API Keys
   // Use the publishable key (sb_publishable_...)
