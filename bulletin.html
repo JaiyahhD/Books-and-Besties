@@ -1,0 +1,888 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bulletin Board | Bestie University</title>
+
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --espresso: #563b3b;
+      --cream: #fff8f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      color: var(--espresso);
+      background: linear-gradient(135deg, #fff8f2, #f8dce8);
+    }
+
+    button, textarea { font: inherit; }
+
+    .gate {
+      max-width: 600px;
+      margin: 90px auto;
+      padding: 30px;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .page {
+      max-width: 950px;
+      margin: auto;
+      padding: 30px 20px 70px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 30px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .top-nav a {
+      color: var(--espresso);
+      text-decoration: none;
+    }
+
+    .hero {
+      background: var(--pink);
+      padding: 42px 25px;
+      border-radius: 25px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .eyebrow {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 50px);
+      margin: 15px 0;
+    }
+
+    .hero p { line-height: 1.7; }
+
+    .panel, .post-card {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px #563b3b10;
+    }
+
+    .panel h2 { margin-top: 0; }
+
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      padding: 15px;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      resize: vertical;
+      font-size: 14px;
+    }
+
+    .primary-button {
+      border: none;
+      border-radius: 12px;
+      background: var(--espresso);
+      color: white;
+      padding: 13px 22px;
+      margin-top: 12px;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .primary-button:disabled { opacity: .5; }
+
+    .post-meta {
+      font: 700 12px Arial, sans-serif;
+      opacity: .7;
+      margin-bottom: 12px;
+    }
+
+    .post-content {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.8;
+    }
+
+    .post-actions {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .post-actions button {
+      background: #fff0f6;
+      color: #85506a;
+      border: none;
+      border-radius: 10px;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+
+    .notice {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      opacity: .75;
+    }
+
+    
+/* 🎀 Bulletin Board Comments */
+
+.post-comments {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #eadce0;
+}
+
+.post-comments h4 {
+  margin: 0 0 14px;
+}
+
+.comment {
+  padding: 12px 14px;
+  background: #fff7fa;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.comment p {
+  margin: 7px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comment-form {
+  margin-top: 15px;
+}
+
+.comment-form textarea {
+  min-height: 65px;
+}
+
+.comment-form button {
+  margin-top: 8px;
+}
+
+/* 💌 Bestie reply reactions */
+.comment-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.comment-reactions button {
+  border: 1px solid #f0d7e2;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.comment-reactions button.reacted {
+  background: #f6d7e5;
+  border-color: #d99ab8;
+  color: #78405e;
+}
+
+.comment-reactions button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+/* 🎀 Bulletin Board editing */
+.edit-content-button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 13px;
+  border: 1px solid #ead0db;
+  border-radius: 10px;
+  background: #fff0f6;
+  color: #85506a;
+  font: 700 11px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.edit-content-button:hover {
+  background: #f6d7e5;
+}
+
+.edit-content-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+  </style>
+</head>
+
+<body>
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">
+      Checking your Bulletin Board access...
+    </p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+    <nav class="top-nav">
+      <a id="backToDorm" href="housing.html">← MY DORM</a>
+      <a href="locker.html">MY BESTIE LOCKER 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · RESIDENTIAL LIFE
+      </div>
+      <h1 id="boardTitle">📌 Bulletin Board</h1>
+      <p id="boardSubtitle">Your team's shared feed.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Leave a Little Note 💌</h2>
+      <p>Updates, reading plans, team encouragement, and everything in between.</p>
+
+      <form id="postForm">
+        <textarea id="postInput" maxlength="5000"
+          placeholder="What's happening in your dorm?"
+          required></textarea>
+        <button id="postButton" class="primary-button"
+          type="submit">POST TO BOARD 📌</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Our Dorm Feed ✨</h2>
+      <p id="boardStatus">Loading posts...</p>
+      <div id="postFeed"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const gate = document.getElementById("campusGate");
+      const gateMessage = document.getElementById("campusGateMessage");
+      const content = document.getElementById("campusContent");
+      const status = document.getElementById("boardStatus");
+      const feed = document.getElementById("postFeed");
+      const form = document.getElementById("postForm");
+      const input = document.getElementById("postInput");
+      const postButton = document.getElementById("postButton");
+
+      function deny(message) {
+        content.hidden = true;
+        content.style.display = "none";
+        gate.hidden = false;
+        gate.style.display = "block";
+        gateMessage.textContent = message;
+      }
+
+      const guard = window.BB_CAMPUS_GUARD;
+
+      if (!guard) {
+        deny("Campus authentication is unavailable.");
+        return;
+      }
+
+      let result;
+
+      try {
+        result = await guard.protectPage({
+          level: "approved",
+          gateId: "campusGate",
+          contentId: "campusContent",
+          messageId: "campusGateMessage"
+        });
+      } catch (error) {
+        console.error(error);
+        deny("Unable to verify campus membership.");
+        return;
+      }
+
+      if (!result?.user) return;
+
+      content.hidden = true;
+
+      const client = result.client || guard.getClient();
+      const roomId = new URLSearchParams(location.search).get("room");
+
+      if (!roomId) {
+        deny("No Bulletin Board selected.");
+        return;
+      }
+
+      // Supabase RLS independently restricts dorm access.
+      const { data: room, error: roomError } = await client
+        .from("housing_rooms")
+        .select("id, dorm_id, room_type, is_available")
+        .eq("id", roomId)
+        .eq("room_type", "bulletin_board")
+        .eq("is_available", true)
+        .maybeSingle();
+
+      if (roomError || !room) {
+        deny("🔒 This Bulletin Board is residents-only.");
+        return;
+      }
+
+      const { data: dorm, error: dormError } = await client
+        .from("housing_dorm_settings")
+        .select("id, team_id, primary_color")
+        .eq("id", room.dorm_id)
+        .maybeSingle();
+
+      if (dormError || !dorm) {
+        deny("Unable to load your dorm.");
+        return;
+      }
+
+      const { data: team, error: teamError } = await client
+        .from("crown_teams")
+        .select("id, name, emoji")
+        .eq("id", dorm.team_id)
+        .maybeSingle();
+
+      if (teamError || !team) {
+        deny("Unable to load your team.");
+        return;
+      }
+
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("id")
+          .eq("user_id", result.user.id)
+          .eq("team_id", team.id)
+          .eq("status", "approved")
+          .maybeSingle();
+
+      if (enrollmentError || !enrollment) {
+        deny("🔒 This board belongs to assigned residents.");
+        return;
+      }
+
+      document.getElementById("boardTitle").textContent =
+        `${team.emoji || "🏡"} Bulletin Board`;
+
+      document.getElementById("boardSubtitle").textContent =
+        `${team.name} · Your private team feed`;
+
+      document.querySelector(".hero").style.background =
+        dorm.primary_color || "#e8b4c8";
+
+      document.getElementById("backToDorm").href =
+        `dorm.html?team=${encodeURIComponent(team.id)}`;
+
+      gate.hidden = true;
+      gate.style.display = "none";
+      content.hidden = false;
+      content.style.display = "block";
+
+      const names = new Map();
+
+      async function loadPosts() {
+        const { data: posts, error } = await client
+          .from("housing_posts")
+          .select("id, author_id, content, created_at, is_pinned")
+          .eq("dorm_id", dorm.id)
+          .eq("is_removed", false)
+          .order("is_pinned", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(100);
+
+        if (error) {
+          console.error("Post loading error:", error);
+          status.textContent = "Unable to load posts.";
+          return;
+        }
+
+        const ids = [...new Set(
+          (posts || []).map(post => post.author_id)
+        )].filter(id => !names.has(id));
+
+        if (ids.length) {
+          const { data: profiles } = await client
+            .from("profiles")
+            .select("id, display_name")
+            .in("id", ids);
+
+          for (const profile of profiles || []) {
+            names.set(profile.id, profile.display_name);
+          }
+        }
+
+        feed.replaceChildren();
+
+        if (!posts?.length) {
+          status.textContent =
+            "No posts yet. Be the first to leave a note! 💗";
+          return;
+        }
+
+        status.textContent = `${posts.length} dorm post(s)`;
+
+        for (const post of posts) {
+          const card = document.createElement("article");
+          card.className = "post-card";
+
+          const meta = document.createElement("div");
+          meta.className = "post-meta";
+          meta.textContent =
+            `${names.get(post.author_id) || "Bestie"} · ` +
+            new Date(post.created_at).toLocaleString();
+
+          const body = document.createElement("div");
+          body.className = "post-content";
+          body.textContent = post.content;
+
+          
+const postReactions = document.createElement("div");
+postReactions.className = "post-actions";
+
+const reactionEmojis = ["💗", "☕", "😂", "🔥", "🥹", "👑"];
+
+const { data: savedReactions, error: reactionsError } =
+  await client
+    .from("housing_reactions")
+    .select("id, user_id, emoji")
+    .eq("post_id", post.id);
+
+if (reactionsError) {
+  console.error("Post reactions error:", reactionsError);
+}
+
+for (const emoji of reactionEmojis) {
+  const matching = (savedReactions || []).filter(
+    reaction => reaction.emoji === emoji
+  );
+
+  const mine = matching.find(
+    reaction => reaction.user_id === result.user.id
+  );
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = `${emoji} ${matching.length || ""}`;
+  button.setAttribute("aria-pressed", String(Boolean(mine)));
+
+  if (mine) {
+    button.style.background = "#ead0db";
+  }
+
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+
+    let error;
+
+    if (mine) {
+      ({ error } = await client
+        .from("housing_reactions")
+        .delete()
+        .eq("id", mine.id));
+    } else {
+      ({ error } = await client
+        .from("housing_reactions")
+        .insert({
+          user_id: result.user.id,
+          post_id: post.id,
+          emoji: emoji
+        }));
+    }
+
+    if (error) {
+      console.error("Post reaction error:", error);
+      alert("Couldn't update your reaction.");
+      button.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  postReactions.appendChild(button);
+}
+
+card.appendChild(postReactions);
+
+          card.append(meta, body);
+
+          
+if (post.author_id === result.user.id) {
+  const removePostButton = document.createElement("button");
+  removePostButton.type = "button";
+  removePostButton.className = "edit-content-button";
+  removePostButton.textContent = "🗑️ Remove Post";
+
+  removePostButton.addEventListener("click", async () => {
+    if (!confirm("Remove this post and hide its replies?")) return;
+
+    removePostButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "remove_own_housing_post",
+      { p_post_id: post.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Post removal error:", error);
+      alert("Couldn't remove this post.");
+      removePostButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  card.appendChild(removePostButton);
+}
+
+if (post.author_id === result.user.id) {
+  const editPostButton = document.createElement("button");
+  editPostButton.type = "button";
+  editPostButton.className = "edit-content-button";
+  editPostButton.textContent = "✏️ Edit Post";
+
+  editPostButton.addEventListener("click", async () => {
+    const updatedContent = prompt("Edit your post:", post.content);
+
+    if (updatedContent === null) return;
+
+    const newContent = updatedContent.trim();
+
+    if (!newContent || newContent === post.content) return;
+
+    editPostButton.disabled = true;
+
+    const { error } = await client
+      .from("housing_posts")
+      .update({ content: newContent })
+      .eq("id", post.id)
+      .eq("author_id", result.user.id);
+
+    if (error) {
+      console.error("Post editing error:", error);
+      alert("Couldn't update your post.");
+      editPostButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  card.appendChild(editPostButton);
+}
+
+          
+// 🎀 Comments for this dorm post
+const commentsSection = document.createElement("div");
+commentsSection.className = "post-comments";
+
+const commentsHeading = document.createElement("h4");
+commentsHeading.textContent = "💬 Bestie Replies";
+
+const commentsList = document.createElement("div");
+commentsList.className = "comments-list";
+
+const { data: comments, error: commentsError } = await client
+  .from("housing_comments")
+  .select("id, author_id, content, created_at")
+  .eq("post_id", post.id)
+  .eq("is_removed", false)
+  .order("created_at", { ascending: true });
+
+if (commentsError) {
+  console.error("Comments loading error:", commentsError);
+  commentsList.textContent = "Unable to load replies.";
+} else {
+  const authorIds = [...new Set(
+    (comments || []).map(comment => comment.author_id)
+  )];
+
+  const missingIds = authorIds.filter(id => !names.has(id));
+
+  if (missingIds.length) {
+    const { data: profiles } = await client
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", missingIds);
+
+    for (const profile of profiles || []) {
+      names.set(profile.id, profile.display_name);
+    }
+  }
+
+  for (const comment of comments || []) {
+    const reply = document.createElement("div");
+    reply.className = "comment";
+
+    const author = document.createElement("strong");
+    author.textContent =
+      names.get(comment.author_id) || "Bestie";
+
+    const text = document.createElement("p");
+    text.textContent = comment.content;
+
+    reply.append(author, text);
+    
+if (comment.author_id === result.user.id) {
+  const removeReplyButton = document.createElement("button");
+  removeReplyButton.type = "button";
+  removeReplyButton.className = "edit-content-button";
+  removeReplyButton.textContent = "🗑️ Remove Reply";
+
+  removeReplyButton.addEventListener("click", async () => {
+    if (!confirm("Remove this reply?")) return;
+
+    removeReplyButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "remove_own_housing_comment",
+      { p_comment_id: comment.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Reply removal error:", error);
+      alert("Couldn't remove this reply.");
+      removeReplyButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  reply.appendChild(removeReplyButton);
+}
+
+    
+if (comment.author_id === result.user.id) {
+  const editReplyButton = document.createElement("button");
+  editReplyButton.type = "button";
+  editReplyButton.className = "edit-content-button";
+  editReplyButton.textContent = "✏️ Edit Reply";
+
+  editReplyButton.addEventListener("click", async () => {
+    const updatedContent = prompt(
+      "Edit your reply:",
+      comment.content
+    );
+
+    if (updatedContent === null) return;
+
+    const newContent = updatedContent.trim();
+
+    if (!newContent || newContent === comment.content) return;
+
+    editReplyButton.disabled = true;
+
+    const { error } = await client
+      .from("housing_comments")
+      .update({ content: newContent })
+      .eq("id", comment.id)
+      .eq("author_id", result.user.id);
+
+    if (error) {
+      console.error("Reply editing error:", error);
+      alert("Couldn't update your reply.");
+      editReplyButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  reply.appendChild(editReplyButton);
+}
+
+    
+ // 💗 Reactions on individual Bestie replies
+const commentReactions = document.createElement("div");
+commentReactions.className = "comment-reactions";
+
+const { data: savedCommentReactions, error: commentReactionError } =
+  await client
+    .from("housing_reactions")
+    .select("id, user_id, emoji")
+    .eq("comment_id", comment.id);
+
+if (commentReactionError) {
+  console.error("Comment reactions error:", commentReactionError);
+}
+
+for (const emoji of ["💗", "☕", "😂", "🔥", "🥹", "👑"]) {
+  const matching = (savedCommentReactions || []).filter(
+    reaction => reaction.emoji === emoji
+  );
+
+  const mine = matching.find(
+    reaction => reaction.user_id === result.user.id
+  );
+
+  const reactionButton = document.createElement("button");
+  reactionButton.type = "button";
+  reactionButton.textContent = `${emoji} ${matching.length || ""}`;
+  reactionButton.setAttribute("aria-pressed", String(Boolean(mine)));
+
+  if (mine) {
+    reactionButton.classList.add("reacted");
+  }
+
+  reactionButton.addEventListener("click", async () => {
+    reactionButton.disabled = true;
+
+    let error;
+
+    if (mine) {
+      ({ error } = await client
+        .from("housing_reactions")
+        .delete()
+        .eq("id", mine.id));
+    } else {
+      ({ error } = await client
+        .from("housing_reactions")
+        .insert({
+          user_id: result.user.id,
+          comment_id: comment.id,
+          emoji
+        }));
+    }
+
+    if (error) {
+      console.error("Comment reaction error:", error);
+      alert("Couldn't update your reaction.");
+      reactionButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  commentReactions.appendChild(reactionButton);
+}
+
+reply.appendChild(commentReactions);
+
+    commentsList.appendChild(reply);
+  }
+
+  if (!comments?.length) {
+    commentsList.textContent = "No replies yet. 💗";
+  }
+}
+
+commentsSection.append(commentsHeading, commentsList);
+
+// Comment composer
+const commentForm = document.createElement("form");
+commentForm.className = "comment-form";
+
+const commentInput = document.createElement("textarea");
+commentInput.maxLength = 2000;
+commentInput.required = true;
+commentInput.placeholder = "Leave a little reply...";
+
+const commentButton = document.createElement("button");
+commentButton.type = "submit";
+commentButton.className = "primary-button";
+commentButton.textContent = "REPLY 💌";
+
+commentForm.append(commentInput, commentButton);
+
+commentForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const text = commentInput.value.trim();
+  if (!text) return;
+
+  commentButton.disabled = true;
+
+  const { error } = await client
+    .from("housing_comments")
+    .insert({
+      post_id: post.id,
+      author_id: result.user.id,
+      content: text
+    });
+
+  commentButton.disabled = false;
+
+  if (error) {
+    console.error("Comment error:", error);
+    alert("Couldn't save your reply.");
+    return;
+  }
+
+  await loadPosts();
+});
+
+commentsSection.appendChild(commentForm);
+card.appendChild(commentsSection);
+
+          if (post.is_pinned) {
+            const pinned = document.createElement("p");
+            pinned.textContent = "📌 PINNED POST";
+            card.prepend(pinned);
+          }
+
+          feed.appendChild(card);
+        }
+      }
+
+      await loadPosts();
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const text = input.value.trim();
+        if (!text) return;
+
+        postButton.disabled = true;
+
+        const { error } = await client
+          .from("housing_posts")
+          .insert({
+            dorm_id: dorm.id,
+            author_id: result.user.id,
+            content: text
+          });
+
+        postButton.disabled = false;
+
+        if (error) {
+          console.error("Post creation error:", error);
+          status.textContent = "Unable to publish your post.";
+          return;
+        }
+
+        input.value = "";
+        await loadPosts();
+      });
+    })().catch(error => {
+      console.error("Bulletin Board error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Something went wrong loading the Bulletin Board.";
+      document.getElementById("campusGate").style.display = "block";
+    });
+  </script>
+</body>
+</html>
