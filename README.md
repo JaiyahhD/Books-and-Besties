@@ -98,3 +98,7 @@ This edition refreshes the CSS and public homepage while preserving the existing
 
 ## Dreamhouse scrapbook redesign (v3)
 This edition recreates the layered scrapbook composition using actual HTML and CSS components, with small decorative image crops from the supplied visual reference. The homepage cards, navigation, book pick and Monthly Crown links remain functional HTML. The original logo is unchanged. Backend integration is unchanged and still requires configuration, testing and final scoring-rule verification.
+
+## Facebook community link
+
+The public Join the Besties link is configured as `https://www.facebook.com/share/g/1DQiL7jpnA/` in `js/config.js`, and the homepage includes a Campus Admissions section. Admins can change the URL in Admin HQ after Supabase is configured.

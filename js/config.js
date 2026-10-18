@@ -3,7 +3,7 @@
 window.BB_CONFIG = {
   SUPABASE_URL: '',
   SUPABASE_ANON_KEY: '',
-  FACEBOOK_URL: '',
+  FACEBOOK_URL: 'https://www.facebook.com/share/g/1DQiL7jpnA/',
   CONTACT_EMAIL: '',
   SITE_NAME: 'Books & Besties'
 };
