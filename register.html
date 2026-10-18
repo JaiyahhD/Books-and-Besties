@@ -1,0 +1,417 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Campus Admissions | Bestie University</title>
+
+  <link rel="icon" href="assets/logo.png">
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    .admissions-page {
+      min-height: 100vh;
+      padding: 65px 20px;
+      background:
+        radial-gradient(circle at 15% 10%, #ffe4ee 0, transparent 35%),
+        radial-gradient(circle at 90% 85%, #d8f2ee 0, transparent 35%),
+        #fff8f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+
+    .admissions-card {
+      width: 100%;
+      max-width: 490px;
+      background: #fff;
+      border: 2px solid #f2c5d7;
+      border-radius: 26px;
+      padding: 35px;
+      box-shadow: 0 15px 45px #80395c20;
+      text-align: center;
+    }
+
+    .admissions-logo {
+      width: 85px;
+      height: 85px;
+      object-fit: contain;
+      margin: 0 auto 14px;
+    }
+
+    .admissions-kicker {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #aa6484;
+    }
+
+    .admissions-card h1 {
+      margin: 12px 0;
+      color: #65374d;
+      font-size: clamp(28px, 5vw, 38px);
+    }
+
+    .admissions-intro {
+      color: #846b78;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .admissions-form {
+      text-align: left;
+    }
+
+    .admissions-field {
+      margin-bottom: 17px;
+    }
+
+    .admissions-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: #65374d;
+      margin-bottom: 7px;
+    }
+
+    .admissions-field input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px;
+      border: 1.5px solid #eacbd8;
+      border-radius: 12px;
+      background: #fffafb;
+      color: #442b38;
+      font: inherit;
+    }
+
+    .admissions-field input:focus {
+      outline: 2px solid #b96e8d;
+      outline-offset: 2px;
+    }
+
+    .admissions-help {
+      font-size: 12px;
+      color: #846b78;
+      margin-top: 7px;
+      line-height: 1.5;
+    }
+
+    .admissions-submit {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #c96e9a, #994d7b);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .admissions-submit:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .admissions-message {
+      display: none;
+      padding: 14px;
+      border-radius: 12px;
+      margin: 18px 0;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .admissions-message.success {
+      display: block;
+      background: #e7f5ee;
+      color: #245b43;
+    }
+
+    .admissions-message.error {
+      display: block;
+      background: #fff0f0;
+      color: #9c3249;
+    }
+
+    .admissions-footer {
+      margin-top: 22px;
+      font-size: 13px;
+      color: #846b78;
+    }
+
+    .admissions-footer a {
+      color: #a54c79;
+      font-weight: 800;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="admissions-page">
+
+    <section class="admissions-card">
+
+      <img
+        src="assets/logo.png"
+        alt="Books & Besties"
+        class="admissions-logo"
+      >
+
+      <div class="admissions-kicker">
+        🎓 BESTIE UNIVERSITY
+      </div>
+
+      <h1>Campus Admissions ♡</h1>
+
+      <p class="admissions-intro">
+        Your next bookish chapter starts here!
+        Create your Bestie account and join
+        our campus community. 💗
+      </p>
+
+      <div
+        id="registrationMessage"
+        class="admissions-message"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <form id="registrationForm" class="admissions-form">
+
+        <div class="admissions-field">
+          <label for="displayName">Bestie Display Name</label>
+          <input
+            id="displayName"
+            type="text"
+            maxlength="70"
+            autocomplete="nickname"
+            required
+          >
+        </div>
+
+        <div class="admissions-field">
+          <label for="email">Email Address</label>
+          <input
+            id="email"
+            type="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="admissions-field">
+          <label for="password">Create Password</label>
+          <input
+            id="password"
+            type="password"
+            minlength="12"
+            maxlength="128"
+            autocomplete="new-password"
+            required
+          >
+          <p class="admissions-help">
+            Use at least 12 characters.
+            A unique passphrase works great!
+            Don't reuse a password from another website.
+          </p>
+        </div>
+
+        <div class="admissions-field">
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            minlength="12"
+            maxlength="128"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <button
+          id="registerButton"
+          class="admissions-submit"
+          type="submit"
+        >
+          Apply for Campus Admission ♡
+        </button>
+
+      </form>
+
+      <div class="admissions-footer">
+        Already a Bestie?
+        <a href="index.html#login">Bestie Login</a>
+        <p>
+          <a href="index.html#home">
+            ← Back to Campus Quad
+          </a>
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const config = window.BB_CONFIG;
+
+      const form = document.getElementById(
+        "registrationForm"
+      );
+
+      const button = document.getElementById(
+        "registerButton"
+      );
+
+      const messageBox = document.getElementById(
+        "registrationMessage"
+      );
+
+      function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.className =
+          "admissions-message " + type;
+      }
+
+      if (
+        !config?.SUPABASE_URL ||
+        !config?.SUPABASE_ANON_KEY ||
+        !window.supabase
+      ) {
+        showMessage(
+          "Campus registration is temporarily unavailable.",
+          "error"
+        );
+        button.disabled = true;
+        return;
+      }
+
+      const supabaseClient =
+        window.supabase.createClient(
+          config.SUPABASE_URL,
+          config.SUPABASE_ANON_KEY
+        );
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const displayName =
+          document.getElementById("displayName")
+            .value.trim();
+
+        const email =
+          document.getElementById("email")
+            .value.trim();
+
+        const password =
+          document.getElementById("password")
+            .value;
+
+        const confirmPassword =
+          document.getElementById("confirmPassword")
+            .value;
+
+        if (displayName.length < 2) {
+          showMessage(
+            "Please enter a display name of at least 2 characters.",
+            "error"
+          );
+          return;
+        }
+
+        if (password.length < 12) {
+          showMessage(
+            "Your password must have at least 12 characters.",
+            "error"
+          );
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showMessage(
+            "Your passwords don't match, Bestie!",
+            "error"
+          );
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+          "Submitting your application... ♡";
+
+        try {
+          const redirectUrl =
+            window.location.origin +
+            "/index.html#login";
+
+          const { data, error } =
+            await supabaseClient.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  display_name: displayName
+                },
+                emailRedirectTo: redirectUrl
+              }
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          showMessage(
+            "💌 Application received! " +
+            "If this email is eligible for a new account, " +
+            "check your inbox for a verification link. " +
+            "After verification, your account will " +
+            "await campus approval.",
+            "success"
+          );
+
+          form.reset();
+
+          // Do not treat account creation as approval.
+          // Database membership_status remains pending.
+          // No privileged campus access is granted here.
+
+        } catch (error) {
+          console.error(
+            "Registration error:",
+            error
+          );
+
+          showMessage(
+            error.message ||
+            "Something went wrong. Please try again.",
+            "error"
+          );
+
+        } finally {
+          button.disabled = false;
+          button.textContent =
+            "Apply for Campus Admission ♡";
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
