@@ -527,7 +527,7 @@
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
         Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
-        and Dorm Design Studio are live. Activity, Honors, Pink Ballot,
+        Dorm Design Studio, and Dorm Assignments are live. Activity, Honors, Pink Ballot,
         and Bestie Access planners remain browser-local previews.
       </div>
 
@@ -566,6 +566,9 @@
 
           <button class="nav-btn" data-section="dorm-design">
             🎨 Dorm Design Studio
+          </button>
+          <button class="nav-btn" data-section="dorm-assignments">
+            🏡 Dorm Assignments
           </button>
 
           <button class="nav-btn" data-section="commons">
@@ -1022,6 +1025,51 @@
                   <p id="designSaveMessage" class="mini" role="status" aria-live="polite"></p>
                 </form>
                 <p class="mini">The existing dorm page already displays the saved primary color and description. Theme names, secondary/accent colors and banners are saved now; displaying all of them on the resident page is the next visual integration.</p>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- LIVE DORM ASSIGNMENTS & TRANSFERS -->
+          <section class="section" id="section-dorm-assignments">
+            <h2 class="section-heading">🏡 Dorm Assignments & Team Transfers</h2>
+            <p class="section-description">Manage approved Besties' Monthly Crown enrollment, assign their seasonal team, and transfer residents. All changes save to your existing Supabase records. Administrators can make changes; moderators can view rosters.</p>
+            <div class="panel">
+              <div class="panel-head">👑 CHOOSE A SEASON</div>
+              <div class="panel-body">
+                <label class="field"><span>Monthly Crown Season</span>
+                  <select id="assignmentSeason"><option value="">Loading seasons...</option></select>
+                </label>
+                <p class="mini" id="assignmentStatus" role="status" aria-live="polite">Preparing the residence desk...</p>
+              </div>
+            </div>
+            <div class="panel" id="assignmentEditor" hidden>
+              <div class="panel-head">💌 APPROVE, ASSIGN OR TRANSFER A BESTIE</div>
+              <div class="panel-body">
+                <form id="assignmentForm">
+                  <label class="field"><span>Find an approved Bestie</span>
+                    <input id="assignmentSearch" type="search" placeholder="Search display names" autocomplete="off">
+                  </label>
+                  <label class="field"><span>Bestie</span>
+                    <select id="assignmentMember" required><option value="">Choose a member</option></select>
+                  </label>
+                  <p id="assignmentCurrent" class="notice" role="status">Choose a Bestie to see their current enrollment.</p>
+                  <label class="field"><span>Assign to Team / Dorm</span>
+                    <select id="assignmentTeam" required><option value="">Choose a team</option></select>
+                  </label>
+                  <div class="actions">
+                    <button class="btn secondary" type="submit" id="assignmentSave">💗 Approve & Assign / Transfer</button>
+                    <button class="btn light" type="button" id="assignmentRefresh">🔄 Refresh Residents</button>
+                  </div>
+                  <p class="mini" id="assignmentSaveMessage" role="status" aria-live="polite"></p>
+                </form>
+                <p class="mini">Only campus-approved members can be assigned. Existing Monthly Crown submissions follow a resident to their new team, so eligible pages count for the new dorm after a transfer. Dorm access updates with the enrollment.</p>
+              </div>
+            </div>
+            <div class="panel" id="assignmentRosterPanel" hidden>
+              <div class="panel-head">🎀 LIVE SEASON ROSTERS</div>
+              <div class="panel-body">
+                <div id="assignmentRoster" aria-live="polite">Loading residents...</div>
               </div>
             </div>
           </section>
@@ -1878,6 +1926,172 @@
         $("designSaveMessage").textContent = "💗 Dorm makeover saved to Supabase!";
       });
       document.addEventListener("bb:campus-hq-ready", initialize, { once: true });
+    })();
+  </script>
+
+  <script>
+    // Phase 5: Live dorm assignment management. Server-side RPC enforces admin access.
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      let client, isAdmin = false, members = [], teams = [], enrollments = [];
+      let requestToken = 0;
+      const status = message => { $("assignmentStatus").textContent = message; };
+      const errorText = error => error?.message || "Unknown database error";
+      const label = member => member.display_name || "Unnamed Bestie";
+      const teamLabel = team => `${team.emoji || "🏡"} ${team.name}`;
+
+      function enrollmentFor(userId) {
+        return enrollments.find(entry => entry.user_id === userId) || null;
+      }
+
+      function refreshMemberOptions() {
+        const selected = $("assignmentMember").value;
+        const query = $("assignmentSearch").value.trim().toLowerCase();
+        const select = $("assignmentMember");
+        select.replaceChildren(new Option("Choose a member", ""));
+        members.filter(member => label(member).toLowerCase().includes(query))
+          .sort((a,b) => label(a).localeCompare(label(b)))
+          .forEach(member => select.add(new Option(label(member), member.id)));
+        if (members.some(member => member.id === selected) &&
+            [...select.options].some(option => option.value === selected)) select.value = selected;
+        showMember();
+      }
+
+      function showMember() {
+        const id = $("assignmentMember").value;
+        const enrollment = enrollmentFor(id);
+        const team = teams.find(entry => entry.id === enrollment?.team_id);
+        const text = $("assignmentCurrent");
+        if (!id) { text.textContent = "Choose a Bestie to see their current enrollment."; return; }
+        if (!enrollment) text.textContent = "💌 Not enrolled this season. Assigning will create an approved Monthly Crown enrollment.";
+        else text.textContent = `${enrollment.status === "approved" ? "✅ Approved" : "⏳ " + enrollment.status} · ${team ? teamLabel(team) : "No team assigned"}`;
+        $("assignmentTeam").value = enrollment?.team_id || "";
+      }
+
+      function renderRoster() {
+        const root = $("assignmentRoster");
+        root.replaceChildren();
+        const nameById = new Map(members.map(member => [member.id, label(member)]));
+        const active = enrollments.filter(entry => entry.status === "approved");
+        const pending = enrollments.filter(entry => entry.status === "pending");
+        for (const team of teams) {
+          const entries = active.filter(entry => entry.team_id === team.id)
+            .sort((a,b) => (nameById.get(a.user_id) || "").localeCompare(nameById.get(b.user_id) || ""));
+          const panel = document.createElement("div");
+          panel.className = "item";
+          const heading = document.createElement("h4");
+          heading.textContent = `${teamLabel(team)} · ${entries.length} resident${entries.length === 1 ? "" : "s"}`;
+          panel.append(heading);
+          if (!entries.length) {
+            const empty = document.createElement("p"); empty.className = "mini";
+            empty.textContent = "No approved residents assigned yet."; panel.append(empty);
+          }
+          for (const entry of entries) {
+            const line = document.createElement("p");
+            line.textContent = `🎀 ${nameById.get(entry.user_id) || "Member (profile unavailable)"}`;
+            panel.append(line);
+          }
+          root.append(panel);
+        }
+        if (pending.length) {
+          const panel = document.createElement("div"); panel.className = "item";
+          const heading = document.createElement("h4"); heading.textContent = `⏳ Pending enrollments · ${pending.length}`;
+          panel.append(heading);
+          pending.forEach(entry => {
+            const line = document.createElement("p");
+            line.textContent = nameById.get(entry.user_id) || "Member (profile unavailable)";
+            panel.append(line);
+          });
+          root.append(panel);
+        }
+        if (!teams.length) root.textContent = "No teams exist for this season yet.";
+      }
+
+      async function loadSeason() {
+        const token = ++requestToken;
+        const seasonId = $("assignmentSeason").value;
+        $("assignmentEditor").hidden = true;
+        $("assignmentRosterPanel").hidden = true;
+        if (!seasonId) { status("Select a season to manage its dorms."); return; }
+        status("Loading live teams, members and enrollments...");
+        const [teamResult, memberResult, enrollmentResult] = await Promise.all([
+          client.from("crown_teams").select("id,name,emoji").eq("season_id",seasonId).order("name"),
+          client.from("profiles").select("id,display_name,membership_status").eq("membership_status","approved").order("display_name").limit(1000),
+          client.from("crown_enrollments").select("id,user_id,season_id,team_id,status").eq("season_id",seasonId).limit(2000)
+        ]);
+        if (token !== requestToken) return;
+        const error = teamResult.error || memberResult.error || enrollmentResult.error;
+        if (error) { status("Unable to load residence records: " + errorText(error)); return; }
+        teams = teamResult.data || [];
+        members = memberResult.data || [];
+        enrollments = enrollmentResult.data || [];
+        const teamSelect = $("assignmentTeam");
+        teamSelect.replaceChildren(new Option("Choose a team", ""));
+        teams.forEach(team => teamSelect.add(new Option(teamLabel(team), team.id)));
+        refreshMemberOptions();
+        renderRoster();
+        $("assignmentEditor").hidden = false;
+        $("assignmentRosterPanel").hidden = false;
+        status(`${teams.length} team(s) · ${members.length} approved campus member(s) · ${enrollments.length} season enrollment(s).`);
+      }
+
+      async function initialize() {
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) { status("Campus staff connection unavailable. Refresh Campus HQ."); return; }
+        const { data, error } = await client.rpc("is_campus_admin");
+        if (error) { status("Unable to verify staff role: " + errorText(error)); return; }
+        isAdmin = data === true;
+        $("assignmentSave").disabled = !isAdmin;
+        $("assignmentSave").textContent = isAdmin ? "💗 Approve & Assign / Transfer" : "🔒 Admin Only";
+        $("assignmentTeam").disabled = !isAdmin;
+        const seasons = await client.from("crown_seasons").select("id,name,starts_on").order("starts_on",{ascending:false});
+        if (seasons.error) { status("Unable to load seasons: " + errorText(seasons.error)); return; }
+        $("assignmentSeason").replaceChildren(new Option("Choose a season", ""));
+        (seasons.data || []).forEach(season => $("assignmentSeason").add(new Option(season.name,season.id)));
+        const november = (seasons.data || []).find(season => season.name === "November 2026");
+        if (november) { $("assignmentSeason").value = november.id; await loadSeason(); }
+        else status("Choose a season to begin.");
+      }
+
+      $("assignmentSeason").addEventListener("change",loadSeason);
+      $("assignmentMember").addEventListener("change",showMember);
+      $("assignmentSearch").addEventListener("input",refreshMemberOptions);
+      $("assignmentRefresh").addEventListener("click",loadSeason);
+      $("assignmentForm").addEventListener("submit",async event => {
+        event.preventDefault();
+        if (!isAdmin) return;
+        const seasonId = $("assignmentSeason").value;
+        const userId = $("assignmentMember").value;
+        const teamId = $("assignmentTeam").value;
+        if (!seasonId || !userId || !teamId) {
+          $("assignmentSaveMessage").textContent = "Choose a season, Bestie and team first."; return;
+        }
+        const prior = enrollmentFor(userId);
+        const oldTeam = teams.find(team => team.id === prior?.team_id);
+        const nextTeam = teams.find(team => team.id === teamId);
+        if (prior?.status === "approved" && prior.team_id === teamId) {
+          $("assignmentSaveMessage").textContent = "This Bestie is already approved for that dorm."; return;
+        }
+        if (prior?.status === "approved" && prior.team_id !== teamId &&
+            !confirm(`Transfer ${label(members.find(member => member.id === userId) || {})} from ${oldTeam ? teamLabel(oldTeam) : "their old team"} to ${nextTeam ? teamLabel(nextTeam) : "the selected team"}? Their eligible Monthly Crown pages will move to the new team.`)) return;
+        const button = $("assignmentSave");
+        button.disabled = true;
+        $("assignmentSaveMessage").textContent = "Saving assignment to Supabase...";
+        try {
+          const { error } = await client.rpc("admin_assign_crown_dorm",{
+            p_season_id:seasonId,p_user_id:userId,p_team_id:teamId
+          });
+          if (error) { $("assignmentSaveMessage").textContent = "Save failed: " + errorText(error); return; }
+          await loadSeason();
+          $("assignmentMember").value = userId;
+          showMember();
+          $("assignmentSaveMessage").textContent = "💗 Dorm assignment saved! The resident roster and Crown totals are updated.";
+        } catch (error) {
+          $("assignmentSaveMessage").textContent = "Save failed: " + errorText(error);
+        } finally { button.disabled = !isAdmin; }
+      });
+      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
     })();
   </script>
 
