@@ -715,7 +715,7 @@
           <div class="panel">
 
             <div class="panel-head">
-              💬 THE BESTIE CHAT · DEMO
+              THE BESTIE CHAT · CAMPUS LOUNGE
             </div>
 
             <div
@@ -741,7 +741,7 @@
                 class="btn teal"
                 type="button"
               >
-                Send Demo Message ↗
+                Send to Bestie Chat 💌 ↗
               </button>
 
             </div>
@@ -822,6 +822,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/campus-guard.js"></script>
+  <script src="js/commons-chat.js"></script>
   <script src="js/commons-posts.js"></script>
   <script src="js/commons-comments.js"></script>
 
@@ -1031,11 +1032,13 @@
         );
       }
 
+      
       function initializeDemo() {
         if (initialized) return;
 
         initialized = true;
 
+        // Keep the Bulletin and Chat tab switching.
         $("#feedTab").addEventListener(
           "click",
           () => showTab("feed")
@@ -1046,44 +1049,11 @@
           () => showTab("chat")
         );
 
-        function sendMessage() {
-          const text = $("#chatText").value.trim();
-
-          if (!text) return;
-
-          chats.push({
-            id:crypto.randomUUID(),
-            text,
-            created:Date.now()
-          });
-
-          save(CHAT_KEY, chats);
-
-          $("#chatText").value = "";
-
-          renderChat();
-        }
-
-        $("#sendChat").addEventListener(
-          "click",
-          sendMessage
-        );
-
-        $("#chatText").addEventListener(
-          "keydown",
-          event => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              sendMessage();
-            }
-          }
-        );
-
+        // Update the footer year.
         $("#year").textContent =
           new Date().getFullYear();
-
-        renderChat();
       }
+
 
       async function initializeCommons() {
         const guard = window.BB_CAMPUS_GUARD;
@@ -1174,6 +1144,11 @@
         await window.BB_COMMONS_POSTS.startBulletin(
           result.client,
           result.user
+        );
+
+        await window.BB_COMMONS_CHAT.startChat(
+        result.client,
+        result.user
         );
               }
 
