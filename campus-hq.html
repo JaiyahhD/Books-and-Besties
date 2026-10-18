@@ -1234,11 +1234,10 @@
         });
       }
 
-      function renderDemoOverview() {
-        $("statActivities").textContent =
-          state.activities.filter(
-            activity => activity.status === "Published"
-          ).length;
+      function renderDemoOverview() {        
+        // Live Campus Overview handles activity and VIP statistics.
+        // Demo records must not overwrite the live counters.
+
 
         $("statVIP").textContent = state.vips.length;
 

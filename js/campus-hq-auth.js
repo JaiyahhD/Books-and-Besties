@@ -1,89 +1,112 @@
 
 /* ==========================================
    BESTIE UNIVERSITY 🎓💗
-   CAMPUS OVERVIEW — LIVE STATISTICS
+   CAMPUS HQ — AUTHENTICATION GATE
    ========================================== */
 
 (() => {
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
+  const config = window.BB_CONFIG;
 
-  let initialized = false;
+  const gate = document.getElementById("campusAuthGate");
+  const dashboard = document.getElementById("campusDashboard");
+  const message = document.getElementById("campusAuthMessage");
 
-  async function loadCampusOverview() {
-    // Reuse the authenticated Campus HQ client.
-    const client = window.BB_CAMPUS_CLIENT;
+  function showGate(text) {
+    if (gate) gate.hidden = false;
+    if (dashboard) dashboard.hidden = true;
+    if (message) message.textContent = text;
+  }
 
-    if (!client) {
-      console.error(
-        "Campus Overview: Supabase client unavailable."
-      );
+  function showDashboard() {
+    if (gate) gate.hidden = true;
+    if (dashboard) dashboard.hidden = false;
+  }
+
+  async function initialize() {
+    if (
+      !window.supabase ||
+      !config?.SUPABASE_URL ||
+      !config?.SUPABASE_ANON_KEY
+    ) {
+      showGate("Campus HQ configuration is unavailable.");
       return;
     }
 
-    const { data, error } = await client.rpc(
-      "get_campus_overview_stats"
+    const client = window.supabase.createClient(
+      config.SUPABASE_URL,
+      config.SUPABASE_ANON_KEY
     );
 
-    if (error) {
-      console.error(
-        "Campus Overview: " + error.message
+    window.BB_CAMPUS_CLIENT = client;
+
+    const {
+      data: { user },
+      error: authError
+    } = await client.auth.getUser();
+
+    if (authError || !user) {
+      showGate(
+        "🗝️ The Dean's Office is reserved for campus staff. " +
+        "Please sign in with your approved staff account."
       );
       return;
     }
 
-    const stats = Array.isArray(data) ? data[0] : data;
+    const { data: profile, error: profileError } =
+      await client
+        .from("profiles")
+        .select("display_name, membership_status")
+        .eq("id", user.id)
+        .maybeSingle();
 
-    if (!stats) {
-      console.warn(
-        "Campus Overview: No statistics returned."
+    if (
+      profileError ||
+      !profile ||
+      profile.membership_status !== "approved"
+    ) {
+      showGate("Your campus membership is not approved.");
+      return;
+    }
+
+    const { data: staff, error: staffError } =
+      await client
+        .from("campus_staff")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (
+      staffError ||
+      !staff ||
+      !["admin", "moderator"].includes(staff.role)
+    ) {
+      showGate(
+        "This office is reserved for authorized campus staff."
       );
       return;
     }
 
-    const values = {
-      statMembers: stats.approved_besties,
-      statPending: stats.pending_applications,
-      statActivities: stats.published_activities,
-      statVIP: stats.active_vips
+    window.BB_CAMPUS_STAFF = {
+      id: user.id,
+      displayName: profile.display_name,
+      role: staff.role
     };
 
-    for (const [id, value] of Object.entries(values)) {
-      const element = $(id);
+    showDashboard();
 
-      if (element) {
-        element.textContent = Number(
-          value ?? 0
-        ).toLocaleString();
-      }
-    }
-
-    console.log(
-      "👑 Campus Overview statistics loaded:",
-      stats
-    );
-  }
-
-  function initialize() {
-    if (initialized) return;
-    initialized = true;
-
-    loadCampusOverview();
-
-    // Refresh statistics when returning to this tab.
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (!document.hidden) {
-          loadCampusOverview();
+    document.dispatchEvent(
+      new CustomEvent("bb:campus-hq-ready", {
+        detail: {
+          role: staff.role
         }
-      }
+      })
     );
   }
 
-  document.addEventListener(
-    "bb:campus-hq-ready",
-    initialize
-  );
+  initialize().catch(error => {
+    console.error("Campus HQ authentication:", error);
+    showGate("Unable to verify campus staff access.");
+  });
 })();
