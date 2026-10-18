@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f64fa1">
-<title>Bingo Bulletin | Bestie University</title>
+<title>Bingo & Biscotti | Bestie University</title>
 <link rel="icon" href="../assets/logo.png">
 
 <style>
@@ -427,6 +427,230 @@ footer {
   .panel-body {padding:12px}
   .stats {gap:5px}
 }
+
+
+/* ==========================================
+   NOVEMBER 2026 — BINGO & BISCOTTI
+   THE VELVET LATTE LOUNGE COLLECTION
+   ========================================== */
+
+:root {
+  --pink:#d995ad;
+  --hot:#b85f86;
+  --teal:#587c69;
+  --ink:#4c302d;
+  --blush:#f8e4eb;
+  --cream:#fff8f0;
+  --espresso:#4c302d;
+  --mocha:#785047;
+  --caramel:#c18a67;
+  --sage:#a8bdaa;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 15%,#f7dce6,transparent 35%),
+    radial-gradient(circle at 90% 78%,#e3e9d8,transparent 35%),
+    #fff8f0;
+}
+
+.top {
+  background:#4c302d;
+  border-bottom-color:#d995ad;
+}
+
+nav a.active {
+  background:#d995ad;
+  color:#4c302d;
+}
+
+.hero {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 35px,
+      #ffffff17 35px 70px
+    ),
+    linear-gradient(
+      135deg,
+      #f4d4e0 0%,
+      #e7b4c6 40%,
+      #e7c5aa 75%,
+      #c2d3bb 100%
+    );
+  border-bottom-color:#785047;
+}
+
+.kicker {
+  background:#fff8f0e8;
+  color:#785047;
+  border-color:#fff8f0;
+}
+
+.hero h1 {
+  color:#fff8f0;
+  -webkit-text-stroke:1.5px #785047;
+  text-shadow:
+    4px 5px 0 #785047,
+    7px 8px 0 #ffffff88;
+}
+
+.script {
+  color:#4c302d;
+}
+
+.notice {
+  background:#fffdf9;
+  border-color:#d995ad;
+  box-shadow:5px 6px 0 #e9c6cf;
+}
+
+.panel {
+  background:#fffdf9;
+  border-color:#d9acb8;
+  box-shadow:6px 7px 0 #ead0d0;
+}
+
+.panel-head {
+  background:linear-gradient(
+    110deg,
+    #785047,
+    #b87987,
+    #d995ad
+  );
+  color:#fffaf5;
+}
+
+.board-title {
+  color:#785047;
+}
+
+.letter {
+  color:#b85f86;
+  text-shadow:1px 2px 0 #f5dbe5;
+}
+
+.square {
+  background:#fff1f3;
+  border-color:#ddb0bd;
+  color:#4c302d;
+}
+
+.square:hover {
+  background:#f6d9e2;
+}
+
+.square.marked {
+  background:linear-gradient(
+    140deg,
+    #a8bdaa,
+    #e2eedc
+  );
+  border-color:#587c69;
+  color:#345343;
+}
+
+.square.marked:after {
+  color:#345343;
+}
+
+.square.free {
+  background:#f4d6a8;
+  border-color:#c18a67;
+  color:#4c302d;
+}
+
+.square.free.marked {
+  background:#b8d2b5;
+  border-color:#587c69;
+}
+
+.progress-track {
+  background:#f1e0d9;
+}
+
+.progress-fill {
+  background:linear-gradient(
+    90deg,
+    #d995ad,
+    #c18a67,
+    #a8bdaa
+  );
+}
+
+.stat {
+  background:#f9e8e8;
+}
+
+.stat strong {
+  color:#785047;
+}
+
+.btn {
+  background:linear-gradient(
+    #eab0c4,
+    #c9779a
+  );
+  color:#4c302d;
+  box-shadow:0 4px 0 #a75e7b;
+}
+
+.btn.secondary {
+  background:#785047;
+  color:white;
+  box-shadow:0 4px 0 #4c302d;
+}
+
+.detail {
+  background:#fbecf0;
+  border-left-color:#d995ad;
+}
+
+.detail h3 {
+  color:#785047;
+}
+
+.event {
+  background:#e8efe4;
+}
+
+.event h3 {
+  color:#587c69;
+}
+
+.celebrate {
+  background:#fff0d5;
+  border-color:#c18a67;
+}
+
+.gate-card {
+  background:#fffdf9;
+  border-color:#d995ad;
+  box-shadow:7px 8px 0 #e9c6cf;
+}
+
+.gate-card h2 {
+  color:#785047;
+}
+
+.gate-actions a {
+  background:#785047;
+}
+
+.gate-actions a.secondary {
+  background:#f8e4eb;
+  color:#785047;
+}
+
+.square:focus-visible,
+.btn:focus-visible {
+  outline-color:#587c69;
+}
+
+footer {
+  background:#4c302d;
+}
+
 </style>
 </head>
 
@@ -439,7 +663,7 @@ footer {
 
     <div style="font-size:55px">🎀</div>
 
-    <h2>BINGO BULLETIN</h2>
+    <h2>BINGO & BISCOTTI</h2>
 
     <p id="campusGateMessage" role="status">
       🎓 Checking your campus membership...
@@ -486,7 +710,7 @@ footer {
   <section class="hero">
 
     <span class="kicker">
-      ✦ THE BESTIE PLAYGROUND PRESENTS ✦
+      ✦ THE VELVET LATTE LOUNGE PRESENTS ✦
     </span>
 
     <h1>BINGO<br>BULLETIN</h1>
@@ -519,13 +743,13 @@ footer {
       <section class="panel">
 
         <div class="panel-head">
-          🎀 YOUR BINGO BOARD
+          🍪 YOUR BINGO & BISCOTTI BOARD
         </div>
 
         <div class="panel-body">
 
           <h2 class="board-title">
-            THE BESTIE BINGO CLUB ♡
+            THE BISCOTTI BINGO CLUB ♡
           </h2>
 
           <div
@@ -613,17 +837,17 @@ footer {
         <section class="panel">
 
           <div class="panel-head">
-            💌 THE BINGO BRIEF
+            ☕ THE BARISTA'S BINGO BRIEF
           </div>
 
           <div class="panel-body">
 
             <div class="event">
 
-              <h3>🎀 Sample Event</h3>
+              <h3>🍪 November Café Preview</h3>
 
               <strong>
-                The Bestie Bingo Club
+                Bingo & Biscotti
               </strong>
 
               <p>
@@ -669,7 +893,7 @@ footer {
               id="squareDetail"
               aria-live="polite"
             >
-              <h3>💗 Pick a Square!</h3>
+              <h3>🍪 Pick a Square!</h3>
               <p>
                 Tap a Bingo square to see its
                 full mission here.
