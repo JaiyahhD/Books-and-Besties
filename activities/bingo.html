@@ -729,11 +729,10 @@ footer {
   <main class="wrap">
 
     <div class="notice">
-      🎀 DESIGN PREVIEW: This is a sample Bingo event,
-      not an official live competition. Your demo board
-      saves in this browser only. Shared events, verified
-      participation, and admin-managed boards will be
-      added when we connect Supabase.
+      🍪 BINGO & BISCOTTI: Your very own November reading
+          adventure! Explore the 25 missions now. Square marking
+          opens November 1, 2026. Your progress will save
+          securely to your Bestie University account. ☕🤎
     </div>
 
     <div class="layout">
@@ -798,15 +797,7 @@ footer {
             aria-live="polite"
           ></p>
 
-          <div class="actions">
-
-            <button
-              class="btn secondary"
-              id="resetBoard"
-              type="button"
-            >
-              ↻ Reset Demo Board
-            </button>
+          <div class="actions">     
 
             <a
               class="btn"
@@ -956,58 +947,52 @@ footer {
 <script src="../js/config.js"></script>
 <script src="../js/campus-guard.js"></script>
 
+
 <script>
 (async () => {
   "use strict";
 
-  const gateMessage =
-    document.getElementById("campusGateMessage");
-
-  const year =
-    document.getElementById("year");
-
-  if (year) {
-    year.textContent = new Date().getFullYear();
-  }
+  const gateMessage = document.getElementById("campusGateMessage");
+  const year = document.getElementById("year");
+  if (year) year.textContent = new Date().getFullYear();
 
   const guard = window.BB_CAMPUS_GUARD;
-
   if (!guard) {
-    gateMessage.textContent =
-      "Campus access verification is unavailable. Please try again.";
+    gateMessage.textContent = "Campus access verification is unavailable.";
     return;
   }
 
   try {
-    const result = await guard.protectPage({
-      level:"approved",
-      gateId:"campusGate",
-      contentId:"campusContent",
-      messageId:"campusGateMessage"
+    const access = await guard.protectPage({
+      level: "approved",
+      gateId: "campusGate",
+      contentId: "campusContent",
+      messageId: "campusGateMessage"
     });
 
-    if (!result.allowed) return;
+    if (!access.allowed) return;
 
-    initializeBingo();
+    const client = guard.getClient();
+    const { data: { user }, error: authError } =
+      await client.auth.getUser();
+
+    if (authError || !user) {
+      throw authError || new Error("No authenticated user.");
+    }
+
+    await initializeBingo(client, user.id);
 
   } catch (error) {
-    console.error("Bingo access error:", error);
-
-    document.getElementById(
-      "campusContent"
-    ).hidden = true;
-
-    document.getElementById(
-      "campusGate"
-    ).hidden = false;
-
-    gateMessage.textContent =
-      "We couldn't load Bingo Bulletin. Please try again.";
+    console.error("Bingo loading error:", error);
+    const message = document.getElementById("progressMessage");
+    if (message) {
+      message.textContent =
+        "We couldn't load your Bingo board. Please refresh and try again.";
+    }
   }
 
-  function initializeBingo() {
-
-    const STORAGE_KEY = "bb_bingo_demo_v1";
+  async function initializeBingo(client, userId) {
+    const SLUG = "bingo-and-biscotti-2026-11";
 
     const missions = [
       "Read a romance",
@@ -1015,25 +1000,21 @@ footer {
       "Read 50 pages",
       "Share a book quote",
       "Read a thriller",
-
       "Read before bed",
       "Recommend a book",
       "Read 100 pages",
       "Try an audiobook",
       "Read a novella",
-
       "Read a pink cover",
       "Read outside",
       "FREE SPACE",
       "Read a fantasy",
       "Rate a book",
-
       "Read for 30 minutes",
       "Read a library book",
       "Finish a chapter",
       "Read a debut novel",
       "Share your TBR",
-
       "Read a cozy book",
       "Read 75 pages",
       "Read a new genre",
@@ -1041,178 +1022,178 @@ footer {
       "Celebrate a Bestie"
     ];
 
-    const board =
-      document.getElementById("board");
-
-    const completedEl =
-      document.getElementById("completed");
-
-    const linesEl =
-      document.getElementById("lines");
-
-    const percentEl =
-      document.getElementById("percent");
-
-    const fillEl =
-      document.getElementById("progressFill");
-
-    const trackEl =
-      document.getElementById("progressTrack");
-
-    const messageEl =
-      document.getElementById("progressMessage");
-
-    const detailEl =
-      document.getElementById("squareDetail");
-
-    const celebrateEl =
-      document.getElementById("celebrate");
+    const board = document.getElementById("board");
+    const completedEl = document.getElementById("completed");
+    const linesEl = document.getElementById("lines");
+    const percentEl = document.getElementById("percent");
+    const fillEl = document.getElementById("progressFill");
+    const trackEl = document.getElementById("progressTrack");
+    const messageEl = document.getElementById("progressMessage");
+    const detailEl = document.getElementById("squareDetail");
+    const celebrateEl = document.getElementById("celebrate");
 
     let marked = new Set([12]);
-
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      );
-
-      if (Array.isArray(saved)) {
-        marked = new Set(
-          saved.filter(n =>
-            Number.isInteger(n) &&
-            n >= 0 &&
-            n < 25
-          )
-        );
-
-        marked.add(12);
-      }
-
-    } catch (error) {
-      console.warn(
-        "Unable to restore Bingo preview:",
-        error
-      );
-    }
+    let event = null;
+    let saving = false;
 
     const winningLines = [];
 
     for (let row = 0; row < 5; row++) {
       winningLines.push(
-        [0,1,2,3,4].map(
-          col => row * 5 + col
-        )
+        [0, 1, 2, 3, 4].map(col => row * 5 + col)
       );
     }
 
     for (let col = 0; col < 5; col++) {
       winningLines.push(
-        [0,1,2,3,4].map(
-          row => row * 5 + col
-        )
+        [0, 1, 2, 3, 4].map(row => row * 5 + col)
       );
     }
 
-    winningLines.push(
-      [0,6,12,18,24]
-    );
+    winningLines.push([0, 6, 12, 18, 24]);
+    winningLines.push([4, 8, 12, 16, 20]);
 
-    winningLines.push(
-      [4,8,12,16,20]
-    );
+    function chicagoDate() {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Chicago",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
 
-    function save() {
-      try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify([...marked])
-        );
+      const values = Object.fromEntries(
+        parts.map(part => [part.type, part.value])
+      );
 
-      } catch (error) {
-        console.warn(
-          "Unable to save Bingo preview:",
-          error
-        );
-      }
+      return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    function eventIsOpen() {
+      if (!event) return false;
+
+      const today = chicagoDate();
+      return today >= event.starts_on &&
+             today <= event.ends_on;
+    }
+
+    async function loadBoard() {
+      const { data, error } = await client
+        .from("bingo_progress")
+        .select("marked_squares")
+        .eq("event_id", event.id)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      marked = new Set(
+        Array.isArray(data?.marked_squares)
+          ? data.marked_squares
+          : [12]
+      );
+
+      marked.add(12);
+      renderBoard();
+      showDetail(12);
+    }
+
+    async function saveBoard(nextMarked) {
+      const payload = {
+        event_id: event.id,
+        user_id: userId,
+        marked_squares: [...nextMarked].sort((a, b) => a - b),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await client
+        .from("bingo_progress")
+        .upsert(payload, {
+          onConflict: "event_id,user_id"
+        });
+
+      if (error) throw error;
     }
 
     function showDetail(index) {
       detailEl.replaceChildren();
 
-      const heading =
-        document.createElement("h3");
-
+      const heading = document.createElement("h3");
       heading.textContent =
         index === 12
           ? "⭐ FREE SPACE!"
           : "🎀 " + missions[index];
 
-      const description =
-        document.createElement("p");
+      const description = document.createElement("p");
 
       description.textContent =
         index === 12
           ? "This square is automatically completed. Enjoy your little freebie, Bestie!"
-          : "Complete this reading mission, then mark your square. This is a sample task for our design preview.";
+          : eventIsOpen()
+            ? "Complete this reading mission, then mark your square. Your progress saves to your Bestie account."
+            : "☕ Bingo & Biscotti opens November 1, 2026. You can explore the missions now!";
 
-      detailEl.append(
-        heading,
-        description
-      );
+      detailEl.append(heading, description);
 
-      if (index !== 12) {
-        const button =
-          document.createElement("button");
+      if (index === 12 || !eventIsOpen()) return;
 
-        button.type = "button";
-        button.className = "btn";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "btn";
+      button.disabled = saving;
 
-        button.textContent =
-          marked.has(index)
-            ? "↻ Unmark Square"
-            : "✓ Mark Complete";
+      button.textContent =
+        marked.has(index)
+          ? "↻ Unmark Square"
+          : "✓ Mark Complete";
 
-        button.addEventListener(
-          "click",
-          () => toggle(index)
-        );
-
-        detailEl.append(button);
-      }
+      button.addEventListener("click", () => toggle(index));
+      detailEl.append(button);
     }
 
-    function toggle(index) {
-      if (index === 12) return;
+    async function toggle(index) {
+      if (index === 12 || !eventIsOpen() || saving) return;
 
-      if (marked.has(index)) {
-        marked.delete(index);
+      saving = true;
+
+      const nextMarked = new Set(marked);
+
+      if (nextMarked.has(index)) {
+        nextMarked.delete(index);
       } else {
-        marked.add(index);
+        nextMarked.add(index);
       }
 
-      save();
-      renderBoard();
+      nextMarked.add(12);
       showDetail(index);
+
+      try {
+        await saveBoard(nextMarked);
+        marked = nextMarked;
+        renderBoard();
+        showDetail(index);
+      } catch (error) {
+        console.error("Unable to save Bingo square:", error);
+        messageEl.textContent =
+          "☕ Your square wasn't saved. Please try again.";
+        showDetail(index);
+      } finally {
+        saving = false;
+        showDetail(index);
+      }
     }
 
     function updateProgress() {
       const count = marked.size;
+      const percent = Math.round(count / 25 * 100);
 
-      const percent =
-        Math.round(count / 25 * 100);
-
-      const lines =
-        winningLines.filter(line =>
-          line.every(index =>
-            marked.has(index)
-          )
-        ).length;
+      const lines = winningLines.filter(line =>
+        line.every(index => marked.has(index))
+      ).length;
 
       completedEl.textContent = count;
       linesEl.textContent = lines;
       percentEl.textContent = percent + "%";
-
-      fillEl.style.width =
-        percent + "%";
+      fillEl.style.width = percent + "%";
 
       trackEl.setAttribute(
         "aria-valuenow",
@@ -1220,9 +1201,11 @@ footer {
       );
 
       messageEl.textContent =
-        count === 25
-          ? "👑 BLACKOUT, BESTIE! You've completed the whole board!"
-          : `${count} of 25 squares complete. Keep going, Bestie!`;
+        !eventIsOpen()
+          ? "🔒 Bingo & Biscotti opens November 1, 2026."
+          : count === 25
+            ? "👑 BLACKOUT, BESTIE! You've completed the whole board!"
+            : `${count} of 25 squares complete. Saved to your Bestie account!`;
 
       celebrateEl.classList.toggle(
         "hidden",
@@ -1239,37 +1222,25 @@ footer {
       board.replaceChildren();
 
       "BINGO".split("").forEach(letter => {
-        const heading =
-          document.createElement("div");
-
+        const heading = document.createElement("div");
         heading.className = "letter";
         heading.textContent = letter;
-
         board.append(heading);
       });
 
-      missions.forEach((mission,index) => {
-        const button =
-          document.createElement("button");
-
+      missions.forEach((mission, index) => {
+        const button = document.createElement("button");
         button.type = "button";
         button.className = "square";
 
-        if (index === 12) {
-          button.classList.add("free");
-        }
-
-        if (marked.has(index)) {
-          button.classList.add("marked");
-        }
+        if (index === 12) button.classList.add("free");
+        if (marked.has(index)) button.classList.add("marked");
 
         button.textContent = mission;
-
         button.setAttribute(
           "aria-label",
           `${mission}, ${marked.has(index) ? "completed" : "not completed"}`
         );
-
         button.setAttribute(
           "aria-pressed",
           String(marked.has(index))
@@ -1286,25 +1257,22 @@ footer {
       updateProgress();
     }
 
-    document.getElementById(
-      "resetBoard"
-    ).addEventListener("click", () => {
-      if (!confirm(
-        "Reset your demo Bingo board?"
-      )) return;
+    const { data: eventData, error: eventError } =
+      await client
+        .from("bingo_events")
+        .select("id, title, starts_on, ends_on")
+        .eq("slug", SLUG)
+        .single();
 
-      marked = new Set([12]);
+    if (eventError) throw eventError;
 
-      save();
-      renderBoard();
-      showDetail(12);
-    });
+    event = eventData;
 
-    renderBoard();
+    await loadBoard();
   }
-
 })();
 </script>
+
 
 </body>
 </html>
