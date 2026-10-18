@@ -1068,10 +1068,39 @@
                   </form>
                 </div>
 
+                
+                <!-- LIVE COMMONS REPORTS -->
+                <div class="item" id="commonsReportsPanel">
+                  <h4>🚩 DEAN'S OFFICE — MEMBER REPORTS</h4>
+
+                  <p class="mini">
+                    Review reported Bulletin posts, comments,
+                    and Bestie Chat messages. Only authorized
+                    campus staff can manage reports.
+                  </p>
+
+                  <div id="commonsReportsStatus"
+                       role="status"
+                       aria-live="polite">
+                    💗 Preparing the moderation desk...
+                  </div>
+
+                  <div id="commonsReportsList"></div>
+
+                  <button
+                    class="btn secondary"
+                    id="refreshCommonsReports"
+                    type="button">
+                    🔄 Refresh Reports
+                  </button>
+                </div>
+
                 <p class="mini">
-                  Chat and Bulletin moderation are still previews.
-                  Campus Mail announcements are now live.
+                  📣 Campus announcements publish to both
+                  Campus Buzz and approved Besties' Campus Mail.
+                  The Dean's Office reporting system is being connected.
                 </p>
+
 
                 <a class="btn secondary" href="commons.html">
                   Preview Crown Commons ↗
@@ -1692,6 +1721,7 @@
   <script src="js/campus-hq-auth.js"></script>
   <script src="js/campus-overview.js"></script>
   <script src="js/campus-announcements.js"></script>
+  <script src="js/campus-moderation.js"></script>
 
 </body>
 </html>

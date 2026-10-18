@@ -34,8 +34,17 @@
 
     let loading = false;
 
+    
     async function loadMessages() {
       if (loading) return;
+
+      // Don't interrupt a Bestie filling out a report.
+      const openReportForm = root.querySelector(
+        ".commons-report-wrapper form:not([hidden])"
+      );
+
+      if (openReportForm) return;
+
       loading = true;
 
       try {
@@ -145,10 +154,21 @@
             bubble.append(remove);
           }
 
+          
+          // Allow Besties to report individual chat messages.
+          window.BB_COMMONS_REPORTS.addReportButton(
+            bubble,
+            "chat",
+            message.id,
+            client,
+            user
+          );
+
           root.append(bubble);
         }
 
         root.scrollTop = root.scrollHeight;
+
       } finally {
         loading = false;
       }
