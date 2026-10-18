@@ -146,10 +146,21 @@
           item.append(deleteButton);
         }
 
+      
+        // Let Besties report this specific comment.
+        window.BB_COMMONS_REPORTS.addReportButton(
+          item,
+          "comment",
+          comment.id,
+          client,
+          user
+        );
+
         list.append(item);
       }
 
       const input = make("textarea");
+
       input.maxLength = 1000;
       input.rows = 3;
       input.placeholder = "Leave a little bookish love... 💌";

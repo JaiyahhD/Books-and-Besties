@@ -203,14 +203,26 @@
           article.append(removeButton);
         }
 
+        
         postsRoot.append(article);
 
+        // Allow Besties to report Bulletin posts.
+        window.BB_COMMONS_REPORTS.addReportButton(
+        article,
+        "post",
+        post.id,
+        client,
+        user
+        );
+
+        // Keep expandable comments working.
         await window.BB_COMMONS_COMMENTS.addComments(
         article,
         post,
         client,
         user
         );
+
       }
     }
 
