@@ -66,7 +66,12 @@
   }
 
   document.addEventListener(
-    "bb:campus-hq-ready",
-    initialize
-  );
+  "bb:campus-hq-ready",
+  () => {
+    initialize();
+
+    // Refresh after the original dashboard finishes initializing.
+    setTimeout(loadCampusOverview, 100);
+  }
+);
 })();
