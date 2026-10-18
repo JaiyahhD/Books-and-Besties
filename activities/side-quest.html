@@ -697,10 +697,10 @@ footer {
   <main class="wrap">
 
     <div class="notice">
-      💌 DESIGN PREVIEW: These are sample missions, not
-      official Books &amp; Besties events. Your progress
-      and journal save in this browser only. Real monthly
-      quests will eventually be published through Campus HQ.
+      ☕ THE VELVET QUEST DIARIES | NOVEMBER 1–30, 2026
+      💌 Your missions and private diary are saved to your
+      Bestie account. Complete quests, collect stamps,
+      and write your cozy November memories!
     </div>
 
     <div class="layout">
@@ -811,7 +811,7 @@ footer {
               id="saveStatus"
               aria-live="polite"
             >
-              Saved locally as you type.
+              📓 Loading your private Velvet Diary...
             </p>
 
             <div class="actions">
@@ -846,6 +846,7 @@ footer {
 
 </div>
 
+
 <!-- SUPABASE + APPROVED MEMBER GUARD -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -856,12 +857,50 @@ footer {
 (async () => {
   "use strict";
 
-  const gateMessage =
-    document.getElementById("campusGateMessage");
+  const EVENT_SLUG = "velvet-quest-diaries-2026-11";
 
-  const year =
-    document.getElementById("year");
+  const missions = [
+    {
+      icon: "☕",
+      title: "Latte & Literature",
+      desc: "Read while enjoying a warm drink."
+    },
+    {
+      icon: "🍪",
+      title: "Sweet Little Chapter",
+      desc: "Pair your reading session with a sweet treat."
+    },
+    {
+      icon: "🤎",
+      title: "Cozy Cover Crush",
+      desc: "Read a book with a brown, cream, or warm-toned cover."
+    },
+    {
+      icon: "🧸",
+      title: "Soft Girl Reading Hour",
+      desc: "Spend an uninterrupted hour reading somewhere comfy."
+    },
+    {
+      icon: "💌",
+      title: "Bestie Book Love",
+      desc: "Recommend a comforting book to another Bestie."
+    },
+    {
+      icon: "🍂",
+      title: "Autumn Afterglow",
+      desc: "Finish a book that gives you cozy seasonal vibes."
+    }
+  ];
 
+  const stampLevels = [
+    { count: 1, emoji: "💌", title: "FIRST QUEST" },
+    { count: 3, emoji: "🎀", title: "QUEST CUTIE" },
+    { count: 6, emoji: "👑", title: "QUEST QUEEN" }
+  ];
+
+  const $ = id => document.getElementById(id);
+
+  const year = $("year");
   if (year) {
     year.textContent = new Date().getFullYear();
   }
@@ -869,241 +908,218 @@ footer {
   const guard = window.BB_CAMPUS_GUARD;
 
   if (!guard) {
-    gateMessage.textContent =
-      "Campus access verification is unavailable. Please try again.";
+    $("campusGateMessage").textContent =
+      "Campus verification is unavailable. Please refresh.";
     return;
   }
 
   try {
-    const result = await guard.protectPage({
-      level:"approved",
-      gateId:"campusGate",
-      contentId:"campusContent",
-      messageId:"campusGateMessage"
+    const access = await guard.protectPage({
+      level: "approved",
+      gateId: "campusGate",
+      contentId: "campusContent",
+      messageId: "campusGateMessage"
     });
 
-    if (!result.allowed) return;
+    if (!access.allowed) return;
 
-    initializeSideQuest();
+    const supabase = guard.getClient();
 
-  } catch (error) {
-    console.error("Side Quest access error:",error);
+    const { data: authData, error: authError } =
+      await supabase.auth.getUser();
 
-    document.getElementById("campusContent").hidden = true;
-    document.getElementById("campusGate").hidden = false;
+    if (authError || !authData?.user) {
+      throw authError || new Error("Please log in again.");
+    }
 
-    gateMessage.textContent =
-      "We couldn't load Monthly Side Quest. Please try again.";
-  }
+    const userId = authData.user.id;
 
-  function initializeSideQuest() {
+    $("monthTitle").textContent =
+      "☕ The Velvet Latte Lounge";
 
-    // Keep this key unchanged to preserve existing progress.
-    const STORAGE_KEY = "bb_side_quest_demo_v1";
+    $("monthDescription").textContent =
+      "Warm drinks, cozy chapters, and soft little moments for your reading life.";
 
-    const quests = {
-      november: {
-        title:"☕ The Velvet Latte Lounge",
-        description:
-          "Warm drinks, cozy chapters, and soft little moments for your reading life.",
-        missions:[
+    $("totalCount").textContent = missions.length;
+
+    const journal = $("journal");
+    const saveDiaryButton = $("saveDiary");
+
+    if (!journal || !saveDiaryButton) {
+      throw new Error(
+        "The diary textarea or Save My Diary button is missing."
+      );
+    }
+
+    journal.disabled = true;
+    saveDiaryButton.disabled = true;
+
+    $("saveStatus").textContent =
+      "📓 Loading your private Velvet Diary...";
+
+    const { data: event, error: eventError } =
+      await supabase
+        .from("quest_events")
+        .select("id,starts_on,ends_on,is_published")
+        .eq("slug", EVENT_SLUG)
+        .eq("is_published", true)
+        .single();
+
+    if (eventError || !event) {
+      throw eventError ||
+        new Error("November's quest is unavailable.");
+    }
+
+    const { data: savedProgress, error: progressError } =
+      await supabase
+        .from("quest_progress")
+        .select("completed_missions,journal")
+        .eq("event_id", event.id)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+    if (progressError) {
+      throw progressError;
+    }
+
+    let completed = Array.isArray(
+      savedProgress?.completed_missions
+    )
+      ? [...new Set(
+          savedProgress.completed_missions.filter(
+            n => Number.isInteger(n) && n >= 0 && n < 6
+          )
+        )].sort((a, b) => a - b)
+      : [];
+
+    let savedJournal =
+      typeof savedProgress?.journal === "string"
+        ? savedProgress.journal
+        : "";
+
+    let busy = false;
+
+    journal.value = savedJournal;
+
+    function chicagoDate() {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Chicago",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
+
+      const get = type =>
+        parts.find(part => part.type === type)?.value;
+
+      return `${get("year")}-${get("month")}-${get("day")}`;
+    }
+
+    function isOpen() {
+      const today = chicagoDate();
+
+      return (
+        event.is_published === true &&
+        today >= event.starts_on &&
+        today <= event.ends_on
+      );
+    }
+
+    function lockMessage() {
+      const today = chicagoDate();
+
+      if (today < event.starts_on) {
+        return "🔒 Your Velvet Diary opens November 1, 2026.";
+      }
+
+      if (today > event.ends_on) {
+        return "📓 November's diary is closed. Your saved memories remain available.";
+      }
+
+      return "🔒 This quest is currently unavailable.";
+    }
+
+    function setStatus(message) {
+      $("saveStatus").textContent = message;
+    }
+
+    function updateControls() {
+      const unlocked = isOpen() && !busy;
+
+      journal.disabled = !unlocked;
+      saveDiaryButton.disabled = !unlocked;
+
+      document.querySelectorAll(
+        "#missionList .check"
+      ).forEach(button => {
+        button.disabled = !unlocked;
+      });
+    }
+
+    async function saveProgress(
+      missionValues,
+      journalValue
+    ) {
+      if (!isOpen()) {
+        throw new Error("The November quest is closed.");
+      }
+
+      const { error } = await supabase
+        .from("quest_progress")
+        .upsert(
           {
-            icon:"☕",
-            title:"Latte & Literature",
-            desc:"Read while enjoying a warm drink."
+            event_id: event.id,
+            user_id: userId,
+            completed_missions: missionValues,
+            journal: journalValue,
+            updated_at: new Date().toISOString()
           },
           {
-            icon:"🍪",
-            title:"Sweet Little Chapter",
-            desc:"Pair your reading session with a sweet treat."
-          },
-          {
-            icon:"🤎",
-            title:"Cozy Cover Crush",
-            desc:"Read a book with a brown, cream, or warm-toned cover."
-          },
-          {
-            icon:"🧸",
-            title:"Soft Girl Reading Hour",
-            desc:"Spend an uninterrupted hour reading somewhere comfy."
-          },
-          {
-            icon:"💌",
-            title:"Bestie Book Love",
-            desc:"Recommend a comforting book to another Bestie."
-          },
-          {
-            icon:"🍂",
-            title:"Autumn Afterglow",
-            desc:"Finish a book that gives you cozy seasonal vibes."
+            onConflict: "event_id,user_id"
           }
-        ]
-      }
-    };
-
-    const stampLevels = [
-      {count:1,emoji:"💌",title:"FIRST QUEST"},
-      {count:3,emoji:"🎀",title:"QUEST CUTIE"},
-      {count:6,emoji:"👑",title:"QUEST QUEEN"}
-    ];
-
-    let month = "november";
-    let data = {};
-
-    try {
-      const stored = JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      );
-
-      if (
-        stored &&
-        typeof stored === "object" &&
-        !Array.isArray(stored)
-      ) {
-        data = stored;
-      }
-
-    } catch (error) {
-      console.warn(
-        "Could not restore quest preview:",
-        error
-      );
-    }
-
-    function getMonthData() {
-      if (
-        !data[month] ||
-        typeof data[month] !== "object"
-      ) {
-        data[month] = {
-          completed:[],
-          journal:""
-        };
-      }
-
-      if (!Array.isArray(data[month].completed)) {
-        data[month].completed = [];
-      }
-
-      if (typeof data[month].journal !== "string") {
-        data[month].journal = "";
-      }
-
-      return data[month];
-    }
-
-    function save() {
-      try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(data)
         );
 
-        document.getElementById(
-          "saveStatus"
-        ).textContent =
-          "💗 Saved in this browser!";
-
-      } catch (error) {
-        document.getElementById(
-          "saveStatus"
-        ).textContent =
-          "Unable to save locally. Check your browser settings.";
+      if (error) {
+        throw error;
       }
     }
 
     function render() {
-      const quest = quests[month];
-      const progress = getMonthData();
-
-      const valid = new Set(
-        progress.completed.filter(n =>
-          Number.isInteger(n) &&
-          n >= 0 &&
-          n < quest.missions.length
-        )
-      );
-
-      progress.completed = [...valid];
-
-      document.querySelectorAll(
-        "[data-month]"
-      ).forEach(button => {
-        const active =
-          button.dataset.month === month;
-
-        button.classList.toggle(
-          "active",
-          active
-        );
-
-        button.setAttribute(
-          "aria-pressed",
-          String(active)
-        );
-      });
-
-      document.getElementById(
-        "monthTitle"
-      ).textContent = quest.title;
-
-      document.getElementById(
-        "monthDescription"
-      ).textContent = quest.description;
-
-      const list =
-        document.getElementById("missionList");
+      const selected = new Set(completed);
+      const list = $("missionList");
 
       list.replaceChildren();
 
-      quest.missions.forEach((mission,index) => {
-        const done = valid.has(index);
+      missions.forEach((mission, index) => {
+        const done = selected.has(index);
 
-        const card =
-          document.createElement("div");
-
+        const card = document.createElement("div");
         card.className =
           "mission" + (done ? " done" : "");
 
-        const icon =
-          document.createElement("span");
-
+        const icon = document.createElement("span");
         icon.className = "mission-icon";
         icon.textContent = mission.icon;
 
-        const info =
-          document.createElement("div");
-
+        const info = document.createElement("div");
         info.className = "mission-info";
 
-        const title =
-          document.createElement("strong");
-
+        const title = document.createElement("strong");
         title.textContent = mission.title;
 
-        const description =
-          document.createElement("p");
-
+        const description = document.createElement("p");
         description.textContent = mission.desc;
 
-        const stamp =
-          document.createElement("span");
-
+        const stamp = document.createElement("span");
         stamp.className = "stamp";
 
         stamp.textContent = done
           ? "✓ MISSION COMPLETE"
           : "✧ AWAITING YOUR ADVENTURE";
 
-        info.append(
-          title,
-          description,
-          stamp
-        );
+        info.append(title, description, stamp);
 
-        const button =
-          document.createElement("button");
-
+        const button = document.createElement("button");
         button.type = "button";
         button.className = "check";
 
@@ -1121,94 +1137,85 @@ footer {
           `${done ? "Undo" : "Complete"} ${mission.title}`
         );
 
-        button.addEventListener("click",() => {
-          const current = getMonthData();
+        button.addEventListener("click", async () => {
+          if (!isOpen() || busy) return;
 
-          const selected = new Set(
-            current.completed
-          );
+          const previous = [...completed];
+          const next = new Set(completed);
 
-          if (selected.has(index)) {
-            selected.delete(index);
+          if (next.has(index)) {
+            next.delete(index);
           } else {
-            selected.add(index);
+            next.add(index);
           }
 
-          current.completed = [...selected];
+          completed = [...next].sort((a, b) => a - b);
 
-          save();
+          busy = true;
           render();
+
+          try {
+            await saveProgress(
+              completed,
+              savedJournal
+            );
+          } catch (error) {
+            completed = previous;
+
+            console.error(
+              "Quest mission save failed:",
+              error
+            );
+
+            alert(
+              "💌 That mission couldn't be saved. Please try again."
+            );
+          } finally {
+            busy = false;
+            render();
+          }
         });
 
-        card.append(
-          icon,
-          info,
-          button
-        );
-
+        card.append(icon, info, button);
         list.append(card);
       });
 
-      const count = valid.size;
-      const total = quest.missions.length;
-
+      const count = selected.size;
+      const total = missions.length;
       const percent = Math.round(
-        count / total * 100
+        (count / total) * 100
       );
 
-      document.getElementById(
-        "doneCount"
-      ).textContent = count;
+      $("doneCount").textContent = count;
+      $("totalCount").textContent = total;
+      $("percent").textContent = percent + "%";
 
-      document.getElementById(
-        "totalCount"
-      ).textContent = total;
+      $("progressFill").style.width =
+        percent + "%";
 
-      document.getElementById(
-        "percent"
-      ).textContent = percent + "%";
-
-      document.getElementById(
-        "progressFill"
-      ).style.width = percent + "%";
-
-      document.getElementById(
-        "progressTrack"
-      ).setAttribute(
+      $("progressTrack").setAttribute(
         "aria-valuenow",
         String(percent)
       );
 
-      const stamps =
-        document.getElementById("stamps");
-
+      const stamps = $("stamps");
       stamps.replaceChildren();
 
       stampLevels.forEach(level => {
-        const earned =
-          count >= level.count;
+        const earned = count >= level.count;
 
-        const card =
-          document.createElement("div");
-
+        const card = document.createElement("div");
         card.className =
           "stamp-card" + (earned ? " earned" : "");
 
-        const emoji =
-          document.createElement("span");
-
+        const emoji = document.createElement("span");
         emoji.className = "emoji";
         emoji.textContent = level.emoji;
 
-        const title =
-          document.createElement("strong");
-
+        const title = document.createElement("strong");
         title.textContent = level.title;
 
-        card.append(
-          emoji,
-          title
-        );
+        card.append(emoji, title);
 
         card.setAttribute(
           "aria-label",
@@ -1218,8 +1225,7 @@ footer {
         stamps.append(card);
       });
 
-      const celebrate =
-        document.getElementById("celebrate");
+      const celebrate = $("celebrate");
 
       celebrate.classList.toggle(
         "hidden",
@@ -1229,30 +1235,94 @@ footer {
       celebrate.textContent =
         "👑 ALL QUESTS COMPLETE! Main-character behavior, Bestie!";
 
-      document.getElementById(
-        "journal"
-      ).value = progress.journal;
+      updateControls();
     }
 
-    document.querySelectorAll(
-      "[data-month]"
-    ).forEach(button => {
-      button.addEventListener("click",() => {
-        month = button.dataset.month;
-        render();
-      });
+    journal.addEventListener("input", () => {
+      if (!isOpen()) return;
+
+      setStatus(
+        "✍🏽 Unsaved changes. Click Save My Diary when you're ready."
+      );
     });
 
-    document.getElementById(
-      "journal"
-    ).addEventListener("input",event => {
-      getMonthData().journal =
-        event.target.value;
+    saveDiaryButton.addEventListener(
+      "click",
+      async () => {
+        if (!isOpen() || busy) return;
 
-      save();
+        const draft = journal.value;
+
+        if (draft.length > 10000) {
+          setStatus(
+            "💌 Your diary can hold up to 10,000 characters."
+          );
+          return;
+        }
+
+        busy = true;
+        updateControls();
+
+        setStatus(
+          "☕ Saving your private diary..."
+        );
+
+        try {
+          await saveProgress(completed, draft);
+
+          savedJournal = draft;
+
+          setStatus(
+            "💗 Diary saved to your Bestie account!"
+          );
+        } catch (error) {
+          console.error(
+            "Diary save failed:",
+            error
+          );
+
+          setStatus(
+            "❌ Diary wasn't saved. Please try again."
+          );
+        } finally {
+          busy = false;
+          updateControls();
+        }
+      }
+    );
+
+    render();
+
+    if (isOpen()) {
+      setStatus(
+        "📓 Your diary is private. Click Save My Diary to save your writing."
+      );
+    } else {
+      setStatus(lockMessage());
+    }
+
+    // Refresh the event lock when returning to the page.
+    window.addEventListener("focus", () => {
+      updateControls();
+
+      if (!isOpen()) {
+        setStatus(lockMessage());
+      }
     });
 
-}})();
+  } catch (error) {
+    console.error(
+      "Velvet Quest initialization failed:",
+      error
+    );
+
+    $("campusContent").hidden = true;
+    $("campusGate").hidden = false;
+
+    $("campusGateMessage").textContent =
+      "We couldn't load your Velvet Quest Diaries. Please refresh and try again.";
+  }
+})();
 </script>
 
 </body>
