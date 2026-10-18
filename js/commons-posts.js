@@ -59,6 +59,33 @@
         return;
       }
 
+      
+      // Load shared Love reactions for these posts.
+      const postIds = posts.map(post => post.id);
+
+      const { data: reactions, error: reactionsError } = await client
+        .from("commons_post_reactions")
+        .select("post_id, user_id")
+        .in("post_id", postIds);
+
+      if (reactionsError) {
+        console.error("Bulletin reactions:", reactionsError);
+      }
+
+      const reactionCounts = new Map();
+      const myReactions = new Set();
+
+      for (const reaction of reactions || []) {
+        reactionCounts.set(
+          reaction.post_id,
+          (reactionCounts.get(reaction.post_id) || 0) + 1
+        );
+
+        if (reaction.user_id === user.id) {
+          myReactions.add(reaction.post_id);
+        }
+      }
+
       const authorIds = [...new Set(posts.map(post => post.author_id))];
 
       const { data: profiles, error: profileError } = await client
@@ -98,6 +125,51 @@
           header,
           make("p", "", post.content)
         );
+
+        
+        const loveButton = make(
+          "button",
+          "reaction",
+          `💗 ${myReactions.has(post.id) ? "Loved" : "Love"} · ${
+            reactionCounts.get(post.id) || 0
+          }`
+        );
+
+        loveButton.type = "button";
+        loveButton.setAttribute(
+          "aria-pressed",
+          String(myReactions.has(post.id))
+        );
+
+        loveButton.addEventListener("click", async () => {
+          loveButton.disabled = true;
+
+          const alreadyLoved = myReactions.has(post.id);
+
+          const { error: reactionError } = alreadyLoved
+            ? await client
+                .from("commons_post_reactions")
+                .delete()
+                .eq("post_id", post.id)
+                .eq("user_id", user.id)
+            : await client
+                .from("commons_post_reactions")
+                .insert({
+                  post_id: post.id,
+                  user_id: user.id
+                });
+
+          if (reactionError) {
+            console.error("Love reaction:", reactionError);
+            alert("Couldn't update your reaction. Please try again.");
+            loveButton.disabled = false;
+            return;
+          }
+
+          await loadPosts();
+        });
+
+        article.append(loveButton);
 
         if (post.author_id === user.id) {
           const removeButton = make(
