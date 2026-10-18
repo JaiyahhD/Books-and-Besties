@@ -1,0 +1,914 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reading Nook | Bestie University</title>
+
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --espresso: #563b3b;
+      --cream: #fff8f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      color: var(--espresso);
+      background: linear-gradient(135deg, #fff8f2, #f8dce8);
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    .gate {
+      max-width: 600px;
+      margin: 90px auto;
+      padding: 30px;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .page {
+      max-width: 950px;
+      margin: auto;
+      padding: 30px 20px 70px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 30px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .top-nav a {
+      color: var(--espresso);
+      text-decoration: none;
+    }
+
+    .hero {
+      background: var(--pink);
+      padding: 45px 25px;
+      border-radius: 25px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .eyebrow {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      font-size: clamp(34px, 5vw, 52px);
+      margin: 15px 0;
+    }
+
+    .hero p { line-height: 1.7; }
+
+    .panel, .thread-card {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px #563b3b10;
+    }
+
+    .panel h2 { margin-top: 0; }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font: 700 12px Arial, sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      background: white;
+      font-size: 14px;
+    }
+
+    .field textarea {
+      min-height: 115px;
+      resize: vertical;
+    }
+
+    .primary-button {
+      border: none;
+      border-radius: 12px;
+      background: var(--espresso);
+      color: white;
+      padding: 13px 22px;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .primary-button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    .thread-meta {
+      font: 700 12px Arial, sans-serif;
+      opacity: .7;
+      margin-bottom: 12px;
+    }
+
+    .thread-tag {
+      display: inline-block;
+      padding: 7px 12px;
+      background: #fff0f6;
+      border-radius: 20px;
+      font: 700 11px Arial, sans-serif;
+      margin-bottom: 12px;
+    }
+
+    .thread-card h3 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .book-author {
+      font-size: 13px;
+      opacity: .7;
+      margin-bottom: 15px;
+    }
+
+    .thread-content {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.8;
+    }
+
+    .notice {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      opacity: .75;
+    }
+
+    .feed-heading {
+      margin: 35px 0 20px;
+    }
+
+    
+/* 📚 Cozy Reading Nook Replies */
+
+.nook-replies {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eadce0;
+}
+
+.nook-replies h4 {
+  margin: 0 0 16px;
+  font-size: 16px;
+}
+
+.nook-reply {
+  padding: 15px;
+  margin-bottom: 12px;
+  background: #fff5f9;
+  border: 1px solid #f2dce6;
+  border-radius: 14px;
+}
+
+.nook-reply strong {
+  display: block;
+  font: 700 13px Arial, sans-serif;
+  color: #85506a;
+}
+
+.nook-reply small {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.nook-reply p {
+  margin: 12px 0 0;
+  line-height: 1.7;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.nook-reply-form {
+  margin-top: 18px;
+}
+
+.nook-reply-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 13px;
+  border: 1px solid #ddcdd2;
+  border-radius: 12px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.nook-reply-form button {
+  margin-top: 10px;
+}
+
+
+/* 💗 Reading Nook reactions */
+
+.nook-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.nook-reactions button {
+  border: 1px solid #f0d7e2;
+  background: #fff7fa;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.nook-reactions button:hover {
+  background: #fce5ef;
+}
+
+.nook-reactions button.reacted {
+  background: #f3c9dc;
+  border-color: #d99ab8;
+  color: #78405e;
+}
+
+.nook-reactions button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+/* ✏️ Reading Nook editing */
+
+.nook-edit-button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 13px;
+  border: 1px solid #ead0db;
+  border-radius: 10px;
+  background: #fff0f6;
+  color: #85506a;
+  font: 700 11px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.nook-edit-button:hover {
+  background: #f6d7e5;
+}
+
+.nook-edit-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+  </style>
+</head>
+
+<body>
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">
+      Checking your Reading Nook access...
+    </p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+    <nav class="top-nav">
+      <a id="backToDorm" href="housing.html">← MY DORM</a>
+      <a href="locker.html">MY BESTIE LOCKER 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · RESIDENTIAL LIFE
+      </div>
+      <h1>📚 The Reading Nook</h1>
+      <p id="nookSubtitle">
+        A cozy corner for all your bookish thoughts.
+      </p>
+    </header>
+
+    <section class="panel">
+      <h2>What's on Your Bookshelf? 💗</h2>
+      <p>
+        Share your current read, start a bookish discussion,
+        or celebrate a reading milestone!
+      </p>
+
+      <form id="threadForm">
+        <div class="field">
+          <label for="discussionType">What are we sharing?</label>
+          <select id="discussionType" required>
+            <option value="currently_reading">📖 Currently Reading</option>
+            <option value="discussion">☕ Bookish Discussion</option>
+            <option value="reading_update">✨ Reading Update</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bookTitle">Book Title</label>
+          <input id="bookTitle" type="text" maxlength="200"
+            placeholder="What's the book, Bestie?" required>
+        </div>
+
+        <div class="field">
+          <label for="bookAuthor">Author (optional)</label>
+          <input id="bookAuthor" type="text" maxlength="200"
+            placeholder="Who wrote it?">
+        </div>
+
+        <div class="field">
+          <label for="threadContent">Your Bookish Thoughts</label>
+          <textarea id="threadContent" maxlength="5000"
+            placeholder="Spill the bookish tea..."
+            required></textarea>
+        </div>
+
+        <button id="threadButton" class="primary-button"
+          type="submit">
+          SHARE WITH MY DORM 📚
+        </button>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="feed-heading">The Bookshelf Buzz ✨</h2>
+      <p id="nookStatus">Loading bookish conversations...</p>
+      <div id="threadFeed"></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const gate = document.getElementById("campusGate");
+      const gateMessage = document.getElementById("campusGateMessage");
+      const content = document.getElementById("campusContent");
+      const status = document.getElementById("nookStatus");
+      const feed = document.getElementById("threadFeed");
+      const form = document.getElementById("threadForm");
+      const submitButton = document.getElementById("threadButton");
+
+      function deny(message) {
+        content.hidden = true;
+        content.style.display = "none";
+        gate.hidden = false;
+        gate.style.display = "block";
+        gateMessage.textContent = message;
+      }
+
+      const guard = window.BB_CAMPUS_GUARD;
+
+      if (!guard) {
+        deny("Campus authentication is unavailable.");
+        return;
+      }
+
+      let result;
+
+      try {
+        result = await guard.protectPage({
+          level: "approved",
+          gateId: "campusGate",
+          contentId: "campusContent",
+          messageId: "campusGateMessage"
+        });
+      } catch (error) {
+        console.error(error);
+        deny("Unable to verify campus membership.");
+        return;
+      }
+
+      if (!result?.user) return;
+
+      content.hidden = true;
+
+      const client = result.client || guard.getClient();
+      const roomId = new URLSearchParams(location.search).get("room");
+
+      if (!roomId) {
+        deny("No Reading Nook selected.");
+        return;
+      }
+
+      const { data: room, error: roomError } = await client
+        .from("housing_rooms")
+        .select("id, dorm_id, room_type, is_available")
+        .eq("id", roomId)
+        .eq("room_type", "reading_nook")
+        .eq("is_available", true)
+        .maybeSingle();
+
+      if (roomError || !room) {
+        deny("🔒 This Reading Nook is residents-only.");
+        return;
+      }
+
+      const { data: dorm, error: dormError } = await client
+        .from("housing_dorm_settings")
+        .select("id, team_id, primary_color")
+        .eq("id", room.dorm_id)
+        .maybeSingle();
+
+      if (dormError || !dorm) {
+        deny("Unable to load your dorm.");
+        return;
+      }
+
+      const { data: team, error: teamError } = await client
+        .from("crown_teams")
+        .select("id, name, emoji")
+        .eq("id", dorm.team_id)
+        .maybeSingle();
+
+      if (teamError || !team) {
+        deny("Unable to load your team.");
+        return;
+      }
+
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("id")
+          .eq("user_id", result.user.id)
+          .eq("team_id", team.id)
+          .eq("status", "approved")
+          .maybeSingle();
+
+      if (enrollmentError || !enrollment) {
+        deny("🔒 This nook belongs to assigned residents.");
+        return;
+      }
+
+      document.getElementById("nookSubtitle").textContent =
+        `${team.emoji || "📚"} ${team.name} · Your cozy bookish corner`;
+
+      document.querySelector(".hero").style.background =
+        dorm.primary_color || "#e8b4c8";
+
+      document.getElementById("backToDorm").href =
+        `dorm.html?team=${encodeURIComponent(team.id)}`;
+
+      gate.hidden = true;
+      gate.style.display = "none";
+      content.hidden = false;
+      content.style.display = "block";
+
+      const names = new Map();
+      
+      // 💗 Reading Nook reactions
+      async function createReadingReactions(targetType, targetId) {
+        const container = document.createElement("div");
+        container.className = "nook-reactions";
+
+        const column = targetType === "thread"
+          ? "thread_id"
+          : "reply_id";
+
+        const { data: savedReactions, error: loadError } =
+          await client
+            .from("housing_reading_reactions")
+            .select("id, user_id, emoji")
+            .eq(column, targetId);
+
+        if (loadError) {
+          console.error("Reading reactions loading error:", loadError);
+          container.textContent = "Reactions unavailable.";
+          return container;
+        }
+
+        const emojis = ["💗", "☕", "😂", "🔥", "🥹", "👑"];
+
+        for (const emoji of emojis) {
+          const matching = (savedReactions || []).filter(
+            reaction => reaction.emoji === emoji
+          );
+
+          const mine = matching.find(
+            reaction => reaction.user_id === result.user.id
+          );
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = `${emoji} ${matching.length || ""}`;
+          button.setAttribute(
+            "aria-pressed",
+            String(Boolean(mine))
+          );
+
+          if (mine) {
+            button.classList.add("reacted");
+          }
+
+          button.addEventListener("click", async () => {
+            button.disabled = true;
+
+            let error;
+
+            if (mine) {
+              ({ error } = await client
+                .from("housing_reading_reactions")
+                .delete()
+                .eq("id", mine.id));
+            } else {
+              ({ error } = await client
+                .from("housing_reading_reactions")
+                .insert({
+                  user_id: result.user.id,
+                  [column]: targetId,
+                  emoji
+                }));
+            }
+
+            if (error) {
+              console.error("Reading reaction error:", error);
+              alert("Couldn't update your reaction.");
+              button.disabled = false;
+              return;
+            }
+
+            await loadThreads();
+          });
+
+          container.appendChild(button);
+        }
+
+        return container;
+      }
+
+
+      const typeLabels = {
+        currently_reading: "📖 Currently Reading",
+        discussion: "☕ Bookish Discussion",
+        reading_update: "✨ Reading Update"
+      };
+
+      async function loadThreads() {
+        const { data: threads, error } = await client
+          .from("housing_reading_threads")
+          .select(
+            "id, author_id, book_title, book_author, " +
+            "discussion_type, content, created_at"
+          )
+          .eq("room_id", room.id)
+          .eq("is_removed", false)
+          .order("created_at", { ascending: false })
+          .limit(100);
+
+        if (error) {
+          console.error("Reading threads error:", error);
+          status.textContent = "Unable to load reading discussions.";
+          return;
+        }
+
+        const ids = [...new Set(
+          (threads || []).map(thread => thread.author_id)
+        )].filter(id => !names.has(id));
+
+        if (ids.length) {
+          const { data: profiles } = await client
+            .from("profiles")
+            .select("id, display_name")
+            .in("id", ids);
+
+          for (const profile of profiles || []) {
+            names.set(profile.id, profile.display_name);
+          }
+        }
+
+        feed.replaceChildren();
+
+        if (!threads?.length) {
+          status.textContent =
+            "No bookish conversations yet. Start the first one! 💗";
+          return;
+        }
+
+        status.textContent = `${threads.length} bookish conversation(s)`;
+
+        for (const thread of threads) {
+          const card = document.createElement("article");
+          card.className = "thread-card";
+
+          const tag = document.createElement("div");
+          tag.className = "thread-tag";
+          tag.textContent =
+            typeLabels[thread.discussion_type] || "📚 Book Talk";
+
+          const meta = document.createElement("div");
+          meta.className = "thread-meta";
+          meta.textContent =
+            `${names.get(thread.author_id) || "Bestie"} · ` +
+            new Date(thread.created_at).toLocaleString();
+
+          const title = document.createElement("h3");
+          title.textContent = thread.book_title;
+
+          const author = document.createElement("div");
+          author.className = "book-author";
+          author.textContent = thread.book_author
+            ? `by ${thread.book_author}`
+            : "";
+
+          const body = document.createElement("div");
+          body.className = "thread-content";
+          body.textContent = thread.content;
+
+          card.append(tag, meta, title, author, body);      
+          
+if (thread.author_id === result.user.id) {
+  const editThreadButton = document.createElement("button");
+  editThreadButton.type = "button";
+  editThreadButton.className = "nook-edit-button";
+  editThreadButton.textContent = "✏️ Edit Discussion";
+
+  editThreadButton.addEventListener("click", async () => {
+    const updatedContent = prompt(
+      "Edit your bookish thoughts:",
+      thread.content
+    );
+
+    if (updatedContent === null) return;
+
+    const newContent = updatedContent.trim();
+
+    if (!newContent || newContent === thread.content) return;
+
+    editThreadButton.disabled = true;
+
+    const { error } = await client
+      .from("housing_reading_threads")
+      .update({ content: newContent })
+      .eq("id", thread.id)
+      .eq("author_id", result.user.id);
+
+    if (error) {
+      console.error("Discussion editing error:", error);
+      alert("Couldn't update your discussion.");
+      editThreadButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  card.appendChild(editThreadButton);
+}
+   
+          
+          // 📖 Reactions to the book discussion
+          const threadReactions = await createReadingReactions(
+            "thread",
+            thread.id
+          );
+
+          card.appendChild(threadReactions);
+
+          // 💬 Bookish Replies
+          const repliesSection = document.createElement("div");
+          repliesSection.className = "nook-replies";
+
+          const repliesHeading = document.createElement("h4");
+          repliesHeading.textContent = "💬 Bookish Bestie Replies";
+
+          const repliesList = document.createElement("div");
+          repliesList.className = "nook-replies-list";
+
+          const { data: replies, error: repliesError } = await client
+            .from("housing_reading_replies")
+            .select("id, author_id, content, created_at")
+            .eq("thread_id", thread.id)
+            .eq("is_removed", false)
+            .order("created_at", { ascending: true });
+
+          if (repliesError) {
+            console.error("Reading replies error:", repliesError);
+            repliesList.textContent = "Unable to load replies.";
+          } else {
+            const missingIds = [...new Set(
+              (replies || []).map(reply => reply.author_id)
+            )].filter(id => !names.has(id));
+
+            if (missingIds.length) {
+              const { data: profiles } = await client
+                .from("profiles")
+                .select("id, display_name")
+                .in("id", missingIds);
+
+              for (const profile of profiles || []) {
+                names.set(profile.id, profile.display_name);
+              }
+            }
+
+            for (const reply of replies || []) {
+              const replyCard = document.createElement("div");
+              replyCard.className = "nook-reply";
+
+              const replyAuthor = document.createElement("strong");
+              replyAuthor.textContent =
+                names.get(reply.author_id) || "Bestie";
+
+              const replyDate = document.createElement("small");
+              replyDate.textContent =
+                new Date(reply.created_at).toLocaleString();
+
+              const replyText = document.createElement("p");
+              replyText.textContent = reply.content;
+
+              replyCard.append(replyAuthor, replyDate, replyText);
+              
+if (reply.author_id === result.user.id) {
+  const editReplyButton = document.createElement("button");
+  editReplyButton.type = "button";
+  editReplyButton.className = "nook-edit-button";
+  editReplyButton.textContent = "✏️ Edit Reply";
+
+  editReplyButton.addEventListener("click", async () => {
+    const updatedContent = prompt(
+      "Edit your bookish reply:",
+      reply.content
+    );
+
+    if (updatedContent === null) return;
+
+    const newContent = updatedContent.trim();
+
+    if (!newContent || newContent === reply.content) return;
+
+    editReplyButton.disabled = true;
+
+    const { error } = await client
+      .from("housing_reading_replies")
+      .update({ content: newContent })
+      .eq("id", reply.id)
+      .eq("author_id", result.user.id);
+
+    if (error) {
+      console.error("Reply editing error:", error);
+      alert("Couldn't update your reply.");
+      editReplyButton.disabled = false;
+      return;
+    }
+
+    await loadThreads();
+  });
+
+  replyCard.appendChild(editReplyButton);
+}
+
+              
+              // 💌 Reactions to this Bestie's reply
+              const replyReactions = await createReadingReactions(
+                "reply",
+                reply.id
+              );
+
+              replyCard.appendChild(replyReactions);
+
+              repliesList.appendChild(replyCard);
+            }
+
+            if (!replies?.length) {
+              repliesList.textContent =
+                "No replies yet. Start the bookish conversation! 💗";
+            }
+          }
+
+          const replyForm = document.createElement("form");
+          replyForm.className = "nook-reply-form";
+
+          const replyInput = document.createElement("textarea");
+          replyInput.placeholder =
+            "What do you think, Bestie? Spill the bookish tea...";
+          replyInput.maxLength = 2000;
+          replyInput.required = true;
+
+          const replyButton = document.createElement("button");
+          replyButton.type = "submit";
+          replyButton.className = "primary-button";
+          replyButton.textContent = "SEND REPLY 💌";
+
+          replyForm.append(replyInput, replyButton);
+
+          replyForm.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            const replyContent = replyInput.value.trim();
+            if (!replyContent) return;
+
+            replyButton.disabled = true;
+
+            const { error } = await client
+              .from("housing_reading_replies")
+              .insert({
+                thread_id: thread.id,
+                author_id: result.user.id,
+                content: replyContent
+              });
+
+            replyButton.disabled = false;
+
+            if (error) {
+              console.error("Reply submission error:", error);
+              alert("Couldn't save your reply.");
+              return;
+            }
+
+            await loadThreads();
+          });
+
+          repliesSection.append(
+            repliesHeading,
+            repliesList,
+            replyForm
+          );
+
+          card.appendChild(repliesSection);
+
+          feed.appendChild(card);
+        }
+      }
+
+      await loadThreads();
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const bookTitle =
+          document.getElementById("bookTitle").value.trim();
+
+        const bookAuthor =
+          document.getElementById("bookAuthor").value.trim();
+
+        const discussionType =
+          document.getElementById("discussionType").value;
+
+        const threadContent =
+          document.getElementById("threadContent").value.trim();
+
+        if (!bookTitle || !threadContent) return;
+
+        submitButton.disabled = true;
+
+        const { error } = await client
+          .from("housing_reading_threads")
+          .insert({
+            room_id: room.id,
+            author_id: result.user.id,
+            book_title: bookTitle,
+            book_author: bookAuthor || null,
+            discussion_type: discussionType,
+            content: threadContent
+          });
+
+        submitButton.disabled = false;
+
+        if (error) {
+          console.error("Reading post error:", error);
+          status.textContent = "Unable to share your bookish update.";
+          return;
+        }
+
+        form.reset();
+        await loadThreads();
+      });
+    })().catch(error => {
+      console.error("Reading Nook error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Something went wrong loading the Reading Nook.";
+      document.getElementById("campusGate").style.display = "block";
+    });
+  </script>
+</body>
+</html>

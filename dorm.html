@@ -388,23 +388,34 @@
 
         
         if (
-        ["lounge", "bulletin_board"].includes(room.room_type) &&
+        
+        ["lounge", "bulletin_board", "reading_nook"].includes(room.room_type)
+        &&
         room.is_available
         ) {
 
         
-        button.textContent = room.room_type === "lounge"
-        ? "ENTER MAIN LOUNGE 💬"
-        : "OPEN BULLETIN BOARD 📌";
+        
+        button.textContent =
+        room.room_type === "lounge"
+            ? "ENTER MAIN LOUNGE 💬"
+            : room.room_type === "reading_nook"
+            ? "ENTER READING NOOK 📚"
+            : "OPEN BULLETIN BOARD 📌";
+
 
         button.disabled = false;
 
         button.addEventListener("click", () => {
             window.location.href =
             
+        
         room.room_type === "lounge"
         ? `lounge.html?room=${encodeURIComponent(room.id)}`
-        : `bulletin.html?room=${encodeURIComponent(room.id)}`;
+        : room.room_type === "reading_nook"
+            ? `nook.html?room=${encodeURIComponent(room.id)}`
+            : `bulletin.html?room=${encodeURIComponent(room.id)}`;
+
 
         });
         } else {

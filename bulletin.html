@@ -399,6 +399,14 @@
       content.hidden = false;
       content.style.display = "block";
 
+      
+        const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+        if (staffError) {
+        console.error("Staff verification error:", staffError);
+        }
+
       const names = new Map();
 
       async function loadPosts() {
@@ -526,6 +534,38 @@ for (const emoji of reactionEmojis) {
 card.appendChild(postReactions);
 
           card.append(meta, body);
+          
+if (isStaff === true && post.author_id !== result.user.id) {
+  const moderatePostButton = document.createElement("button");
+  moderatePostButton.type = "button";
+  moderatePostButton.className = "edit-content-button";
+  moderatePostButton.textContent = "🛡️ Moderate Post";
+
+  moderatePostButton.addEventListener("click", async () => {
+    if (!confirm("Remove this post and hide its replies as campus staff?")) {
+      return;
+    }
+
+    moderatePostButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "moderate_housing_post",
+      { p_post_id: post.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Post moderation error:", error);
+      alert("Couldn't moderate this post.");
+      moderatePostButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  card.appendChild(moderatePostButton);
+}
+
 
           
 if (post.author_id === result.user.id) {
@@ -644,6 +684,36 @@ if (commentsError) {
     text.textContent = comment.content;
 
     reply.append(author, text);
+    
+if (isStaff === true && comment.author_id !== result.user.id) {
+  const moderateReplyButton = document.createElement("button");
+  moderateReplyButton.type = "button";
+  moderateReplyButton.className = "edit-content-button";
+  moderateReplyButton.textContent = "🛡️ Moderate Reply";
+
+  moderateReplyButton.addEventListener("click", async () => {
+    if (!confirm("Remove this reply as campus staff?")) return;
+
+    moderateReplyButton.disabled = true;
+
+    const { data: removed, error } = await client.rpc(
+      "moderate_housing_comment",
+      { p_comment_id: comment.id }
+    );
+
+    if (error || removed !== true) {
+      console.error("Reply moderation error:", error);
+      alert("Couldn't moderate this reply.");
+      moderateReplyButton.disabled = false;
+      return;
+    }
+
+    await loadPosts();
+  });
+
+  reply.appendChild(moderateReplyButton);
+}
+
     
 if (comment.author_id === result.user.id) {
   const removeReplyButton = document.createElement("button");
