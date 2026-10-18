@@ -1,879 +1,1687 @@
 
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#e86da8">
-<title>Campus HQ | Bestie University</title>
-<link rel="icon" href="assets/logo.png">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
 
-:root{
- --pink:#ee70a8;--hot:#d84088;--ink:#402c3b;
- --teal:#286e70;--cream:#fff9f7;--rose:#a84e79;
-}
-*{box-sizing:border-box}
-body{
- margin:0;font-family:Nunito,sans-serif;color:var(--ink);
- background:radial-gradient(circle at 8% 15%,#ffd8e9,transparent 35%),
- radial-gradient(circle at 95% 75%,#dcece8,transparent 35%),#fff5fa
-}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-a{color:inherit;text-decoration:none}
-button:focus-visible,a:focus-visible,input:focus-visible,
-select:focus-visible,textarea:focus-visible{
- outline:3px solid var(--teal);outline-offset:3px
-}
-.top{
- background:#302c35;color:white;border-bottom:6px solid var(--pink);
- display:flex;justify-content:space-between;align-items:center;
- flex-wrap:wrap;gap:14px;
- padding:14px max(20px,calc((100% - 1300px)/2))
-}
-.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:19px}
-.brand img{width:52px;height:52px;object-fit:contain}
-.top nav{display:flex;gap:9px;flex-wrap:wrap}
-.top nav a{
- padding:10px 14px;background:#ffffff18;border-radius:25px;font-weight:900
-}
-.top nav a.active{background:var(--pink);color:#302c35}
-.hero{
- text-align:center;padding:49px 20px 55px;
- background:repeating-linear-gradient(135deg,transparent 0 36px,#ffffff15 36px 72px),
- linear-gradient(135deg,#ffd0e4,#ed9dc3 55%,#b4d9d6);
- border-bottom:8px solid #453645
-}
-.kicker{
- display:inline-block;background:#ffffffbb;border:2px solid white;
- border-radius:30px;padding:9px 17px;font-weight:900;
- color:#774661;letter-spacing:1px
-}
-h1{
- font:clamp(36px,7vw,78px)/1.1 Bungee,sans-serif;
- margin:20px 0 8px;color:#ff4c9d;
- -webkit-text-stroke:1.5px white;
- text-shadow:4px 5px 0 #68465c,7px 8px 0 #ffffff88
-}
-.script{font:clamp(19px,3vw,28px) Pacifico,cursive;color:#68465c}
-.hero p{font-size:18px;font-weight:800;margin:17px auto;max-width:650px}
-.wrap{max-width:1320px;margin:auto;padding:30px 20px 65px}
-.notice{
- background:white;border:3px solid #e7a7c6;border-radius:20px;
- padding:18px 22px;box-shadow:5px 6px 0 #e7bfd2;
- margin-bottom:28px;font-weight:800;line-height:1.65
-}
-.layout{
- display:grid;grid-template-columns:250px minmax(0,1fr);
- gap:25px;align-items:start
-}
-.sidebar{
- background:white;border:3px solid #e7a7c6;border-radius:23px;
- box-shadow:6px 7px 0 #e7bfd2;padding:18px;
- position:sticky;top:16px
-}
-.sidebar h2{
- font:17px Bungee,sans-serif;color:var(--rose);
- margin:5px 6px 17px
-}
-.nav-btn{
- display:block;width:100%;border:2px solid transparent;
- background:transparent;text-align:left;border-radius:13px;
- padding:12px;margin:5px 0;font-weight:900;color:var(--ink)
-}
-.nav-btn:hover{background:#fff0f7}
-.nav-btn.active{background:#ffe1ef;border-color:#e99bbf;color:#9e3d70}
-.workspace{min-width:0}
-.section{display:none}
-.section.active{display:block}
-.section-heading{
- font:clamp(21px,3vw,29px) Bungee,sans-serif;
- color:var(--teal);margin:0 0 17px
-}
-.section-description{font-weight:700;line-height:1.65;margin-bottom:23px}
-.stats{
- display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
- gap:15px;margin-bottom:24px
-}
-.stat{
- background:white;border:3px solid #e7a7c6;border-radius:19px;
- box-shadow:4px 5px 0 #e7bfd2;padding:19px 12px;text-align:center
-}
-.stat strong{
- display:block;font:clamp(21px,3vw,32px) Bungee,sans-serif;color:var(--teal)
-}
-.stat span{font-size:12px;font-weight:900}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.panel{
- background:white;border:3px solid #e7a7c6;border-radius:21px;
- box-shadow:5px 6px 0 #e7bfd2;overflow:hidden;margin-bottom:22px
-}
-.panel-head{
- background:linear-gradient(110deg,#d94b91,#f0a1c6);
- padding:16px 20px;color:white;font-weight:900;font-size:17px
-}
-.panel-body{padding:21px}
-.panel h3{color:var(--rose);margin-top:0}
-.panel p{line-height:1.6}
-.btn{
- border:0;border-radius:28px;padding:11px 17px;
- background:linear-gradient(#ffa8ce,#e75e9e);
- box-shadow:0 4px 0 #b9477c;
- color:#45263b;font-weight:900;display:inline-block
-}
-.btn.secondary{background:#367b7a;color:white;box-shadow:0 4px 0 #245451}
-.btn.light{background:#fff0f7;box-shadow:none;border:2px solid #e6acc7}
-.btn.danger{background:#f5dce4;box-shadow:none;color:#a33356}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
-.field{display:block;margin:12px 0}
-.field span{display:block;font-weight:900;margin-bottom:6px}
-.field input,.field select,.field textarea{
- width:100%;padding:11px;border:2px solid #e3b5cb;
- border-radius:12px;background:#fffafd;color:var(--ink)
-}
-.field textarea{min-height:95px;resize:vertical}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}
-.item{
- border:2px solid #efd0df;background:#fff9fc;border-radius:15px;
- padding:16px;margin:12px 0
-}
-.item h4{margin:0 0 7px;color:var(--rose)}
-.item p{margin:5px 0}
-.tag{
- display:inline-block;background:#ffe0ed;color:#963e70;
- border-radius:20px;padding:5px 10px;font-size:11px;font-weight:900
-}
-.tag.green{background:#def2e9;color:#276b5d}
-.tag.gray{background:#efebee;color:#665862}
-.empty{padding:18px;text-align:center;color:#796775;font-weight:800}
-.mini{font-size:12px;color:#786675;line-height:1.6}
-.toast{
- position:fixed;right:20px;bottom:20px;z-index:20;
- background:#302c35;color:white;padding:14px 19px;
- border-radius:15px;box-shadow:0 5px 20px #0003;
- font-weight:900;max-width:350px
-}
-.hidden{display:none!important}
-footer{text-align:center;background:#302c35;color:white;padding:30px 20px;font-weight:900}
-@media(max-width:1050px){
- .stats{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:800px){
- .layout{grid-template-columns:1fr}
- .sidebar{position:static;display:flex;flex-wrap:wrap;gap:5px}
- .sidebar h2{width:100%}
- .nav-btn{width:auto}
-}
-@media(max-width:580px){
- .grid,.form-grid{grid-template-columns:1fr}
- .top,.top nav{justify-content:center}
- .panel-body{padding:15px}
-}
-</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#e86da8">
+
+  <title>Campus HQ | Bestie University</title>
+
+  <link rel="icon" href="assets/logo.png">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+    :root {
+      --pink: #ee70a8;
+      --hot: #d84088;
+      --ink: #402c3b;
+      --teal: #286e70;
+      --cream: #fff9f7;
+      --rose: #a84e79;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      font-family: Nunito, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 15%, #ffd8e9, transparent 35%),
+        radial-gradient(circle at 95% 75%, #dcece8, transparent 35%),
+        #fff5fa;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+
+    .top {
+      background: #302c35;
+      color: white;
+      border-bottom: 6px solid var(--pink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 14px max(20px, calc((100% - 1300px)/2));
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 19px;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+    }
+
+    .top nav {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .top nav a {
+      padding: 10px 14px;
+      background: #ffffff18;
+      border-radius: 25px;
+      font-weight: 900;
+    }
+
+    .top nav a.active {
+      background: var(--pink);
+      color: #302c35;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 49px 20px 55px;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          transparent 0 36px,
+          #ffffff15 36px 72px
+        ),
+        linear-gradient(135deg, #ffd0e4, #ed9dc3 55%, #b4d9d6);
+      border-bottom: 8px solid #453645;
+    }
+
+    .kicker {
+      display: inline-block;
+      background: #ffffffbb;
+      border: 2px solid white;
+      border-radius: 30px;
+      padding: 9px 17px;
+      font-weight: 900;
+      color: #774661;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font: clamp(36px, 7vw, 78px)/1.1 Bungee, sans-serif;
+      margin: 20px 0 8px;
+      color: #ff4c9d;
+      -webkit-text-stroke: 1.5px white;
+      text-shadow:
+        4px 5px 0 #68465c,
+        7px 8px 0 #ffffff88;
+    }
+
+    .script {
+      font: clamp(19px, 3vw, 28px) Pacifico, cursive;
+      color: #68465c;
+    }
+
+    .hero p {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 17px auto;
+      max-width: 650px;
+    }
+
+    .wrap {
+      max-width: 1320px;
+      margin: auto;
+      padding: 30px 20px 65px;
+    }
+
+    .notice {
+      background: white;
+      border: 3px solid #e7a7c6;
+      border-radius: 20px;
+      padding: 18px 22px;
+      box-shadow: 5px 6px 0 #e7bfd2;
+      margin-bottom: 28px;
+      font-weight: 800;
+      line-height: 1.65;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 25px;
+      align-items: start;
+    }
+
+    .sidebar {
+      background: white;
+      border: 3px solid #e7a7c6;
+      border-radius: 23px;
+      box-shadow: 6px 7px 0 #e7bfd2;
+      padding: 18px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .sidebar h2 {
+      font: 17px Bungee, sans-serif;
+      color: var(--rose);
+      margin: 5px 6px 17px;
+    }
+
+    .nav-btn {
+      display: block;
+      width: 100%;
+      border: 2px solid transparent;
+      background: transparent;
+      text-align: left;
+      border-radius: 13px;
+      padding: 12px;
+      margin: 5px 0;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .nav-btn:hover { background: #fff0f7; }
+
+    .nav-btn.active {
+      background: #ffe1ef;
+      border-color: #e99bbf;
+      color: #9e3d70;
+    }
+
+    .workspace { min-width: 0; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-heading {
+      font: clamp(21px, 3vw, 29px) Bungee, sans-serif;
+      color: var(--teal);
+      margin: 0 0 17px;
+    }
+
+    .section-description {
+      font-weight: 700;
+      line-height: 1.65;
+      margin-bottom: 23px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: white;
+      border: 3px solid #e7a7c6;
+      border-radius: 19px;
+      box-shadow: 4px 5px 0 #e7bfd2;
+      padding: 19px 12px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font: clamp(21px, 3vw, 32px) Bungee, sans-serif;
+      color: var(--teal);
+    }
+
+    .stat span {
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .panel {
+      background: white;
+      border: 3px solid #e7a7c6;
+      border-radius: 21px;
+      box-shadow: 5px 6px 0 #e7bfd2;
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    .panel-head {
+      background: linear-gradient(110deg, #d94b91, #f0a1c6);
+      padding: 16px 20px;
+      color: white;
+      font-weight: 900;
+      font-size: 17px;
+    }
+
+    .panel-body { padding: 21px; }
+    .panel h3 { color: var(--rose); margin-top: 0; }
+    .panel p { line-height: 1.6; }
+
+    .btn {
+      border: 0;
+      border-radius: 28px;
+      padding: 11px 17px;
+      background: linear-gradient(#ffa8ce, #e75e9e);
+      box-shadow: 0 4px 0 #b9477c;
+      color: #45263b;
+      font-weight: 900;
+      display: inline-block;
+    }
+
+    .btn.secondary {
+      background: #367b7a;
+      color: white;
+      box-shadow: 0 4px 0 #245451;
+    }
+
+    .btn.light {
+      background: #fff0f7;
+      box-shadow: none;
+      border: 2px solid #e6acc7;
+    }
+
+    .btn.danger {
+      background: #f5dce4;
+      box-shadow: none;
+      color: #a33356;
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 13px;
+    }
+
+    .field {
+      display: block;
+      margin: 12px 0;
+    }
+
+    .field span {
+      display: block;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 11px;
+      border: 2px solid #e3b5cb;
+      border-radius: 12px;
+      background: #fffafd;
+      color: var(--ink);
+    }
+
+    .field textarea {
+      min-height: 95px;
+      resize: vertical;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 15px;
+    }
+
+    .item {
+      border: 2px solid #efd0df;
+      background: #fff9fc;
+      border-radius: 15px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    .item h4 {
+      margin: 0 0 7px;
+      color: var(--rose);
+    }
+
+    .item p { margin: 5px 0; }
+
+    .tag {
+      display: inline-block;
+      background: #ffe0ed;
+      color: #963e70;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .tag.green {
+      background: #def2e9;
+      color: #276b5d;
+    }
+
+    .tag.gray {
+      background: #efebee;
+      color: #665862;
+    }
+
+    .empty {
+      padding: 18px;
+      text-align: center;
+      color: #796775;
+      font-weight: 800;
+    }
+
+    .mini {
+      font-size: 12px;
+      color: #786675;
+      line-height: 1.6;
+    }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 20;
+      background: #302c35;
+      color: white;
+      padding: 14px 19px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px #0003;
+      font-weight: 900;
+      max-width: 350px;
+    }
+
+    .hidden { display: none !important; }
+
+    .auth-screen {
+      min-height: 75vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+      padding: 40px 28px;
+      text-align: center;
+      background: white;
+      border: 3px solid #e7a7c6;
+      border-radius: 26px;
+      box-shadow: 7px 8px 0 #e7bfd2;
+    }
+
+    .auth-card h2 {
+      color: var(--teal);
+      font: 24px Bungee, sans-serif;
+    }
+
+    .auth-card p {
+      line-height: 1.8;
+      font-weight: 800;
+    }
+
+    footer {
+      text-align: center;
+      background: #302c35;
+      color: white;
+      padding: 30px 20px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 1050px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .sidebar h2 { width: 100%; }
+      .nav-btn { width: auto; }
+    }
+
+    @media (max-width: 580px) {
+      .grid, .form-grid { grid-template-columns: 1fr; }
+      .top, .top nav { justify-content: center; }
+      .panel-body { padding: 15px; }
+    }
+  </style>
 </head>
+
 <body>
 
-<header class="top">
- <a class="brand" href="index.html#home">
-  <img src="assets/logo.png" alt="Books & Besties logo">
-  <span>BESTIE UNIVERSITY 🎓</span>
- </a>
- <nav aria-label="Campus navigation">
-  <a href="index.html#home">Campus Quad</a>
-  <a href="activities.html">Campus Activities</a>
-  <a href="honors.html">Honors Society</a>
-  <a href="campus-hq.html" class="active">Campus HQ</a>
- </nav>
-</header>
-
-<section class="hero">
- <span class="kicker">✦ THE DEAN'S OFFICE ✦</span>
- <h1>CAMPUS HQ</h1>
- <div class="script">Big Bestie Energy. Executive Edition. ♡</div>
- <p>Your campus. Your community. Your fabulous little command center.</p>
-</section>
-
-<main class="wrap">
-
- <div class="notice">
-  🗝️ ADMIN DESIGN PREVIEW: This page is not secured by an admin login.
-  All records here are fictional demo data or browser-local entries.
-  Nothing here publishes to the real website, approves real members,
-  changes live competitions, or moderates actual messages.
-  Before launch, Campus HQ must require verified admin/mod accounts
-  and server-enforced permissions through Supabase.
- </div>
-
- <div class="layout">
-
-  <aside class="sidebar" aria-label="Campus HQ sections">
-   <h2>🗝️ DEAN'S DIRECTORY</h2>
-   <button class="nav-btn active" data-section="overview">📊 Campus Overview</button>
-   <button class="nav-btn" data-section="activities">🎮 Activity Manager</button>
-   <button class="nav-btn" data-section="members">🎓 Member Admissions</button>
-   <button class="nav-btn" data-section="honors">💎 Honors Society</button>
-   <button class="nav-btn" data-section="polls">🗳️ Pink Ballot</button>
-   <button class="nav-btn" data-section="access">💌 Bestie Access</button>
-   <button class="nav-btn" data-section="crown">👑 Monthly Crown</button>
-   <button class="nav-btn" data-section="commons">📣 Commons Moderation</button>
-  </aside>
-
-  <div class="workspace">
-
-   <section class="section active" id="section-overview">
-    <h2 class="section-heading">📊 The Dean's Dashboard</h2>
-    <p class="section-description">Your bird's-eye view of everything happening around Bestie University.</p>
-
-    <div class="stats">
-     <div class="stat"><strong id="statMembers">0</strong><span>DEMO MEMBERS</span></div>
-     <div class="stat"><strong id="statPending">0</strong><span>PENDING APPROVAL</span></div>
-     <div class="stat"><strong id="statActivities">0</strong><span>PUBLISHED ACTIVITIES</span></div>
-     <div class="stat"><strong id="statVIP">0</strong><span>VIP BESTIES</span></div>
-    </div>
-
-    <div class="grid">
-     <div class="panel">
-      <div class="panel-head">💌 THE CAMPUS TO-DO LIST</div>
-      <div class="panel-body" id="todoList"></div>
-     </div>
-     <div class="panel">
-      <div class="panel-head">🎀 QUICK ACCESS</div>
-      <div class="panel-body">
-       <p>Jump straight to your favorite administrative tools.</p>
-       <div class="actions">
-        <button class="btn" data-jump="activities">Create Activity</button>
-        <button class="btn secondary" data-jump="members">Review Members</button>
-        <button class="btn light" data-jump="polls">Manage Polls</button>
-       </div>
+  <div id="campusAuthGate" class="auth-screen">
+    <div class="auth-card">
+      <img
+        src="assets/logo.png"
+        alt="Books & Besties logo"
+        width="85"
+      >
+      <h2>🗝️ The Dean's Office</h2>
+      <p id="campusAuthMessage" role="status">
+        Verifying your campus staff credentials... ♡
+      </p>
+      <a class="btn secondary" href="login.html">
+        🎓 Campus Staff Login
+      </a>
+      <div class="actions" style="justify-content:center">
+        <a class="btn light" href="index.html#home">
+          ← Campus Quad
+        </a>
       </div>
-     </div>
     </div>
-   </section>
+  </div>
 
-   <section class="section" id="section-activities">
-    <h2 class="section-heading">🎮 Activity Manager</h2>
-    <p class="section-description">Create, schedule, publish, and archive campus adventures. This prototype stores activities locally; the real manager will publish through Supabase.</p>
+  <div id="campusDashboard" hidden>
 
-    <div class="panel">
-     <div class="panel-head">🎀 CREATE OR EDIT AN ACTIVITY</div>
-     <div class="panel-body">
-      <form id="activityForm">
-       <input type="hidden" id="activityId">
-       <div class="form-grid">
-        <label class="field"><span>Activity Name</span>
-         <input id="activityName" required maxlength="100" placeholder="e.g. Espresso Your ABCs">
-        </label>
-        <label class="field"><span>Activity Type</span>
-         <select id="activityType">
-          <option>Bingo</option><option>Alphabet Rush</option>
-          <option>Side Quest</option><option>Reading Social</option>
-          <option>Other</option>
-         </select>
-        </label>
-        <label class="field"><span>Start Date</span>
-         <input id="activityStart" type="date">
-        </label>
-        <label class="field"><span>End Date</span>
-         <input id="activityEnd" type="date">
-        </label>
-        <label class="field"><span>Eligibility</span>
-         <select id="activityEligibility">
-          <option>All Besties</option>
-          <option>Honors Society Only</option>
-          <option>Monthly Crown Only</option>
-         </select>
-        </label>
-        <label class="field"><span>Status</span>
-         <select id="activityStatus">
-          <option>Draft</option><option>Scheduled</option>
-          <option>Published</option><option>Archived</option>
-         </select>
-        </label>
-       </div>
-       <label class="field"><span>Description & Instructions</span>
-        <textarea id="activityDescription" maxlength="1500" placeholder="Tell the Besties all about this activity..."></textarea>
-       </label>
-       <div class="actions">
-        <button class="btn" type="submit">💗 Save Activity</button>
-        <button class="btn light" type="button" id="clearActivity">Clear Form</button>
-       </div>
-      </form>
-     </div>
-    </div>
+    <header class="top">
+      <a class="brand" href="index.html#home">
+        <img src="assets/logo.png" alt="Books & Besties logo">
+        <span>BESTIE UNIVERSITY 🎓</span>
+      </a>
 
-    <div class="panel">
-     <div class="panel-head">📋 THE ACTIVITY REGISTRY</div>
-     <div class="panel-body" id="activityList"></div>
-    </div>
-   </section>
+      <nav aria-label="Campus navigation">
+        <a href="index.html#home">Campus Quad</a>
+        <a href="activities.html">Campus Activities</a>
+        <a href="honors.html">Honors Society</a>
+        <a href="campus-hq.html" class="active">Campus HQ</a>
+      </nav>
+    </header>
 
-   <section class="section" id="section-members">
-    <h2 class="section-heading">🎓 Member Admissions</h2>
-    <p class="section-description">Review Bestie applications and approve community access. Monthly Crown enrollment will remain a separate process.</p>
-    <div class="panel">
-     <div class="panel-head">💌 APPLICATION REVIEW DESK</div>
-     <div class="panel-body">
-      <p class="mini">Sample applicants only. Future approval will require verified group eligibility and protected member records.</p>
-      <div id="memberList"></div>
-     </div>
-    </div>
-   </section>
-
-   <section class="section" id="section-honors">
-    <h2 class="section-heading">💎 Honors Society Management</h2>
-    <p class="section-description">Invite active Besties into the VIP lounge and manage their access.</p>
-    <div class="panel">
-     <div class="panel-head">💎 THE VIP ROSTER</div>
-     <div class="panel-body">
-      <form id="vipForm">
-       <label class="field"><span>Bestie Display Name</span>
-        <input id="vipName" required maxlength="60" placeholder="Enter a Bestie name">
-       </label>
-       <button class="btn" type="submit">💎 Add Demo VIP</button>
-      </form>
-      <p class="mini">Future invitations will link to approved member accounts, not just names.</p>
-      <div id="vipList"></div>
-     </div>
-    </div>
-   </section>
-
-   <section class="section" id="section-polls">
-    <h2 class="section-heading">🗳️ Pink Ballot Manager</h2>
-    <p class="section-description">Shape the campus with VIP-only polls and community feedback.</p>
-    <div class="panel">
-     <div class="panel-head">🎀 CREATE A PINK BALLOT</div>
-     <div class="panel-body">
-      <form id="pollForm">
-       <label class="field"><span>Poll Question</span>
-        <input id="pollQuestion" required maxlength="180" placeholder="What should we host next?">
-       </label>
-       <label class="field"><span>Choices (one per line)</span>
-        <textarea id="pollChoices" required placeholder="Coffeehouse Social&#10;Craft Night&#10;Reading Party"></textarea>
-       </label>
-       <button class="btn" type="submit">🗳️ Create Demo Poll</button>
-      </form>
-      <div id="pollList"></div>
-     </div>
-    </div>
-   </section>
-
-   <section class="section" id="section-access">
-    <h2 class="section-heading">💌 Bestie Access Manager</h2>
-    <p class="section-description">Plan VIP early-registration opportunities and event signups.</p>
-    <div class="panel">
-     <div class="panel-head">💌 CREATE AN EARLY ACCESS EVENT</div>
-     <div class="panel-body">
-      <form id="eventForm">
-       <label class="field"><span>Event Name</span>
-        <input id="eventName" required maxlength="100" placeholder="Velvet Latte Reading Social">
-       </label>
-       <div class="form-grid">
-        <label class="field"><span>Capacity</span>
-         <input id="eventCapacity" type="number" min="1" max="10000" value="20" required>
-        </label>
-        <label class="field"><span>Early Access Date</span>
-         <input id="eventDate" type="date">
-        </label>
-       </div>
-       <button class="btn" type="submit">💌 Create Demo Event</button>
-      </form>
-      <div id="eventList"></div>
-     </div>
-    </div>
-   </section>
-
-   <section class="section" id="section-crown">
-    <h2 class="section-heading">👑 Monthly Crown Management</h2>
-    <p class="section-description">Competition administration remains separate from general campus membership.</p>
-    <div class="grid">
-     <div class="panel">
-      <div class="panel-head">🏠 CAMPUS HOUSING</div>
-      <div class="panel-body">
-       <div class="item"><h4>💋 Vicious Vixens</h4><p>Admin-assigned competition team</p></div>
-       <div class="item"><h4>👻 The Ghoulfriends</h4><p>Admin-assigned competition team</p></div>
-       <div class="item"><h4>🔮 Pretty Little Hexes</h4><p>Admin-assigned competition team</p></div>
-       <p class="mini">Team assignments, season transfers, and roster management will connect to your existing Monthly Crown system later.</p>
+    <section class="hero">
+      <span class="kicker">✦ THE DEAN'S OFFICE ✦</span>
+      <h1>CAMPUS HQ</h1>
+      <div class="script">
+        Big Bestie Energy. Executive Edition. ♡
       </div>
-     </div>
-     <div class="panel">
-      <div class="panel-head">📚 READING SUBMISSIONS</div>
-      <div class="panel-body">
-       <p>Future tools will include submission review, score adjustments, season management, and team standings.</p>
-       <a class="btn secondary" href="index.html#crown">Visit Monthly Crown ↗</a>
-      </div>
-     </div>
-    </div>
-   </section>
+      <p>
+        Your campus. Your community.
+        Your fabulous little command center.
+      </p>
+    </section>
 
-   <section class="section" id="section-commons">
-    <h2 class="section-heading">📣 Crown Commons Moderation</h2>
-    <p class="section-description">A future moderation center for Bulletin posts, comments, reports, chat, and announcements.</p>
-    <div class="panel">
-     <div class="panel-head">🛡️ THE MODERATION DESK</div>
-     <div class="panel-body">
-      <div class="item">
-       <h4>💬 Bestie Chat</h4>
-       <p>Review reported messages and enforce community guidelines.</p>
+    <main class="wrap">
+
+      <div class="notice">
+        🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
+        Member Admissions is connected to real Supabase
+        accounts. The remaining management tools are
+        browser-local previews and do not publish changes
+        to the live website.
       </div>
-      <div class="item">
-       <h4>💌 Bestie Bulletin</h4>
-       <p>Review posts, comments, and member reports.</p>
+
+      <div class="layout">
+
+        <aside class="sidebar" aria-label="Campus HQ sections">
+          <h2>🗝️ DEAN'S DIRECTORY</h2>
+
+          <button class="nav-btn active" data-section="overview">
+            📊 Campus Overview
+          </button>
+
+          <button class="nav-btn" data-section="activities">
+            🎮 Activity Manager
+          </button>
+
+          <button class="nav-btn" data-section="members">
+            🎓 Member Admissions
+          </button>
+
+          <button class="nav-btn" data-section="honors">
+            💎 Honors Society
+          </button>
+
+          <button class="nav-btn" data-section="polls">
+            🗳️ Pink Ballot
+          </button>
+
+          <button class="nav-btn" data-section="access">
+            💌 Bestie Access
+          </button>
+
+          <button class="nav-btn" data-section="crown">
+            👑 Monthly Crown
+          </button>
+
+          <button class="nav-btn" data-section="commons">
+            📣 Commons Moderation
+          </button>
+        </aside>
+
+        <div class="workspace">
+
+          <!-- CAMPUS OVERVIEW -->
+
+          <section class="section active" id="section-overview">
+            <h2 class="section-heading">
+              📊 The Dean's Dashboard
+            </h2>
+
+            <p class="section-description">
+              Your bird's-eye view of everything happening
+              around Bestie University.
+            </p>
+
+            <div class="stats">
+              <div class="stat">
+                <strong id="statMembers">—</strong>
+                <span>APPROVED BESTIES</span>
+              </div>
+
+              <div class="stat">
+                <strong id="statPending">—</strong>
+                <span>PENDING APPROVAL</span>
+              </div>
+
+              <div class="stat">
+                <strong id="statActivities">0</strong>
+                <span>DEMO ACTIVITIES</span>
+              </div>
+
+              <div class="stat">
+                <strong id="statVIP">0</strong>
+                <span>DEMO VIP BESTIES</span>
+              </div>
+            </div>
+
+            <div class="grid">
+
+              <div class="panel">
+                <div class="panel-head">
+                  💌 THE CAMPUS TO-DO LIST
+                </div>
+                <div class="panel-body" id="todoList"></div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  🎀 QUICK ACCESS
+                </div>
+                <div class="panel-body">
+                  <p>
+                    Jump straight to your favorite
+                    administrative tools.
+                  </p>
+
+                  <div class="actions">
+                    <button class="btn" data-jump="activities">
+                      Create Activity
+                    </button>
+
+                    <button class="btn secondary" data-jump="members">
+                      Review Members
+                    </button>
+
+                    <button class="btn light" data-jump="polls">
+                      Manage Polls
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ACTIVITY MANAGER -->
+
+          <section class="section" id="section-activities">
+            <h2 class="section-heading">
+              🎮 Activity Manager
+            </h2>
+
+            <p class="section-description">
+              Create, edit, publish, and archive activities
+              in your browser-local planning registry.
+              These changes are not live.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                🎀 CREATE OR EDIT AN ACTIVITY
+              </div>
+
+              <div class="panel-body">
+                <form id="activityForm">
+                  <input type="hidden" id="activityId">
+
+                  <div class="form-grid">
+
+                    <label class="field">
+                      <span>Activity Name</span>
+                      <input
+                        id="activityName"
+                        required
+                        maxlength="100"
+                        placeholder="e.g. Espresso Your ABCs"
+                      >
+                    </label>
+
+                    <label class="field">
+                      <span>Activity Type</span>
+                      <select id="activityType">
+                        <option>Bingo</option>
+                        <option>Alphabet Rush</option>
+                        <option>Side Quest</option>
+                        <option>Reading Social</option>
+                        <option>Other</option>
+                      </select>
+                    </label>
+
+                    <label class="field">
+                      <span>Start Date</span>
+                      <input id="activityStart" type="date">
+                    </label>
+
+                    <label class="field">
+                      <span>End Date</span>
+                      <input id="activityEnd" type="date">
+                    </label>
+
+                    <label class="field">
+                      <span>Eligibility</span>
+                      <select id="activityEligibility">
+                        <option>All Besties</option>
+                        <option>Honors Society Only</option>
+                        <option>Monthly Crown Only</option>
+                      </select>
+                    </label>
+
+                    <label class="field">
+                      <span>Status</span>
+                      <select id="activityStatus">
+                        <option>Draft</option>
+                        <option>Scheduled</option>
+                        <option>Published</option>
+                        <option>Archived</option>
+                      </select>
+                    </label>
+
+                  </div>
+
+                  <label class="field">
+                    <span>Description & Instructions</span>
+                    <textarea
+                      id="activityDescription"
+                      maxlength="1500"
+                      placeholder="Tell the Besties all about this activity..."
+                    ></textarea>
+                  </label>
+
+                  <div class="actions">
+                    <button class="btn" type="submit">
+                      💗 Save Demo Activity
+                    </button>
+
+                    <button
+                      class="btn light"
+                      type="button"
+                      id="clearActivity"
+                    >
+                      Clear Form
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                📋 THE ACTIVITY REGISTRY
+              </div>
+              <div class="panel-body" id="activityList"></div>
+            </div>
+          </section>
+
+          <!-- LIVE MEMBER ADMISSIONS -->
+
+          <section class="section" id="section-members">
+            <h2 class="section-heading">
+              🎓 Member Admissions
+            </h2>
+
+            <p class="section-description">
+              Review real Bestie University applications.
+              Community membership is separate from
+              Monthly Crown enrollment and Honors Society access.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                💌 LIVE APPLICATION REVIEW DESK
+              </div>
+
+              <div class="panel-body">
+                <p class="mini">
+                  Live Supabase member records.
+                  Only administrators can approve or decline
+                  pending applications. Moderators have
+                  read-only access.
+                </p>
+
+                <p
+                  id="admissionsNotice"
+                  class="notice"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Waiting for campus staff verification...
+                </p>
+
+                <div id="memberList">
+                  <p class="empty">
+                    Loading admissions...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- HONORS SOCIETY -->
+
+          <section class="section" id="section-honors">
+            <h2 class="section-heading">
+              💎 Honors Society Management
+            </h2>
+
+            <p class="section-description">
+              Plan VIP invitations for your most active Besties.
+              This roster is a local preview only.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                💎 THE VIP ROSTER
+              </div>
+
+              <div class="panel-body">
+                <form id="vipForm">
+                  <label class="field">
+                    <span>Bestie Display Name</span>
+                    <input
+                      id="vipName"
+                      required
+                      maxlength="60"
+                      placeholder="Enter a Bestie name"
+                    >
+                  </label>
+
+                  <button class="btn" type="submit">
+                    💎 Add Demo VIP
+                  </button>
+                </form>
+
+                <p class="mini">
+                  Real Honors Society invitations will
+                  eventually connect to approved member accounts.
+                </p>
+
+                <div id="vipList"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PINK BALLOT -->
+
+          <section class="section" id="section-polls">
+            <h2 class="section-heading">
+              🗳️ Pink Ballot Manager
+            </h2>
+
+            <p class="section-description">
+              Plan VIP polls and community feedback opportunities.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                🎀 CREATE A PINK BALLOT
+              </div>
+
+              <div class="panel-body">
+                <form id="pollForm">
+
+                  <label class="field">
+                    <span>Poll Question</span>
+                    <input
+                      id="pollQuestion"
+                      required
+                      maxlength="180"
+                      placeholder="What should we host next?"
+                    >
+                  </label>
+
+                  <label class="field">
+                    <span>Choices (one per line)</span>
+                    <textarea
+                      id="pollChoices"
+                      required
+                      placeholder="Coffeehouse Social&#10;Craft Night&#10;Reading Party"
+                    ></textarea>
+                  </label>
+
+                  <button class="btn" type="submit">
+                    🗳️ Create Demo Poll
+                  </button>
+                </form>
+
+                <div id="pollList"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- BESTIE ACCESS -->
+
+          <section class="section" id="section-access">
+            <h2 class="section-heading">
+              💌 Bestie Access Manager
+            </h2>
+
+            <p class="section-description">
+              Plan VIP early-registration opportunities
+              and event signups.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                💌 CREATE AN EARLY ACCESS EVENT
+              </div>
+
+              <div class="panel-body">
+                <form id="eventForm">
+
+                  <label class="field">
+                    <span>Event Name</span>
+                    <input
+                      id="eventName"
+                      required
+                      maxlength="100"
+                      placeholder="Velvet Latte Reading Social"
+                    >
+                  </label>
+
+                  <div class="form-grid">
+
+                    <label class="field">
+                      <span>Capacity</span>
+                      <input
+                        id="eventCapacity"
+                        type="number"
+                        min="1"
+                        max="10000"
+                        value="20"
+                        required
+                      >
+                    </label>
+
+                    <label class="field">
+                      <span>Early Access Date</span>
+                      <input id="eventDate" type="date">
+                    </label>
+
+                  </div>
+
+                  <button class="btn" type="submit">
+                    💌 Create Demo Event
+                  </button>
+                </form>
+
+                <div id="eventList"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- MONTHLY CROWN -->
+
+          <section class="section" id="section-crown">
+            <h2 class="section-heading">
+              👑 Monthly Crown Management
+            </h2>
+
+            <p class="section-description">
+              Competition administration remains separate
+              from general campus membership.
+            </p>
+
+            <div class="grid">
+
+              <div class="panel">
+                <div class="panel-head">
+                  🏠 CAMPUS HOUSING
+                </div>
+
+                <div class="panel-body">
+                  <div class="item">
+                    <h4>💋 Vicious Vixens</h4>
+                    <p>Admin-assigned competition team</p>
+                  </div>
+
+                  <div class="item">
+                    <h4>👻 The Ghoulfriends</h4>
+                    <p>Admin-assigned competition team</p>
+                  </div>
+
+                  <div class="item">
+                    <h4>🔮 Pretty Little Hexes</h4>
+                    <p>Admin-assigned competition team</p>
+                  </div>
+
+                  <p class="mini">
+                    Season assignments and team transfers
+                    will connect to Supabase later.
+                  </p>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  📚 READING SUBMISSIONS
+                </div>
+
+                <div class="panel-body">
+                  <p>
+                    Future tools will include submission review,
+                    score adjustments, season management,
+                    and team standings.
+                  </p>
+
+                  <a
+                    class="btn secondary"
+                    href="index.html#crown"
+                  >
+                    Visit Monthly Crown ↗
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- CROWN COMMONS -->
+
+          <section class="section" id="section-commons">
+            <h2 class="section-heading">
+              📣 Crown Commons Moderation
+            </h2>
+
+            <p class="section-description">
+              A future moderation center for Bulletin posts,
+              comments, reports, chat, and announcements.
+            </p>
+
+            <div class="panel">
+              <div class="panel-head">
+                🛡️ THE MODERATION DESK
+              </div>
+
+              <div class="panel-body">
+
+                <div class="item">
+                  <h4>💬 Bestie Chat</h4>
+                  <p>
+                    Review reported messages and enforce
+                    community guidelines.
+                  </p>
+                </div>
+
+                <div class="item">
+                  <h4>💌 Bestie Bulletin</h4>
+                  <p>
+                    Review posts, comments, and member reports.
+                  </p>
+                </div>
+
+                <div class="item">
+                  <h4>📣 Campus Announcements</h4>
+                  <p>
+                    Publish important news for all Besties.
+                  </p>
+                </div>
+
+                <p class="mini">
+                  No real messages or moderation actions
+                  are connected to this preview.
+                </p>
+
+                <a class="btn secondary" href="commons.html">
+                  Preview Crown Commons ↗
+                </a>
+              </div>
+            </div>
+          </section>
+
+        </div>
       </div>
-      <div class="item">
-       <h4>📣 Campus Announcements</h4>
-       <p>Publish important news for all Besties.</p>
-      </div>
-      <p class="mini">Moderation actions will require server-side admin permissions. No real messages are connected to this preview.</p>
-      <a class="btn secondary" href="commons.html">Preview Crown Commons ↗</a>
-     </div>
-    </div>
-   </section>
+    </main>
+
+    <div
+      class="toast hidden"
+      id="toast"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+    <footer>
+      BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+      <p>© <span id="year"></span> Bestie University</p>
+    </footer>
 
   </div>
- </div>
-</main>
-
-<div class="toast hidden" id="toast" role="status"></div>
-
-<footer>
- BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
- <p>© <span id="year"></span> Bestie University</p>
-</footer>
-
-<script>
-(() => {
- "use strict";
-
- const KEY = "bb_campus_hq_demo_v1";
-
- const defaults = {
-  activities:[
-   {id:"a1",name:"Espresso Your ABCs",type:"Alphabet Rush",
-    start:"2026-11-01",end:"2026-11-30",
-    eligibility:"All Besties",status:"Draft",
-    description:"A collaborative A–Z reading challenge."},
-   {id:"a2",name:"Bestie Bingo",type:"Bingo",
-    start:"",end:"",eligibility:"All Besties",
-    status:"Draft",description:"Digital reading Bingo adventures."}
-  ],
-  members:[
-   {id:"m1",name:"Sample Bestie A",status:"Pending"},
-   {id:"m2",name:"Sample Bestie B",status:"Pending"},
-   {id:"m3",name:"Sample Bestie C",status:"Approved"}
-  ],
-  vips:[],
-  polls:[],
-  events:[]
- };
-
- function clone(value){return JSON.parse(JSON.stringify(value))}
-
- let state = clone(defaults);
-
- try {
-  const stored = JSON.parse(localStorage.getItem(KEY));
-  if (stored && typeof stored === "object" &&
-      !Array.isArray(stored)) {
-   for (const key of Object.keys(defaults)) {
-    if (Array.isArray(stored[key])) state[key] = stored[key];
-   }
-  }
- } catch(error) {
-  console.warn("Could not restore Campus HQ preview:",error);
- }
-
- function id(){
-  return typeof crypto !== "undefined" && crypto.randomUUID
-   ? crypto.randomUUID()
-   : String(Date.now()) + "-" + Math.random().toString(36).slice(2);
- }
-
- function save(){
-  try{
-   localStorage.setItem(KEY,JSON.stringify(state));
-   return true;
-  }catch(error){
-   alert("Your browser could not save this demo change.");
-   return false;
-  }
- }
-
- let toastTimeout;
-
- function toast(text){
-  const element = document.getElementById("toast");
-  element.textContent = text;
-  element.classList.remove("hidden");
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => element.classList.add("hidden"),3500);
- }
-
- function el(tag,text,className){
-  const node = document.createElement(tag);
-  if(text !== undefined) node.textContent = text;
-  if(className) node.className = className;
-  return node;
- }
-
- function button(text,handler,style="light"){
-  const node = el("button",text,"btn "+style);
-  node.type = "button";
-  node.addEventListener("click",handler);
-  return node;
- }
-
- function item(title,details,tagText,tagClass){
-  const node = el("div",undefined,"item");
-  node.append(el("h4",title));
-  if(details) node.append(el("p",details));
-  if(tagText) node.append(el("span",tagText,"tag "+(tagClass||"")));
-  return node;
- }
-
- function update(mutator){
-  const previous = clone(state);
-  mutator();
-  if(!save()){
-   state = previous;
-   return false;
-  }
-  render();
-  return true;
- }
-
- function showSection(name){
-  document.querySelectorAll(".section").forEach(section => {
-   section.classList.toggle("active",section.id === "section-"+name);
-  });
-  document.querySelectorAll(".nav-btn").forEach(node => {
-   node.classList.toggle("active",node.dataset.section === name);
-  });
- }
-
- document.querySelectorAll("[data-section]").forEach(node => {
-  node.addEventListener("click",() => showSection(node.dataset.section));
- });
-
- document.querySelectorAll("[data-jump]").forEach(node => {
-  node.addEventListener("click",() => showSection(node.dataset.jump));
- });
-
- function renderOverview(){
-  const pending = state.members.filter(m => m.status === "Pending").length;
-  const published = state.activities.filter(a => a.status === "Published").length;
-
-  document.getElementById("statMembers").textContent = state.members.length;
-  document.getElementById("statPending").textContent = pending;
-  document.getElementById("statActivities").textContent = published;
-  document.getElementById("statVIP").textContent = state.vips.length;
-
-  const list = document.getElementById("todoList");
-  list.replaceChildren();
-  list.append(
-   item("🎓 Member Applications",pending+" demo applications awaiting review."),
-   item("🎮 Activity Drafts",
-    state.activities.filter(a => a.status === "Draft").length+" drafts in your activity registry."),
-   item("🗳️ Pink Ballots",state.polls.length+" demo polls created."),
-   item("💌 Early Access",state.events.length+" demo events created.")
-  );
- }
-
- function renderActivities(){
-  const list = document.getElementById("activityList");
-  list.replaceChildren();
-
-  if(!state.activities.length){
-   list.append(el("p","No activities yet, Dean!","empty"));
-   return;
-  }
-
-  state.activities.forEach(activity => {
-   const node = item(
-    "🎮 "+activity.name,
-    activity.type+" · "+activity.eligibility+
-    (activity.start ? " · "+activity.start : "")+
-    (activity.end ? " to "+activity.end : ""),
-    activity.status,
-    activity.status === "Published" ? "green" : "gray"
-   );
-
-   if(activity.description){
-    node.append(el("p",activity.description,"mini"));
-   }
-
-   const actions = el("div",undefined,"actions");
-
-   actions.append(button("✏️ Edit",() => {
-    document.getElementById("activityId").value = activity.id;
-    document.getElementById("activityName").value = activity.name;
-    document.getElementById("activityType").value = activity.type;
-    document.getElementById("activityStart").value = activity.start || "";
-    document.getElementById("activityEnd").value = activity.end || "";
-    document.getElementById("activityEligibility").value = activity.eligibility;
-    document.getElementById("activityStatus").value = activity.status;
-    document.getElementById("activityDescription").value =
-     activity.description || "";
-    document.getElementById("activityForm").scrollIntoView({
-     behavior:"smooth",block:"start"
-    });
-   }));
-
-   if(activity.status !== "Published"){
-    actions.append(button("💗 Publish",() => {
-     if(update(() => activity.status = "Published")){
-      toast("Activity published in demo registry!");
-     }
-    },"secondary"));
-   }
-
-   if(activity.status !== "Archived"){
-    actions.append(button("📦 Archive",() => {
-     if(update(() => activity.status = "Archived")){
-      toast("Activity archived in demo registry.");
-     }
-    }));
-   }
-
-   actions.append(button("Delete",() => {
-    if(!confirm("Delete this demo activity?")) return;
-    if(update(() => {
-     state.activities = state.activities.filter(a => a.id !== activity.id);
-    })) toast("Demo activity deleted.");
-   },"danger"));
-
-   node.append(actions);
-   list.append(node);
-  });
- }
-
- document.getElementById("activityForm").addEventListener("submit",event => {
-  event.preventDefault();
-
-  const activity = {
-   id:document.getElementById("activityId").value || id(),
-   name:document.getElementById("activityName").value.trim(),
-   type:document.getElementById("activityType").value,
-   start:document.getElementById("activityStart").value,
-   end:document.getElementById("activityEnd").value,
-   eligibility:document.getElementById("activityEligibility").value,
-   status:document.getElementById("activityStatus").value,
-   description:document.getElementById("activityDescription").value.trim()
-  };
-
-  if(activity.start && activity.end && activity.end < activity.start){
-   toast("End date must be on or after start date.");
-   return;
-  }
-
-  const saved = update(() => {
-   const index = state.activities.findIndex(a => a.id === activity.id);
-   if(index >= 0) state.activities[index] = activity;
-   else state.activities.push(activity);
-  });
-
-  if(saved){
-   event.target.reset();
-   document.getElementById("activityId").value = "";
-   toast("Activity saved in your demo registry!");
-  }
- });
-
- document.getElementById("clearActivity").addEventListener("click",() => {
-  document.getElementById("activityForm").reset();
-  document.getElementById("activityId").value = "";
- });
-
- function renderMembers(){
-  const list = document.getElementById("memberList");
-  list.replaceChildren();
-
-  state.members.forEach(member => {
-   const node = item("🎓 "+member.name,"Community access application",
-    member.status,member.status === "Approved" ? "green" : "gray");
-
-   const actions = el("div",undefined,"actions");
-
-   if(member.status !== "Approved"){
-    actions.append(button("✓ Approve",() => {
-     if(update(() => member.status = "Approved")){
-      toast("Demo member approved.");
-     }
-    },"secondary"));
-   }
-
-   if(member.status !== "Declined"){
-    actions.append(button("Decline",() => {
-     if(update(() => member.status = "Declined")){
-      toast("Demo application declined.");
-     }
-    },"danger"));
-   }
-
-   node.append(actions);
-   list.append(node);
-  });
- }
-
- document.getElementById("vipForm").addEventListener("submit",event => {
-  event.preventDefault();
-  const name = document.getElementById("vipName").value.trim();
-  if(!name) return;
-
-  if(update(() => state.vips.push({id:id(),name}))){
-   event.target.reset();
-   toast("Demo VIP added!");
-  }
- });
-
- function renderVIPs(){
-  const list = document.getElementById("vipList");
-  list.replaceChildren();
-
-  if(!state.vips.length){
-   list.append(el("p","No demo VIPs added yet.","empty"));
-   return;
-  }
-
-  state.vips.forEach(vip => {
-   const node = item("💎 "+vip.name,"Honors Society demo roster","VIP","green");
-   node.append(button("Remove",() => {
-    if(update(() => {
-     state.vips = state.vips.filter(v => v.id !== vip.id);
-    })) toast("Demo VIP removed.");
-   },"danger"));
-   list.append(node);
-  });
- }
-
- document.getElementById("pollForm").addEventListener("submit",event => {
-  event.preventDefault();
-
-  const question = document.getElementById("pollQuestion").value.trim();
-  const choices = document.getElementById("pollChoices").value
-   .split("\n").map(s => s.trim()).filter(Boolean);
-
-  if(choices.length < 2){
-   toast("Please enter at least two poll choices.");
-   return;
-  }
-
-  if(update(() => state.polls.push({
-   id:id(),question,choices,status:"Draft"
-  }))){
-   event.target.reset();
-   toast("Demo Pink Ballot created!");
-  }
- });
-
- function renderPolls(){
-  const list = document.getElementById("pollList");
-  list.replaceChildren();
-
-  if(!state.polls.length){
-   list.append(el("p","No demo Pink Ballots yet.","empty"));
-   return;
-  }
-
-  state.polls.forEach(poll => {
-   const node = item("🗳️ "+poll.question,poll.choices.join(" · "),
-    poll.status,poll.status === "Published" ? "green" : "gray");
-
-   const actions = el("div",undefined,"actions");
-
-   if(poll.status !== "Published"){
-    actions.append(button("Publish",() => {
-     if(update(() => poll.status = "Published")){
-      toast("Demo poll published.");
-     }
-    },"secondary"));
-   }
-
-   actions.append(button("Delete",() => {
-    if(update(() => {
-     state.polls = state.polls.filter(p => p.id !== poll.id);
-    })) toast("Demo poll deleted.");
-   },"danger"));
-
-   node.append(actions);
-   list.append(node);
-  });
- }
-
- document.getElementById("eventForm").addEventListener("submit",event => {
-  event.preventDefault();
-
-  const name = document.getElementById("eventName").value.trim();
-  const capacity = Number(document.getElementById("eventCapacity").value);
-  const date = document.getElementById("eventDate").value;
-
-  if(!Number.isInteger(capacity) || capacity < 1){
-   toast("Enter a valid capacity.");
-   return;
-  }
-
-  if(update(() => state.events.push({
-   id:id(),name,capacity,date,status:"Draft"
-  }))){
-   event.target.reset();
-   toast("Demo early access event created!");
-  }
- });
-
- function renderEvents(){
-  const list = document.getElementById("eventList");
-  list.replaceChildren();
-
-  if(!state.events.length){
-   list.append(el("p","No demo early access events yet.","empty"));
-   return;
-  }
-
-  state.events.forEach(event => {
-   const node = item(
-    "💌 "+event.name,
-    "Capacity: "+event.capacity+
-    (event.date ? " · Early access: "+event.date : ""),
-    event.status,event.status === "Published" ? "green" : "gray"
-   );
-
-   const actions = el("div",undefined,"actions");
-
-   if(event.status !== "Published"){
-    actions.append(button("Publish",() => {
-     if(update(() => event.status = "Published")){
-      toast("Demo event published.");
-     }
-    },"secondary"));
-   }
-
-   actions.append(button("Delete",() => {
-    if(update(() => {
-     state.events = state.events.filter(e => e.id !== event.id);
-    })) toast("Demo event deleted.");
-   },"danger"));
-
-   node.append(actions);
-   list.append(node);
-  });
- }
-
- function render(){
-  renderOverview();
-  renderActivities();
-  renderMembers();
-  renderVIPs();
-  renderPolls();
-  renderEvents();
- }
-
- document.getElementById("year").textContent =
-  new Date().getFullYear();
-
- render();
-})();
-</script>
+
+  <!-- DEMO MANAGERS: INITIALIZE ONLY AFTER STAFF ACCESS -->
+
+  <script>
+    (() => {
+      "use strict";
+
+      const KEY = "bb_campus_hq_demo_v1";
+
+      const defaults = {
+        activities: [
+          {
+            id: "a1",
+            name: "Espresso Your ABCs",
+            type: "Alphabet Rush",
+            start: "2026-11-01",
+            end: "2026-11-30",
+            eligibility: "All Besties",
+            status: "Draft",
+            description: "A collaborative A–Z reading challenge."
+          },
+          {
+            id: "a2",
+            name: "Bestie Bingo",
+            type: "Bingo",
+            start: "",
+            end: "",
+            eligibility: "All Besties",
+            status: "Draft",
+            description: "Digital reading Bingo adventures."
+          }
+        ],
+        vips: [],
+        polls: [],
+        events: []
+      };
+
+      const $ = id => document.getElementById(id);
+
+      const clone = value =>
+        JSON.parse(JSON.stringify(value));
+
+      let state = clone(defaults);
+      let initialized = false;
+      let toastTimeout;
+
+      function makeId() {
+        return crypto.randomUUID();
+      }
+
+      function el(tag, text, className) {
+        const node = document.createElement(tag);
+
+        if (text !== undefined) {
+          node.textContent = text;
+        }
+
+        if (className) {
+          node.className = className;
+        }
+
+        return node;
+      }
+
+      function button(text, handler, style = "light") {
+        const node = el("button", text, "btn " + style);
+        node.type = "button";
+        node.addEventListener("click", handler);
+        return node;
+      }
+
+      function item(title, details, tagText, tagClass) {
+        const node = el("div", undefined, "item");
+
+        node.append(el("h4", title));
+
+        if (details) {
+          node.append(el("p", details));
+        }
+
+        if (tagText) {
+          node.append(
+            el(
+              "span",
+              tagText,
+              "tag " + (tagClass || "")
+            )
+          );
+        }
+
+        return node;
+      }
+
+      function toast(text) {
+        const node = $("toast");
+
+        node.textContent = text;
+        node.classList.remove("hidden");
+
+        clearTimeout(toastTimeout);
+
+        toastTimeout = setTimeout(() => {
+          node.classList.add("hidden");
+        }, 3500);
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(KEY, JSON.stringify(state));
+          return true;
+        } catch (error) {
+          console.error(error);
+          toast("Unable to save this browser-local change.");
+          return false;
+        }
+      }
+
+      function update(mutator) {
+        const previous = clone(state);
+
+        mutator();
+
+        if (!save()) {
+          state = previous;
+          return false;
+        }
+
+        renderDemo();
+        return true;
+      }
+
+      function showSection(name) {
+        document.querySelectorAll(".section").forEach(section => {
+          section.classList.toggle(
+            "active",
+            section.id === "section-" + name
+          );
+        });
+
+        document.querySelectorAll(".nav-btn").forEach(node => {
+          node.classList.toggle(
+            "active",
+            node.dataset.section === name
+          );
+        });
+      }
+
+      function renderDemoOverview() {
+        $("statActivities").textContent =
+          state.activities.filter(
+            activity => activity.status === "Published"
+          ).length;
+
+        $("statVIP").textContent = state.vips.length;
+
+        const list = $("todoList");
+
+        // Live admissions inserts its own separate task.
+        // Never overwrite the Supabase admissions task.
+        list.querySelectorAll(
+          "[data-demo-task]"
+        ).forEach(node => node.remove());
+
+        const tasks = [
+          [
+            "🎮 Activity Drafts",
+            state.activities.filter(
+              activity => activity.status === "Draft"
+            ).length + " browser-local activity drafts."
+          ],
+          [
+            "🗳️ Pink Ballots",
+            state.polls.length + " demo polls created."
+          ],
+          [
+            "💌 Early Access",
+            state.events.length + " demo events created."
+          ]
+        ];
+
+        tasks.forEach(([title, description]) => {
+          const node = item(title, description);
+          node.dataset.demoTask = "true";
+          list.append(node);
+        });
+      }
+
+      function renderActivities() {
+        const list = $("activityList");
+        list.replaceChildren();
+
+        if (!state.activities.length) {
+          list.append(
+            el("p", "No demo activities yet, Dean!", "empty")
+          );
+          return;
+        }
+
+        state.activities.forEach(activity => {
+          const node = item(
+            "🎮 " + activity.name,
+            activity.type + " · " + activity.eligibility +
+            (activity.start ? " · " + activity.start : "") +
+            (activity.end ? " to " + activity.end : ""),
+            activity.status,
+            activity.status === "Published" ? "green" : "gray"
+          );
+
+          if (activity.description) {
+            node.append(
+              el("p", activity.description, "mini")
+            );
+          }
+
+          const actions = el("div", undefined, "actions");
+
+          actions.append(
+            button("✏️ Edit", () => {
+              $("activityId").value = activity.id;
+              $("activityName").value = activity.name;
+              $("activityType").value = activity.type;
+              $("activityStart").value = activity.start || "";
+              $("activityEnd").value = activity.end || "";
+              $("activityEligibility").value =
+                activity.eligibility;
+              $("activityStatus").value = activity.status;
+              $("activityDescription").value =
+                activity.description || "";
+
+              $("activityForm").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+            })
+          );
+
+          if (activity.status !== "Published") {
+            actions.append(
+              button("💗 Publish", () => {
+                if (update(() => {
+                  activity.status = "Published";
+                })) {
+                  toast("Published in demo registry only.");
+                }
+              }, "secondary")
+            );
+          }
+
+          if (activity.status !== "Archived") {
+            actions.append(
+              button("📦 Archive", () => {
+                if (update(() => {
+                  activity.status = "Archived";
+                })) {
+                  toast("Demo activity archived.");
+                }
+              })
+            );
+          }
+
+          actions.append(
+            button("Delete", () => {
+              if (!confirm("Delete this demo activity?")) {
+                return;
+              }
+
+              if (update(() => {
+                state.activities = state.activities.filter(
+                  entry => entry.id !== activity.id
+                );
+              })) {
+                toast("Demo activity deleted.");
+              }
+            }, "danger")
+          );
+
+          node.append(actions);
+          list.append(node);
+        });
+      }
+
+      function renderVIPs() {
+        const list = $("vipList");
+        list.replaceChildren();
+
+        if (!state.vips.length) {
+          list.append(
+            el("p", "No demo VIPs added yet.", "empty")
+          );
+          return;
+        }
+
+        state.vips.forEach(vip => {
+          const node = item(
+            "💎 " + vip.name,
+            "Honors Society demo roster",
+            "VIP",
+            "green"
+          );
+
+          node.append(
+            button("Remove", () => {
+              if (update(() => {
+                state.vips = state.vips.filter(
+                  entry => entry.id !== vip.id
+                );
+              })) {
+                toast("Demo VIP removed.");
+              }
+            }, "danger")
+          );
+
+          list.append(node);
+        });
+      }
+
+      function renderPolls() {
+        const list = $("pollList");
+        list.replaceChildren();
+
+        if (!state.polls.length) {
+          list.append(
+            el("p", "No demo Pink Ballots yet.", "empty")
+          );
+          return;
+        }
+
+        state.polls.forEach(poll => {
+          const node = item(
+            "🗳️ " + poll.question,
+            poll.choices.join(" · "),
+            poll.status,
+            poll.status === "Published" ? "green" : "gray"
+          );
+
+          const actions = el("div", undefined, "actions");
+
+          if (poll.status !== "Published") {
+            actions.append(
+              button("Publish", () => {
+                if (update(() => {
+                  poll.status = "Published";
+                })) {
+                  toast("Published in demo registry only.");
+                }
+              }, "secondary")
+            );
+          }
+
+          actions.append(
+            button("Delete", () => {
+              if (update(() => {
+                state.polls = state.polls.filter(
+                  entry => entry.id !== poll.id
+                );
+              })) {
+                toast("Demo poll deleted.");
+              }
+            }, "danger")
+          );
+
+          node.append(actions);
+          list.append(node);
+        });
+      }
+
+      function renderEvents() {
+        const list = $("eventList");
+        list.replaceChildren();
+
+        if (!state.events.length) {
+          list.append(
+            el("p", "No demo early access events yet.", "empty")
+          );
+          return;
+        }
+
+        state.events.forEach(event => {
+          const node = item(
+            "💌 " + event.name,
+            "Capacity: " + event.capacity +
+            (event.date ? " · Early access: " + event.date : ""),
+            event.status,
+            event.status === "Published" ? "green" : "gray"
+          );
+
+          const actions = el("div", undefined, "actions");
+
+          if (event.status !== "Published") {
+            actions.append(
+              button("Publish", () => {
+                if (update(() => {
+                  event.status = "Published";
+                })) {
+                  toast("Published in demo registry only.");
+                }
+              }, "secondary")
+            );
+          }
+
+          actions.append(
+            button("Delete", () => {
+              if (update(() => {
+                state.events = state.events.filter(
+                  entry => entry.id !== event.id
+                );
+              })) {
+                toast("Demo event deleted.");
+              }
+            }, "danger")
+          );
+
+          node.append(actions);
+          list.append(node);
+        });
+      }
+
+      function renderDemo() {
+        renderDemoOverview();
+        renderActivities();
+        renderVIPs();
+        renderPolls();
+        renderEvents();
+      }
+
+      function initializeDemo() {
+        if (initialized) return;
+        initialized = true;
+
+        try {
+          const stored = JSON.parse(
+            localStorage.getItem(KEY)
+          );
+
+          if (stored && typeof stored === "object") {
+            for (const key of Object.keys(defaults)) {
+              if (Array.isArray(stored[key])) {
+                state[key] = stored[key];
+              }
+            }
+          }
+        } catch (error) {
+          console.warn(
+            "Could not restore demo records:",
+            error
+          );
+        }
+
+        document.querySelectorAll("[data-section]").forEach(node => {
+          node.addEventListener("click", () => {
+            showSection(node.dataset.section);
+          });
+        });
+
+        document.querySelectorAll("[data-jump]").forEach(node => {
+          node.addEventListener("click", () => {
+            showSection(node.dataset.jump);
+          });
+        });
+
+        $("activityForm").addEventListener("submit", event => {
+          event.preventDefault();
+
+          const activity = {
+            id: $("activityId").value || makeId(),
+            name: $("activityName").value.trim(),
+            type: $("activityType").value,
+            start: $("activityStart").value,
+            end: $("activityEnd").value,
+            eligibility: $("activityEligibility").value,
+            status: $("activityStatus").value,
+            description: $("activityDescription").value.trim()
+          };
+
+          if (
+            activity.start &&
+            activity.end &&
+            activity.end < activity.start
+          ) {
+            toast("End date must be on or after start date.");
+            return;
+          }
+
+          if (update(() => {
+            const index = state.activities.findIndex(
+              entry => entry.id === activity.id
+            );
+
+            if (index >= 0) {
+              state.activities[index] = activity;
+            } else {
+              state.activities.push(activity);
+            }
+          })) {
+            event.target.reset();
+            $("activityId").value = "";
+            toast("Demo activity saved!");
+          }
+        });
+
+        $("clearActivity").addEventListener("click", () => {
+          $("activityForm").reset();
+          $("activityId").value = "";
+        });
+
+        $("vipForm").addEventListener("submit", event => {
+          event.preventDefault();
+
+          const name = $("vipName").value.trim();
+
+          if (!name) return;
+
+          if (update(() => {
+            state.vips.push({
+              id: makeId(),
+              name
+            });
+          })) {
+            event.target.reset();
+            toast("Demo VIP added!");
+          }
+        });
+
+        $("pollForm").addEventListener("submit", event => {
+          event.preventDefault();
+
+          const question = $("pollQuestion").value.trim();
+
+          const choices = $("pollChoices").value
+            .split("\n")
+            .map(choice => choice.trim())
+            .filter(Boolean);
+
+          if (choices.length < 2) {
+            toast("Enter at least two choices.");
+            return;
+          }
+
+          if (update(() => {
+            state.polls.push({
+              id: makeId(),
+              question,
+              choices,
+              status: "Draft"
+            });
+          })) {
+            event.target.reset();
+            toast("Demo Pink Ballot created!");
+          }
+        });
+
+        $("eventForm").addEventListener("submit", event => {
+          event.preventDefault();
+
+          const name = $("eventName").value.trim();
+          const capacity = Number($("eventCapacity").value);
+          const date = $("eventDate").value;
+
+          if (!Number.isInteger(capacity) || capacity < 1) {
+            toast("Enter a valid capacity.");
+            return;
+          }
+
+          if (update(() => {
+            state.events.push({
+              id: makeId(),
+              name,
+              capacity,
+              date,
+              status: "Draft"
+            });
+          })) {
+            event.target.reset();
+            toast("Demo early access event created!");
+          }
+        });
+
+        $("year").textContent = new Date().getFullYear();
+
+        renderDemo();
+      }
+
+      document.addEventListener(
+        "bb:campus-hq-ready",
+        initializeDemo
+      );
+    })();
+  </script>
+
+  <!-- LOAD ADMISSIONS LISTENER BEFORE AUTH GATE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-admissions.js"></script>
+  <script src="js/campus-hq-auth.js"></script>
+
 </body>
 </html>
