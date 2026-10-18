@@ -1,0 +1,434 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f64fa1">
+<title>Monthly Side Quest | Bestie University</title>
+<link rel="icon" href="../assets/logo.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+:root{--pink:#f64fa1;--teal:#176e78;--ink:#382336;--blush:#ffe0ed}
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Nunito,sans-serif;color:var(--ink);
+ background:radial-gradient(circle at 12% 20%,#ffd3e8,transparent 35%),
+ radial-gradient(circle at 90% 75%,#cbeae7,transparent 35%),#fff5fa
+}
+a{color:inherit;text-decoration:none}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.top{
+ background:#23383d;color:white;border-bottom:6px solid var(--pink);
+ display:flex;align-items:center;justify-content:space-between;
+ flex-wrap:wrap;gap:15px;padding:14px max(20px,calc((100% - 1250px)/2))
+}
+.brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:900}
+.brand img{width:52px;height:52px;object-fit:contain}
+nav{display:flex;gap:9px;flex-wrap:wrap}
+nav a{padding:10px 14px;border-radius:25px;background:#ffffff18;font-weight:900}
+nav a.active{background:var(--pink)}
+.hero{
+ text-align:center;padding:55px 20px 65px;
+ background:repeating-linear-gradient(135deg,transparent 0 35px,#ffffff13 35px 70px),
+ linear-gradient(145deg,#ffd0e5,#f6a4ce 55%,#cdebe8);
+ border-bottom:8px solid #23383d
+}
+.kicker{
+ display:inline-block;background:#ffffffb5;border:2px solid white;
+ border-radius:30px;padding:9px 18px;font-weight:900;
+ letter-spacing:1.5px;color:var(--teal)
+}
+h1{
+ font-family:Bungee,sans-serif;font-size:clamp(34px,7vw,77px);
+ line-height:1.1;margin:22px 0 8px;color:#ff4097;
+ -webkit-text-stroke:1.5px white;
+ text-shadow:4px 5px 0 #224b53,7px 8px 0 #ffffff88
+}
+.script{font:clamp(20px,3vw,29px) Pacifico,cursive;color:var(--teal)}
+.hero p{font-size:19px;font-weight:800;max-width:670px;margin:18px auto}
+.wrap{max-width:1230px;margin:auto;padding:30px 20px 60px}
+.notice,.panel{
+ background:white;border:3px solid #e7a5c6;border-radius:22px;
+ box-shadow:6px 7px 0 #e5acc6
+}
+.notice{padding:18px 22px;margin-bottom:27px;font-weight:800}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,1fr);gap:27px}
+.panel{overflow:hidden}
+.panel-head{
+ padding:17px 21px;background:linear-gradient(110deg,#f64fa1,#ee88ba);
+ color:white;font-weight:900;font-size:18px
+}
+.panel-body{padding:23px}
+.months{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.month{
+ border:2px solid #e7a5c6;border-radius:25px;
+ background:#fff0f7;padding:11px 18px;font-weight:900;color:var(--ink)
+}
+.month.active{background:var(--teal);color:white;border-color:var(--teal)}
+h2,h3{color:var(--teal)}
+.month-title{font-family:Bungee,sans-serif;font-size:clamp(20px,3vw,28px);margin:5px 0}
+.mission-list{display:grid;gap:13px;margin-top:22px}
+.mission{
+ display:flex;gap:14px;align-items:flex-start;
+ padding:17px;border:2px solid #f1c0d8;border-radius:17px;
+ background:#fff8fb
+}
+.mission.done{background:#e5f4f1;border-color:#6abbb4}
+.mission-icon{
+ width:49px;height:49px;flex-shrink:0;display:grid;place-items:center;
+ border-radius:14px;background:#ffe0ed;font-size:25px
+}
+.mission.done .mission-icon{background:#bce8de}
+.mission-info{flex:1;min-width:0}
+.mission-info strong{display:block;font-size:16px}
+.mission-info p{margin:5px 0 9px;font-size:14px;line-height:1.55}
+.stamp{font-size:12px;font-weight:900;color:#b82c74}
+.mission.done .stamp{color:var(--teal)}
+.check{
+ border:0;border-radius:20px;padding:9px 12px;
+ background:var(--pink);color:white;font-weight:900;
+ white-space:nowrap
+}
+.mission.done .check{background:var(--teal)}
+.track{height:17px;background:#ffe0ed;border-radius:30px;overflow:hidden;margin:13px 0}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#f64fa1,#176e78);transition:width .25s}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0}
+.stat{background:#fff0f7;border-radius:15px;text-align:center;padding:14px 7px}
+.stat strong{display:block;font:22px Bungee,sans-serif;color:var(--teal)}
+.stat span{font-size:12px;font-weight:900}
+.journal{
+ width:100%;min-height:150px;resize:vertical;border:2px solid #e7a5c6;
+ border-radius:15px;padding:15px;background:#fff9fc;color:var(--ink);
+ line-height:1.6
+}
+.btn{
+ border:0;border-radius:30px;background:linear-gradient(#ff83be,#e93288);
+ color:white;font-weight:900;padding:12px 19px;
+ box-shadow:0 4px 0 #a52c67;display:inline-block;text-align:center
+}
+.btn.secondary{background:var(--teal);box-shadow:0 4px 0 #17444c}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.small{font-size:13px;color:#685565;line-height:1.6}
+.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:18px}
+.stamp-card{
+ text-align:center;border:2px dashed #e8a4c4;border-radius:16px;
+ background:#fff5fa;padding:17px 7px;opacity:.5
+}
+.stamp-card.earned{opacity:1;background:#e2f4ef;border-color:#61b7ac}
+.stamp-card .emoji{font-size:30px;display:block}
+.stamp-card strong{font-size:11px;display:block;margin-top:6px}
+.celebrate{
+ background:#fff0bf;border:2px dashed #d49e46;
+ padding:16px;border-radius:15px;margin-top:17px;
+ text-align:center;font-weight:900
+}
+.hidden{display:none}
+footer{text-align:center;background:#263b40;color:white;padding:30px 20px;font-weight:900}
+button:focus-visible,a:focus-visible,textarea:focus-visible{
+ outline:3px solid var(--teal);outline-offset:3px
+}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}
+@media(max-width:550px){
+ .top,nav{justify-content:center}
+ .mission{flex-wrap:wrap}
+ .check{margin-left:63px}
+ .panel-body{padding:15px}
+ .stamps{gap:6px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+ <a class="brand" href="../index.html#home">
+  <img src="../assets/logo.png" alt="Books & Besties logo">
+  <span>BESTIE UNIVERSITY 🎓</span>
+ </a>
+ <nav aria-label="Campus navigation">
+  <a href="../index.html#home">Campus Quad</a>
+  <a href="../activities.html" class="active">Campus Activities</a>
+  <a href="../commons.html">Crown Commons</a>
+  <a href="../index.html#dashboard">Bestie Locker</a>
+ </nav>
+</header>
+
+<section class="hero">
+ <span class="kicker">✦ THE BESTIE PLAYGROUND PRESENTS ✦</span>
+ <h1>MONTHLY<br>SIDE QUEST</h1>
+ <div class="script">Little missions. Big main-character energy. ♡</div>
+ <p>Pick your quests, collect your stamps, and make every reading month a little more magical!</p>
+</section>
+
+<main class="wrap">
+ <div class="notice">
+  💌 DESIGN PREVIEW: These are sample missions, not official Books &amp; Besties events.
+  Your progress and journal save in this browser only. Real monthly quests will
+  eventually be published through Campus HQ.
+ </div>
+
+ <div class="layout">
+  <section class="panel">
+   <div class="panel-head">💌 THE QUEST BOARD</div>
+   <div class="panel-body">
+    <div class="months" role="group" aria-label="Choose a quest month">
+     <button class="month active" data-month="october" type="button">🎃 October</button>
+     <button class="month" data-month="november" type="button">☕ November</button>
+    </div>
+
+    <h2 class="month-title" id="monthTitle"></h2>
+    <p id="monthDescription"></p>
+
+    <div class="stats">
+     <div class="stat"><strong id="doneCount">0</strong><span>COMPLETED</span></div>
+     <div class="stat"><strong id="totalCount">0</strong><span>MISSIONS</span></div>
+     <div class="stat"><strong id="percent">0%</strong><span>PROGRESS</span></div>
+    </div>
+
+    <div class="track" id="progressTrack" role="progressbar"
+         aria-label="Quest completion progress"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+     <div class="fill" id="progressFill"></div>
+    </div>
+
+    <div class="mission-list" id="missionList"></div>
+
+    <div class="celebrate hidden" id="celebrate" role="status"></div>
+   </div>
+  </section>
+
+  <aside>
+   <section class="panel">
+    <div class="panel-head">🏅 YOUR QUEST STAMP BOOK</div>
+    <div class="panel-body">
+     <h3>Collect Your Little Wins!</h3>
+     <p>Complete missions to unlock these cute demo achievement stamps.</p>
+     <div class="stamps" id="stamps"></div>
+     <p class="small">These stamps are just for this design preview. Official rewards will be determined for each event.</p>
+    </div>
+   </section>
+
+   <section class="panel" style="margin-top:25px">
+    <div class="panel-head">📓 THE BESTIE QUEST JOURNAL</div>
+    <div class="panel-body">
+     <h3>Dear Diary... ♡</h3>
+     <p>Keep your favorite moments, mini reviews, or little notes from your quests.</p>
+     <label for="journal"><strong>Your private demo journal</strong></label>
+     <textarea id="journal" class="journal"
+       placeholder="Today I went on a little bookish adventure..."></textarea>
+     <p class="small" id="saveStatus" aria-live="polite">Saved locally as you type.</p>
+     <div class="actions">
+      <button class="btn secondary" id="resetMonth" type="button">↻ Reset This Month</button>
+      <a class="btn" href="../activities.html">← Activity Directory</a>
+     </div>
+    </div>
+   </section>
+  </aside>
+ </div>
+</main>
+
+<footer>
+ BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+ <p>© <span id="year"></span> Bestie University</p>
+</footer>
+
+<script>
+(() => {
+ "use strict";
+
+ const STORAGE_KEY = "bb_side_quest_demo_v1";
+
+ const quests = {
+  october: {
+   title:"🎃 Boo & Boujee Side Quests",
+   description:"A little spooky, a little glamorous, and full of bookish adventures.",
+   missions:[
+    {icon:"🕯️",title:"Midnight Reader",desc:"Read for at least 30 minutes after sunset."},
+    {icon:"🖤",title:"Dark Cover Darling",desc:"Read a book with a dark or moody cover."},
+    {icon:"🍬",title:"Treat Yourself",desc:"Enjoy your favorite snack or drink during a reading session."},
+    {icon:"👻",title:"Ghostly Goodreads",desc:"Share a spooky or mysterious book recommendation."},
+    {icon:"💋",title:"Main Character Moment",desc:"Dress up your reading nook and take a cute picture."},
+    {icon:"📚",title:"Plot Twist Princess",desc:"Read a book with an unexpected twist."}
+   ]
+  },
+  november: {
+   title:"☕ The Velvet Latte Lounge",
+   description:"Warm drinks, cozy chapters, and soft little moments for your reading life.",
+   missions:[
+    {icon:"☕",title:"Latte & Literature",desc:"Read while enjoying a warm drink."},
+    {icon:"🍪",title:"Sweet Little Chapter",desc:"Pair your reading session with a sweet treat."},
+    {icon:"🤎",title:"Cozy Cover Crush",desc:"Read a book with a brown, cream, or warm-toned cover."},
+    {icon:"🧸",title:"Soft Girl Reading Hour",desc:"Spend an uninterrupted hour reading somewhere comfy."},
+    {icon:"💌",title:"Bestie Book Love",desc:"Recommend a comforting book to another Bestie."},
+    {icon:"🍂",title:"Autumn Afterglow",desc:"Finish a book that gives you cozy seasonal vibes."}
+   ]
+  }
+ };
+
+ const stampLevels = [
+  {count:1,emoji:"💌",title:"FIRST QUEST"},
+  {count:3,emoji:"🎀",title:"QUEST CUTIE"},
+  {count:6,emoji:"👑",title:"QUEST QUEEN"}
+ ];
+
+ let month = "october";
+ let data = {};
+
+ try {
+  const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+   data = stored;
+  }
+ } catch(error) {
+  console.warn("Could not restore quest preview:",error);
+ }
+
+ function getMonthData() {
+  if (!data[month] || typeof data[month] !== "object") {
+   data[month] = {completed:[],journal:""};
+  }
+  if (!Array.isArray(data[month].completed)) data[month].completed = [];
+  if (typeof data[month].journal !== "string") data[month].journal = "";
+  return data[month];
+ }
+
+ function save() {
+  try {
+   localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+   document.getElementById("saveStatus").textContent = "💗 Saved in this browser!";
+  } catch(error) {
+   document.getElementById("saveStatus").textContent =
+    "Unable to save locally. Check your browser settings.";
+  }
+ }
+
+ function render() {
+  const quest = quests[month];
+  const progress = getMonthData();
+  const valid = new Set(progress.completed.filter(n =>
+   Number.isInteger(n) && n >= 0 && n < quest.missions.length
+  ));
+  progress.completed = [...valid];
+
+  document.querySelectorAll("[data-month]").forEach(button => {
+   const active = button.dataset.month === month;
+   button.classList.toggle("active",active);
+   button.setAttribute("aria-pressed",String(active));
+  });
+
+  document.getElementById("monthTitle").textContent = quest.title;
+  document.getElementById("monthDescription").textContent = quest.description;
+
+  const list = document.getElementById("missionList");
+  list.replaceChildren();
+
+  quest.missions.forEach((mission,index) => {
+   const done = valid.has(index);
+
+   const card = document.createElement("div");
+   card.className = "mission" + (done ? " done" : "");
+
+   const icon = document.createElement("span");
+   icon.className = "mission-icon";
+   icon.textContent = mission.icon;
+
+   const info = document.createElement("div");
+   info.className = "mission-info";
+
+   const title = document.createElement("strong");
+   title.textContent = mission.title;
+
+   const description = document.createElement("p");
+   description.textContent = mission.desc;
+
+   const stamp = document.createElement("span");
+   stamp.className = "stamp";
+   stamp.textContent = done ? "✓ MISSION COMPLETE" : "✧ AWAITING YOUR ADVENTURE";
+
+   info.append(title,description,stamp);
+
+   const button = document.createElement("button");
+   button.type = "button";
+   button.className = "check";
+   button.textContent = done ? "↻ Undo" : "✓ Complete";
+   button.setAttribute("aria-pressed",String(done));
+   button.setAttribute("aria-label",
+    `${done ? "Undo" : "Complete"} ${mission.title}`);
+
+   button.addEventListener("click",() => {
+    const current = getMonthData();
+    const selected = new Set(current.completed);
+    if (selected.has(index)) selected.delete(index);
+    else selected.add(index);
+    current.completed = [...selected];
+    save();
+    render();
+   });
+
+   card.append(icon,info,button);
+   list.append(card);
+  });
+
+  const count = valid.size;
+  const total = quest.missions.length;
+  const percent = Math.round(count / total * 100);
+
+  document.getElementById("doneCount").textContent = count;
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("percent").textContent = percent + "%";
+  document.getElementById("progressFill").style.width = percent + "%";
+  document.getElementById("progressTrack").setAttribute("aria-valuenow",String(percent));
+
+  const stamps = document.getElementById("stamps");
+  stamps.replaceChildren();
+
+  stampLevels.forEach(level => {
+   const earned = count >= level.count;
+   const card = document.createElement("div");
+   card.className = "stamp-card" + (earned ? " earned" : "");
+
+   const emoji = document.createElement("span");
+   emoji.className = "emoji";
+   emoji.textContent = level.emoji;
+
+   const title = document.createElement("strong");
+   title.textContent = level.title;
+
+   card.append(emoji,title);
+   card.setAttribute("aria-label",
+    `${level.title}: ${earned ? "earned" : "locked"}`);
+   stamps.append(card);
+  });
+
+  const celebrate = document.getElementById("celebrate");
+  celebrate.classList.toggle("hidden",count !== total);
+  celebrate.textContent = "👑 ALL QUESTS COMPLETE! Main-character behavior, Bestie!";
+
+  document.getElementById("journal").value = progress.journal;
+ }
+
+ document.querySelectorAll("[data-month]").forEach(button => {
+  button.addEventListener("click",() => {
+   month = button.dataset.month;
+   render();
+  });
+ });
+
+ document.getElementById("journal").addEventListener("input",event => {
+  getMonthData().journal = event.target.value;
+  save();
+ });
+
+ document.getElementById("resetMonth").addEventListener("click",() => {
+  if (!confirm("Reset missions and journal for this month?")) return;
+  data[month] = {completed:[],journal:""};
+  save();
+  render();
+ });
+
+ document.getElementById("year").textContent = new Date().getFullYear();
+ render();
+})();
+</script>
+</body>
+</html>
