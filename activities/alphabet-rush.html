@@ -526,11 +526,11 @@ footer {
   <main class="wrap">
 
     <div class="notice">
-      ☕ DESIGN PREVIEW: This interactive board simulates
-      a community A–Z challenge. Submissions save only
-      in this browser. Different members cannot see one
-      another's submissions yet. Shared participation
-      will be connected through Supabase later.
+      ☕ LIVE CAMPUS BOARD: All approved Besties share
+      this A–Z challenge! Each letter can be claimed
+      once, but you can contribute multiple different
+      letters. Claims open November 1–30, 2026.
+      Your contributions are saved in Supabase. 🤎
     </div>
 
     <div class="layout">
@@ -679,7 +679,7 @@ footer {
               </label>
 
               <p class="small">
-                For this preview, the book title must
+                Your book title must
                 begin with your chosen letter. We ignore
                 leading "A", "An", and "The".
               </p>
@@ -710,20 +710,20 @@ footer {
             <ol style="line-height:1.9;font-weight:700;padding-left:20px">
               <li>Choose an available letter from A to Z.</li>
               <li>Enter a book title beginning with that letter.</li>
-              <li>Add the author and your Bestie display name.</li>
+              <li>Add the author. Your campus display name is used automatically.</li>
               <li>Submit to complete that letter.</li>
               <li>Once completed, the letter is locked.</li>
               <li>Work together until the entire alphabet is complete!</li>
             </ol>
 
             <div class="detail">
-              🤎 <strong>One letter. One contribution.</strong>
+              🤎 <strong>One claim per letter. Multiple letters per Bestie!</strong>
               Every completed letter celebrates the Bestie
               who contributed it!
             </div>
 
             <p class="small">
-              These are preview rules. Campus HQ can establish
+              These are the current challenge rules. Campus HQ can establish
               final eligibility and verification rules before
               November's official challenge.
             </p>
@@ -769,427 +769,534 @@ footer {
 <script src="../js/config.js"></script>
 <script src="../js/campus-guard.js"></script>
 
+
 <script>
 (async () => {
   "use strict";
 
-  const gateMessage =
-    document.getElementById("campusGateMessage");
+  const SLUG = "espresso-your-abcs-2026-11";
+  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const gateMessage = document.getElementById("campusGateMessage");
+  const message = document.getElementById("formMessage");
+  const board = document.getElementById("alphabet");
+  const form = document.getElementById("claimForm");
+  const detail = document.getElementById("claimedDetail");
+  const log = document.getElementById("contributionLog");
+  const nameInput = document.getElementById("bestieName");
+  const chosenLetterEl = document.getElementById("chosenLetter");
+  const chosenStatusEl = document.getElementById("chosenStatus");
+  const resetButton = document.getElementById("resetBoard");
 
   document.getElementById("year").textContent =
     new Date().getFullYear();
+
+  // The shared board must never offer a global reset.
+  if (resetButton) resetButton.remove();
 
   const guard = window.BB_CAMPUS_GUARD;
 
   if (!guard) {
     gateMessage.textContent =
-      "Campus access verification is unavailable. Please try again.";
+      "Campus verification is unavailable. Please try again.";
     return;
   }
 
+  let client;
+  let currentUser;
+  let challenge;
+  let selectedLetter = null;
+  let contributions = {};
+  let busy = false;
+  let refreshTimer = null;
+
+  function cleanTitle(title) {
+    return title.trim()
+      .replace(/^(the|an|a)\s+/i, "")
+      .trim();
+  }
+
+  function setMessage(text) {
+    message.textContent = text;
+  }
+
+  function claimWindowOpen() {
+    if (!challenge) return false;
+
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Chicago",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(new Date());
+
+    return today >= challenge.starts_on &&
+           today <= challenge.ends_on;
+  }
+
+  function makeElement(tag, className, text) {
+    const element = document.createElement(tag);
+
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+
+    return element;
+  }
+
+  function showSelection() {
+    chosenLetterEl.textContent = selectedLetter || "?";
+    detail.replaceChildren();
+    detail.classList.add("hidden");
+    form.classList.add("hidden");
+
+    if (!selectedLetter) {
+      chosenStatusEl.textContent =
+        "Waiting for your selection ♡";
+      return;
+    }
+
+    const entry = contributions[selectedLetter];
+
+    if (entry) {
+      chosenStatusEl.textContent =
+        "☕ This letter has been claimed!";
+
+      const heading = makeElement(
+        "strong",
+        "",
+        "🤎 Claimed by " + entry.name
+      );
+
+      const book = makeElement(
+        "p",
+        "",
+        entry.title + " — " + entry.author
+      );
+
+      detail.append(heading, book);
+
+      if (entry.user_id === currentUser.id && claimWindowOpen()) {
+        const releaseButton = makeElement(
+          "button",
+          "btn secondary",
+          "↻ Release My Letter"
+        );
+
+        releaseButton.type = "button";
+        releaseButton.disabled = busy;
+
+        releaseButton.addEventListener("click", () => {
+          releaseClaim(selectedLetter);
+        });
+
+        detail.append(releaseButton);
+      }
+
+      detail.classList.remove("hidden");
+      return;
+    }
+
+    if (!claimWindowOpen()) {
+      chosenStatusEl.textContent =
+        "☕ Claims open November 1–30, 2026.";
+      return;
+    }
+
+    chosenStatusEl.textContent =
+      "💌 Available to claim!";
+
+    form.classList.remove("hidden");
+    nameInput.value = currentDisplayName;
+    nameInput.readOnly = true;
+  }
+
+  let currentDisplayName = "Bestie";
+
+  function chooseLetter(letter) {
+    selectedLetter = letter;
+    setMessage("");
+    showSelection();
+    renderBoard();
+  }
+
+  function updateProgress() {
+    const completed = Object.keys(contributions).length;
+    const remaining = 26 - completed;
+    const percent = Math.round(completed / 26 * 100);
+
+    document.getElementById("completeCount").textContent =
+      completed;
+
+    document.getElementById("remainingCount").textContent =
+      remaining;
+
+    document.getElementById("progressPercent").textContent =
+      percent + "%";
+
+    document.getElementById("progressFill").style.width =
+      percent + "%";
+
+    document.getElementById("progressTrack").setAttribute(
+      "aria-valuenow",
+      String(percent)
+    );
+
+    document.getElementById("celebrate").classList.toggle(
+      "hidden",
+      completed !== 26
+    );
+  }
+
+  function renderLog() {
+    log.replaceChildren();
+
+    const completed = LETTERS.filter(
+      letter => Boolean(contributions[letter])
+    );
+
+    if (!completed.length) {
+      log.append(makeElement(
+        "p",
+        "small",
+        "No letters claimed yet! The first cup is still brewing. ☕"
+      ));
+      return;
+    }
+
+    completed.forEach(letter => {
+      const entry = contributions[letter];
+
+      const card = makeElement("div", "entry");
+      const heading = makeElement(
+        "strong",
+        "",
+        "☕ " + letter + " — " + entry.name
+      );
+      const book = makeElement(
+        "p",
+        "",
+        "📚 " + entry.title
+      );
+      const author = makeElement(
+        "p",
+        "small",
+        "By " + entry.author
+      );
+
+      card.append(heading, book, author);
+      log.append(card);
+    });
+  }
+
+  function renderBoard() {
+    board.replaceChildren();
+
+    LETTERS.forEach(letter => {
+      const entry = contributions[letter];
+      const button = makeElement("button", "letter");
+
+      button.type = "button";
+
+      if (entry) button.classList.add("claimed");
+
+      if (selectedLetter === letter) {
+        button.classList.add("selected");
+      }
+
+      const heading = makeElement("strong", "", letter);
+
+      const status = makeElement(
+        "span",
+        "",
+        entry
+          ? entry.user_id === currentUser.id
+            ? "YOUR LETTER ☕"
+            : "CLAIMED ☕"
+          : "AVAILABLE ♡"
+      );
+
+      button.append(heading, status);
+
+      button.setAttribute(
+        "aria-label",
+        letter + (entry ? ", claimed" : ", available")
+      );
+
+      button.setAttribute(
+        "aria-pressed",
+        String(selectedLetter === letter)
+      );
+
+      button.addEventListener("click", () => {
+        chooseLetter(letter);
+      });
+
+      board.append(button);
+    });
+
+    updateProgress();
+    renderLog();
+  }
+
+  async function loadClaims() {
+    const { data, error } = await client
+      .from("alphabet_claims")
+      .select(
+        "id, letter, user_id, book_title, book_author, created_at"
+      )
+      .eq("challenge_id", challenge.id)
+      .order("letter", { ascending: true });
+
+    if (error) throw error;
+
+    const next = {};
+
+    for (const claim of data || []) {
+      if (!LETTERS.includes(claim.letter)) continue;
+
+      next[claim.letter] = {
+        id: claim.id,
+        user_id: claim.user_id,
+        title: claim.book_title,
+        author: claim.book_author,
+        name: claim.user_id === currentUser.id
+          ? currentDisplayName
+          : "Campus Bestie"
+      };
+    }
+
+    // Fetch contributor names from approved profiles.
+    // If profile visibility is restricted by RLS, the
+    // fallback name above keeps the board functional.
+    const userIds = [
+      ...new Set((data || []).map(claim => claim.user_id))
+    ];
+
+    if (userIds.length) {
+      const { data: profiles, error: profileError } =
+        await client
+          .from("profiles")
+          .select("id, display_name")
+          .in("id", userIds);
+
+      if (!profileError) {
+        for (const profile of profiles || []) {
+          for (const letter of LETTERS) {
+            if (next[letter]?.user_id === profile.id) {
+              next[letter].name =
+                profile.display_name || "Campus Bestie";
+            }
+          }
+        }
+      }
+    }
+
+    contributions = next;
+    renderBoard();
+    showSelection();
+  }
+
+  async function refreshClaims() {
+    if (busy || !challenge) return;
+
+    try {
+      await loadClaims();
+    } catch (error) {
+      console.error("Alphabet refresh error:", error);
+      setMessage(
+        "We couldn't refresh the board. Try reloading the page."
+      );
+    }
+  }
+
+  async function releaseClaim(letter) {
+    const entry = contributions[letter];
+
+    if (!entry ||
+        entry.user_id !== currentUser.id ||
+        !claimWindowOpen() ||
+        busy) return;
+
+    if (!confirm(
+      "Release letter " + letter +
+      "? Another Bestie will be able to claim it."
+    )) return;
+
+    busy = true;
+    setMessage("Releasing your letter...");
+
+    try {
+      const { data, error } = await client
+        .from("alphabet_claims")
+        .delete()
+        .eq("id", entry.id)
+        .eq("user_id", currentUser.id)
+        .select("id");
+
+      if (error) throw error;
+
+      if (!data?.length) {
+        throw new Error("This claim could not be released.");
+      }
+
+      await loadClaims();
+      setMessage("☕ Letter " + letter + " is available again!");
+    } catch (error) {
+      console.error("Release error:", error);
+      setMessage(
+        "Could not release this letter. Please try again."
+      );
+    } finally {
+      busy = false;
+      showSelection();
+    }
+  }
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (busy || !selectedLetter) return;
+
+    if (!claimWindowOpen()) {
+      setMessage("Claims are open November 1–30, 2026.");
+      return;
+    }
+
+    const letter = selectedLetter;
+    const title =
+      document.getElementById("bookTitle").value.trim();
+    const author =
+      document.getElementById("bookAuthor").value.trim();
+
+    if (!title || !author) {
+      setMessage("Please enter a book title and author.");
+      return;
+    }
+
+    if (title.length > 150 || author.length > 100) {
+      setMessage("Please shorten the book title or author.");
+      return;
+    }
+
+    if (cleanTitle(title).charAt(0).toUpperCase() !== letter) {
+      setMessage(
+        "That book title doesn't match letter " + letter + "."
+      );
+      return;
+    }
+
+    busy = true;
+    setMessage("☕ Brewing your contribution...");
+
+    try {
+      const { error } = await client
+        .from("alphabet_claims")
+        .insert({
+          challenge_id: challenge.id,
+          letter,
+          user_id: currentUser.id,
+          book_title: title,
+          book_author: author
+        });
+
+      if (error) {
+        if (error.code === "23505") {
+          await loadClaims();
+          setMessage(
+            "Another Bestie claimed " + letter +
+            " first! Pick another available letter."
+          );
+          return;
+        }
+
+        throw error;
+      }
+
+      form.reset();
+      await loadClaims();
+
+      setMessage(
+        "☕ Letter " + letter +
+        " claimed! Thank you, Bestie!"
+      );
+    } catch (error) {
+      console.error("Alphabet claim error:", error);
+      setMessage(
+        "We couldn't save your claim. Please try again."
+      );
+    } finally {
+      busy = false;
+      showSelection();
+    }
+  });
+
   try {
     const result = await guard.protectPage({
-      level:"approved",
-      gateId:"campusGate",
-      contentId:"campusContent",
-      messageId:"campusGateMessage"
+      level: "approved",
+      gateId: "campusGate",
+      contentId: "campusContent",
+      messageId: "campusGateMessage"
     });
 
     if (!result.allowed) return;
 
-    initializeAlphabetRush(result.profile);
+    currentUser = result.user;
+
+    if (!currentUser?.id) {
+      throw new Error("No authenticated user returned.");
+    }
+
+    currentDisplayName =
+      result.profile?.display_name || "Campus Bestie";
+
+    nameInput.value = currentDisplayName;
+    nameInput.readOnly = true;
+
+    client = guard.getClient();
+
+    if (!client) {
+      throw new Error("Supabase client unavailable.");
+    }
+
+    const { data, error } = await client
+      .from("alphabet_challenges")
+      .select(
+        "id, slug, title, starts_on, ends_on, is_published"
+      )
+      .eq("slug", SLUG)
+      .single();
+
+    if (error || !data) {
+      throw error || new Error("Challenge not found.");
+    }
+
+    challenge = data;
+
+    await loadClaims();
+
+    // Refresh periodically so other Besties' claims
+    // appear without requiring a manual page reload.
+    refreshTimer = window.setInterval(refreshClaims, 15000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshClaims();
+    });
 
   } catch (error) {
-    console.error("Alphabet Rush access error:",error);
+    console.error("Live alphabet initialization error:", error);
 
-    document.getElementById("campusContent").hidden = true;
-    document.getElementById("campusGate").hidden = false;
+    form.classList.add("hidden");
 
-    gateMessage.textContent =
-      "We couldn't load Espresso Your ABCs. Please try again.";
+    board.replaceChildren();
+    log.replaceChildren();
+
+    setMessage(
+      "We couldn't load the live alphabet board. " +
+      "Please refresh and try again."
+    );
   }
-
-  function initializeAlphabetRush(profile) {
-
-    // Keep the existing storage key to preserve demo submissions.
-    const STORAGE_KEY = "bb_espresso_abcs_demo_v1";
-    const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-    const board = document.getElementById("alphabet");
-    const form = document.getElementById("claimForm");
-    const detail = document.getElementById("claimedDetail");
-    const log = document.getElementById("contributionLog");
-    const message = document.getElementById("formMessage");
-
-    const nameInput = document.getElementById("bestieName");
-
-    // Prefill the approved member's campus display name.
-    if (profile && profile.display_name) {
-      nameInput.value = profile.display_name;
-    }
-
-    let contributions = {};
-    let selectedLetter = null;
-
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem(STORAGE_KEY)
-      );
-
-      if (
-        saved &&
-        typeof saved === "object" &&
-        !Array.isArray(saved)
-      ) {
-        for (const letter of LETTERS) {
-          const item = saved[letter];
-
-          if (
-            item &&
-            typeof item.name === "string" &&
-            typeof item.title === "string" &&
-            typeof item.author === "string"
-          ) {
-            contributions[letter] = item;
-          }
-        }
-      }
-    } catch (error) {
-      console.warn(
-        "Unable to restore alphabet preview:",
-        error
-      );
-    }
-
-    function save() {
-      try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(contributions)
-        );
-        return true;
-      } catch (error) {
-        message.textContent =
-          "Your browser could not save this submission.";
-        return false;
-      }
-    }
-
-    function cleanTitle(title) {
-      return title.trim()
-        .replace(/^(the|an|a)\s+/i,"")
-        .trim();
-    }
-
-    function chooseLetter(letter) {
-      selectedLetter = letter;
-
-      document.getElementById(
-        "chosenLetter"
-      ).textContent = letter;
-
-      message.textContent = "";
-
-      const entry = contributions[letter];
-
-      if (entry) {
-        document.getElementById(
-          "chosenStatus"
-        ).textContent =
-          "☕ This letter has been completed!";
-
-        form.classList.add("hidden");
-        detail.classList.remove("hidden");
-        detail.replaceChildren();
-
-        const heading =
-          document.createElement("strong");
-
-        heading.textContent =
-          "🤎 Claimed by " + entry.name;
-
-        const book =
-          document.createElement("p");
-
-        book.textContent =
-          entry.title + " — " + entry.author;
-
-        detail.append(heading,book);
-
-      } else {
-        document.getElementById(
-          "chosenStatus"
-        ).textContent =
-          "💌 Available to complete!";
-
-        form.classList.remove("hidden");
-        detail.classList.add("hidden");
-
-        form.reset();
-
-        if (profile && profile.display_name) {
-          nameInput.value = profile.display_name;
-        }
-      }
-
-      renderBoard();
-    }
-
-    function renderBoard() {
-      board.replaceChildren();
-
-      LETTERS.forEach(letter => {
-        const claimed =
-          Boolean(contributions[letter]);
-
-        const button =
-          document.createElement("button");
-
-        button.type = "button";
-        button.className = "letter";
-
-        if (claimed) {
-          button.classList.add("claimed");
-        }
-
-        if (selectedLetter === letter) {
-          button.classList.add("selected");
-        }
-
-        const heading =
-          document.createElement("strong");
-
-        heading.textContent = letter;
-
-        const status =
-          document.createElement("span");
-
-        status.textContent = claimed
-          ? "COMPLETED ☕"
-          : "AVAILABLE ♡";
-
-        button.append(heading,status);
-
-        button.setAttribute(
-          "aria-label",
-          letter + ", " +
-          (claimed ? "completed" : "available")
-        );
-
-        button.setAttribute(
-          "aria-pressed",
-          String(selectedLetter === letter)
-        );
-
-        button.addEventListener("click",() => {
-          chooseLetter(letter);
-        });
-
-        board.append(button);
-      });
-
-      updateProgress();
-      renderLog();
-    }
-
-    function updateProgress() {
-      const completed = LETTERS.filter(
-        letter => Boolean(contributions[letter])
-      ).length;
-
-      const remaining = 26 - completed;
-      const percent =
-        Math.round(completed / 26 * 100);
-
-      document.getElementById(
-        "completeCount"
-      ).textContent = completed;
-
-      document.getElementById(
-        "remainingCount"
-      ).textContent = remaining;
-
-      document.getElementById(
-        "progressPercent"
-      ).textContent = percent + "%";
-
-      document.getElementById(
-        "progressFill"
-      ).style.width = percent + "%";
-
-      document.getElementById(
-        "progressTrack"
-      ).setAttribute(
-        "aria-valuenow",
-        String(percent)
-      );
-
-      document.getElementById(
-        "celebrate"
-      ).classList.toggle(
-        "hidden",
-        completed !== 26
-      );
-    }
-
-    function renderLog() {
-      log.replaceChildren();
-
-      const completed = LETTERS.filter(
-        letter => Boolean(contributions[letter])
-      );
-
-      if (!completed.length) {
-        const empty =
-          document.createElement("p");
-
-        empty.className = "small";
-
-        empty.textContent =
-          "No letters completed yet! Be the first Bestie to brew one up.";
-
-        log.append(empty);
-        return;
-      }
-
-      completed.forEach(letter => {
-        const entry = contributions[letter];
-
-        const card =
-          document.createElement("div");
-
-        card.className = "entry";
-
-        const heading =
-          document.createElement("strong");
-
-        heading.textContent =
-          "☕ " + letter + " — " + entry.name;
-
-        const book =
-          document.createElement("p");
-
-        book.textContent =
-          "📚 " + entry.title;
-
-        const author =
-          document.createElement("p");
-
-        author.className = "small";
-        author.textContent =
-          "By " + entry.author;
-
-        card.append(heading,book,author);
-        log.append(card);
-      });
-    }
-
-    form.addEventListener("submit",event => {
-      event.preventDefault();
-
-      if (!selectedLetter) {
-        message.textContent =
-          "Please select a letter first.";
-        return;
-      }
-
-      if (contributions[selectedLetter]) {
-        message.textContent =
-          "This letter is already completed!";
-
-        chooseLetter(selectedLetter);
-        return;
-      }
-
-      const name =
-        nameInput.value.trim();
-
-      const title =
-        document.getElementById(
-          "bookTitle"
-        ).value.trim();
-
-      const author =
-        document.getElementById(
-          "bookAuthor"
-        ).value.trim();
-
-      if (!name || !title || !author) {
-        message.textContent =
-          "Please complete all three fields.";
-        return;
-      }
-
-      const normalized = cleanTitle(title);
-
-      const firstLetter =
-        normalized.charAt(0).toUpperCase();
-
-      if (firstLetter !== selectedLetter) {
-        message.textContent =
-          "That book title doesn't match letter " +
-          selectedLetter +
-          ". Please choose a matching title.";
-        return;
-      }
-
-      const letter = selectedLetter;
-
-      contributions[letter] = {
-        name,
-        title,
-        author
-      };
-
-      if (!save()) {
-        delete contributions[letter];
-        return;
-      }
-
-      chooseLetter(letter);
-
-      message.textContent =
-        "☕ Letter " + letter +
-        " completed! Thank you for contributing, Bestie!";
-
-      renderBoard();
-    });
-
-    document.getElementById(
-      "resetBoard"
-    ).addEventListener("click",() => {
-      if (!confirm(
-        "Reset all demo letters and contributions?"
-      )) return;
-
-      contributions = {};
-      selectedLetter = null;
-
-      save();
-
-      document.getElementById(
-        "chosenLetter"
-      ).textContent = "?";
-
-      document.getElementById(
-        "chosenStatus"
-      ).textContent =
-        "Waiting for your selection ♡";
-
-      form.classList.add("hidden");
-      detail.classList.add("hidden");
-
-      message.textContent =
-        "Demo board reset!";
-
-      renderBoard();
-    });
-
-    renderBoard();
-  }
-
 })();
 </script>
+
 
 </body>
 </html>
