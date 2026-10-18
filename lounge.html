@@ -177,6 +177,24 @@
       .message { max-width: 95%; }
       .composer { flex-direction: column; }
     }
+
+    
+.message-edit-button {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 5px 9px;
+  border: none;
+  border-radius: 8px;
+  background: #fff0f6;
+  color: #85506a;
+  font: 700 11px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.message-edit-button:hover {
+  background: #ead0db;
+}
+
   </style>
 </head>
 <body>
@@ -330,6 +348,14 @@
       content.hidden = false;
       content.style.display = "block";
 
+      
+    const { data: isStaff, error: staffError } =
+    await client.rpc("is_campus_staff");
+
+    if (staffError) {
+    console.error("Staff verification error:", staffError);
+    }
+
       const names = new Map();
       let currentMessages = [];
 
@@ -417,6 +443,116 @@ if (currentMessages.length) {
           bubble.textContent = message.content;
 
           
+if (message.sender_id === result.user.id) {
+  const editButton = document.createElement("button");
+  editButton.type = "button";
+  editButton.className = "message-edit-button";
+  editButton.textContent = "✏️ Edit";
+
+  editButton.addEventListener("click", async () => {
+    const updated = prompt("Edit your message:", message.content);
+
+    if (updated === null) return;
+
+    const newContent = updated.trim();
+
+    if (!newContent || newContent === message.content) return;
+
+    if (newContent.length > 2000) {
+      alert("Messages cannot exceed 2000 characters.");
+      return;
+    }
+
+    editButton.disabled = true;
+
+    
+    const { data: removed, error } = await client
+    .rpc("remove_own_housing_message", {
+        p_message_id: message.id
+    });
+
+    if (!error && removed !== true) {
+    alert("This message could not be removed.");
+    removeButton.disabled = false;
+    return;
+    }
+
+
+    if (error) {
+      console.error("Message edit error:", error);
+      alert("Couldn't update your message.");
+      editButton.disabled = false;
+      return;
+    }
+
+    await loadMessages();
+  });
+
+  article.appendChild(editButton);
+}
+
+          
+if (message.sender_id === result.user.id) {
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className = "message-edit-button";
+  removeButton.textContent = "🗑️ Remove";
+
+  removeButton.addEventListener("click", async () => {
+    if (!confirm("Remove this message from the lounge?")) return;
+
+    removeButton.disabled = true;
+
+    const { error } = await client
+      .from("housing_messages")
+      .update({ is_removed: true })
+      .eq("id", message.id)
+      .eq("sender_id", result.user.id);
+
+    if (error) {
+      console.error("Message removal error:", error);
+      alert("Unable to remove this message.");
+      removeButton.disabled = false;
+      return;
+    }
+
+    await loadMessages();
+  });
+
+  article.appendChild(removeButton);
+}
+
+
+// 🛡️ Staff-only message moderation
+if (isStaff === true && message.sender_id !== result.user.id) {
+  const moderateButton = document.createElement("button");
+  moderateButton.type = "button";
+  moderateButton.className = "message-edit-button";
+  moderateButton.textContent = "🛡️ Moderate";
+
+  moderateButton.addEventListener("click", async () => {
+    if (!confirm("Remove this message as campus staff?")) return;
+
+    moderateButton.disabled = true;
+
+    const { data: removed, error } = await client
+      .rpc("moderate_housing_message", {
+        p_message_id: message.id
+      });
+
+    if (error || removed !== true) {
+      console.error("Moderation error:", error);
+      alert("Unable to moderate this message.");
+      moderateButton.disabled = false;
+      return;
+    }
+
+    await loadMessages();
+  });
+
+  article.appendChild(moderateButton);
+}
+
 article.append(meta, bubble);
 
 // 🎀 Emoji reaction picker

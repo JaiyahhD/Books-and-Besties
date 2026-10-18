@@ -386,13 +386,26 @@
         const button = document.createElement("button");
         button.className = "room-button";
 
-        if (room.room_type === "lounge" && room.is_available) {
-        button.textContent = "ENTER MAIN LOUNGE 💬";
+        
+        if (
+        ["lounge", "bulletin_board"].includes(room.room_type) &&
+        room.is_available
+        ) {
+
+        
+        button.textContent = room.room_type === "lounge"
+        ? "ENTER MAIN LOUNGE 💬"
+        : "OPEN BULLETIN BOARD 📌";
+
         button.disabled = false;
 
         button.addEventListener("click", () => {
             window.location.href =
-            `lounge.html?room=${encodeURIComponent(room.id)}`;
+            
+        room.room_type === "lounge"
+        ? `lounge.html?room=${encodeURIComponent(room.id)}`
+        : `bulletin.html?room=${encodeURIComponent(room.id)}`;
+
         });
         } else {
         button.textContent = room.is_available
