@@ -822,6 +822,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/campus-guard.js"></script>
+  <script src="js/commons-posts.js"></script>
 
   <script>
     (() => {
@@ -1044,28 +1045,6 @@
           () => showTab("chat")
         );
 
-        $("#publishPost").addEventListener(
-          "click",
-          () => {
-            const text = $("#postText").value.trim();
-
-            if (!text) return;
-
-            posts.unshift({
-              id:crypto.randomUUID(),
-              text,
-              created:Date.now(),
-              liked:false
-            });
-
-            save(POSTS_KEY, posts);
-
-            $("#postText").value = "";
-
-            renderPosts();
-          }
-        );
-
         function sendMessage() {
           const text = $("#chatText").value.trim();
 
@@ -1102,7 +1081,6 @@
         $("#year").textContent =
           new Date().getFullYear();
 
-        renderPosts();
         renderChat();
       }
 
@@ -1191,7 +1169,12 @@
         }
 
         initializeDemo();
-      }
+
+        await window.BB_COMMONS_POSTS.startBulletin(
+          result.client,
+          result.user
+        );
+              }
 
       initializeCommons().catch(error => {
         console.error(
