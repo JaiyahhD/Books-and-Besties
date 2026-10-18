@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Main Lounge | Bestie University</title>
+  <style>
+    :root {
+      --pink: #e8b4c8;
+      --cream: #fff8f2;
+      --espresso: #563b3b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      color: var(--espresso);
+      background: linear-gradient(135deg, #fff8f2, #f8dce8);
+      min-height: 100vh;
+    }
+    .gate {
+      max-width: 600px;
+      margin: 90px auto;
+      padding: 30px;
+      text-align: center;
+      line-height: 1.8;
+    }
+    .page {
+      max-width: 950px;
+      margin: auto;
+      padding: 30px 20px 60px;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 30px;
+      font: 700 12px Arial, sans-serif;
+    }
+    .top-nav a {
+      color: var(--espresso);
+      text-decoration: none;
+    }
+    .hero {
+      padding: 35px 25px;
+      text-align: center;
+      background: var(--pink);
+      border-radius: 25px 25px 0 0;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 48px);
+      margin: 10px 0;
+    }
+    .hero p { line-height: 1.7; }
+    .chat-shell {
+      background: white;
+      border: 1px solid #eadce0;
+      border-radius: 0 0 25px 25px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px #563b3b15;
+    }
+    .chat-status {
+      padding: 13px 20px;
+      font: 12px Arial, sans-serif;
+      background: #fff7fa;
+      border-bottom: 1px solid #eee;
+    }
+    .messages {
+      height: 430px;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message {
+      max-width: 80%;
+      align-self: flex-start;
+    }
+    .message.mine { align-self: flex-end; }
+    .message-meta {
+      font: 700 11px Arial, sans-serif;
+      margin-bottom: 6px;
+      opacity: .7;
+    }
+    .message-bubble {
+      background: #f6edf0;
+      padding: 13px 17px;
+      border-radius: 17px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .mine .message-bubble { background: #ead0db; }
+    .composer {
+      display: flex;
+      gap: 12px;
+      padding: 18px;
+      border-top: 1px solid #eee;
+    }
+    .composer input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #ddcdd2;
+      border-radius: 12px;
+      padding: 14px;
+      font: 14px Arial, sans-serif;
+    }
+    .composer button {
+      border: 0;
+      border-radius: 12px;
+      background: var(--espresso);
+      color: white;
+      padding: 14px 23px;
+      cursor: pointer;
+      font: 700 12px Arial, sans-serif;
+    }
+    .composer button:disabled { opacity: .5; }
+    @media (max-width: 600px) {
+      .message { max-width: 95%; }
+      .composer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="campusGate" class="gate">
+    <p id="campusGateMessage">Checking your lounge access...</p>
+  </div>
+
+  <main id="campusContent" class="page" hidden>
+    <nav class="top-nav">
+      <a id="backToDorm" href="housing.html">← MY DORM</a>
+      <a href="locker.html">MY BESTIE LOCKER 🎀</a>
+    </nav>
+
+    <header class="hero">
+      <div>BESTIE UNIVERSITY · CAMPUS HOUSING</div>
+      <h1 id="loungeTitle">🛋️ Main Lounge</h1>
+      <p id="loungeSubtitle">Your private team conversation.</p>
+    </header>
+
+    <section class="chat-shell">
+      <div id="chatStatus" class="chat-status">Connecting...</div>
+      <div id="messages" class="messages"
+           role="log" aria-live="polite"></div>
+
+      <form id="composer" class="composer">
+        <input id="messageInput" type="text"
+               maxlength="2000"
+               placeholder="Say something to your besties..."
+               aria-label="Chat message" required>
+        <button id="sendButton" type="submit">SEND 💌</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-guard.js"></script>
+
+  <script>
+    (async function () {
+      const gate = document.getElementById("campusGate");
+      const gateMessage = document.getElementById("campusGateMessage");
+      const content = document.getElementById("campusContent");
+      const status = document.getElementById("chatStatus");
+      const messagesEl = document.getElementById("messages");
+      const form = document.getElementById("composer");
+      const input = document.getElementById("messageInput");
+      const sendButton = document.getElementById("sendButton");
+
+      function deny(message) {
+        content.hidden = true;
+        content.style.display = "none";
+        gate.hidden = false;
+        gate.style.display = "block";
+        gateMessage.textContent = message;
+      }
+
+      const guard = window.BB_CAMPUS_GUARD;
+      if (!guard) {
+        deny("Campus authentication is unavailable.");
+        return;
+      }
+
+      let result;
+      try {
+        result = await guard.protectPage({
+          level: "approved",
+          gateId: "campusGate",
+          contentId: "campusContent",
+          messageId: "campusGateMessage"
+        });
+      } catch (error) {
+        console.error(error);
+        deny("Unable to verify campus membership.");
+        return;
+      }
+
+      if (!result?.user) return;
+
+      content.hidden = true;
+
+      const client = result.client || guard.getClient();
+      const roomId = new URLSearchParams(location.search).get("room");
+
+      if (!roomId) {
+        deny("No lounge selected.");
+        return;
+      }
+
+      // Database policies independently enforce room membership.
+      const { data: room, error: roomError } = await client
+        .from("housing_rooms")
+        .select("id, name, room_type, dorm_id, is_available")
+        .eq("id", roomId)
+        .eq("room_type", "lounge")
+        .eq("is_available", true)
+        .maybeSingle();
+
+      if (roomError || !room) {
+        deny("🔒 This lounge is unavailable or residents-only.");
+        return;
+      }
+
+      const { data: dorm, error: dormError } = await client
+        .from("housing_dorm_settings")
+        .select("id, team_id, primary_color")
+        .eq("id", room.dorm_id)
+        .maybeSingle();
+
+      if (dormError || !dorm) {
+        deny("Unable to load your dorm.");
+        return;
+      }
+
+      const { data: team, error: teamError } = await client
+        .from("crown_teams")
+        .select("id, name, emoji")
+        .eq("id", dorm.team_id)
+        .maybeSingle();
+
+      if (teamError || !team) {
+        deny("Unable to load your team.");
+        return;
+      }
+
+      const { data: enrollment, error: enrollmentError } = await client
+        .from("crown_enrollments")
+        .select("id")
+        .eq("user_id", result.user.id)
+        .eq("team_id", team.id)
+        .eq("status", "approved")
+        .maybeSingle();
+
+      if (enrollmentError || !enrollment) {
+        deny("🔒 This lounge is reserved for assigned residents.");
+        return;
+      }
+
+      document.getElementById("loungeTitle").textContent =
+        `${team.emoji || "🏡"} ${room.name}`;
+      document.getElementById("loungeSubtitle").textContent =
+        `${team.name} · Private team chat`;
+      document.querySelector(".hero").style.background =
+        dorm.primary_color || "#e8b4c8";
+      document.getElementById("backToDorm").href =
+        `dorm.html?team=${encodeURIComponent(team.id)}`;
+
+      gate.hidden = true;
+      gate.style.display = "none";
+      content.hidden = false;
+      content.style.display = "block";
+
+      const names = new Map();
+      let currentMessages = [];
+
+      async function loadMessages() {
+        const { data, error } = await client
+          .from("housing_messages")
+          .select("id, sender_id, content, created_at")
+          .eq("room_id", room.id)
+          .eq("is_removed", false)
+          .order("created_at", { ascending: true })
+          .limit(200);
+
+        if (error) {
+          console.error("Message loading error:", error);
+          status.textContent = "Unable to load messages.";
+          return;
+        }
+
+        currentMessages = data || [];
+
+        const ids = [...new Set(
+          currentMessages.map(m => m.sender_id)
+        )].filter(id => !names.has(id));
+
+        if (ids.length) {
+          const { data: profiles } = await client
+            .from("profiles")
+            .select("id, display_name")
+            .in("id", ids);
+
+          for (const profile of profiles || []) {
+            names.set(profile.id, profile.display_name);
+          }
+        }
+
+        messagesEl.replaceChildren();
+
+        if (!currentMessages.length) {
+          const empty = document.createElement("p");
+          empty.textContent =
+            "It's quiet in here... be the first to say hey! 💗";
+          messagesEl.appendChild(empty);
+        }
+
+        for (const message of currentMessages) {
+          const article = document.createElement("article");
+          article.className = "message";
+          if (message.sender_id === result.user.id) {
+            article.classList.add("mine");
+          }
+
+          const meta = document.createElement("div");
+          meta.className = "message-meta";
+          meta.textContent =
+            `${names.get(message.sender_id) || "Bestie"} · ` +
+            new Date(message.created_at).toLocaleString();
+
+          const bubble = document.createElement("div");
+          bubble.className = "message-bubble";
+          bubble.textContent = message.content;
+
+          article.append(meta, bubble);
+          messagesEl.appendChild(article);
+        }
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+        status.textContent = "💗 Messages saved · Lounge connected";
+      }
+
+      await loadMessages();
+
+      const channel = client
+        .channel(`housing-lounge-${room.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "housing_messages",
+            filter: `room_id=eq.${room.id}`
+          },
+          () => loadMessages()
+        )
+        .subscribe(subscriptionStatus => {
+          if (subscriptionStatus === "CHANNEL_ERROR") {
+            status.textContent =
+              "Live updates disconnected. Refresh to reconnect.";
+          }
+        });
+
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const message = input.value.trim();
+        if (!message) return;
+
+        sendButton.disabled = true;
+
+        const { error } = await client
+          .from("housing_messages")
+          .insert({
+            room_id: room.id,
+            sender_id: result.user.id,
+            content: message
+          });
+
+        sendButton.disabled = false;
+
+        if (error) {
+          console.error("Message sending error:", error);
+          status.textContent =
+            "Message couldn't be sent. Please try again.";
+          return;
+        }
+
+        input.value = "";
+        await loadMessages();
+        input.focus();
+      });
+
+      window.addEventListener("pagehide", () => {
+        client.removeChannel(channel);
+      });
+    })().catch(error => {
+      console.error("Lounge initialization error:", error);
+      document.getElementById("campusGateMessage").textContent =
+        "Something went wrong loading your lounge.";
+      document.getElementById("campusGate").style.display = "block";
+    });
+  </script>
+</body>
+</html>

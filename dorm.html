@@ -382,12 +382,25 @@
         const description = document.createElement("p");
         description.textContent = room.description || "";
 
+        
         const button = document.createElement("button");
         button.className = "room-button";
+
+        if (room.room_type === "lounge" && room.is_available) {
+        button.textContent = "ENTER MAIN LOUNGE 💬";
+        button.disabled = false;
+
+        button.addEventListener("click", () => {
+            window.location.href =
+            `lounge.html?room=${encodeURIComponent(room.id)}`;
+        });
+        } else {
         button.textContent = room.is_available
-          ? "COMING SOON ✨"
-          : "ROOM UNAVAILABLE 🔒";
+            ? "COMING SOON ✨"
+            : "ROOM UNAVAILABLE 🔒";
         button.disabled = true;
+        }
+
 
         card.append(icon, heading, description, button);
         grid.appendChild(card);
