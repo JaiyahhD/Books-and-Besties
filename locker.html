@@ -1,252 +1,703 @@
 
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ee70a8">
+
   <title>Bestie Locker | Bestie University</title>
+
+  <link rel="icon" href="assets/logo.png">
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
 
     :root {
-      --pink:#ee70a8;
-      --hot:#d84088;
-      --teal:#286e70;
-      --ink:#402c3b;
-      --cream:#fff9f7;
+      --pink: #ee70a8;
+      --hot: #d84088;
+      --teal: #286e70;
+      --ink: #402c3b;
+      --cream: #fff9f7;
     }
 
-    * { box-sizing:border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    [hidden] { display:none !important; }
+    [hidden] {
+      display: none !important;
+    }
 
     body {
-      margin:0;
-      font-family:Nunito,sans-serif;
-      color:var(--ink);
+      margin: 0;
+      font-family: Nunito, sans-serif;
+      color: var(--ink);
       background:
-        radial-gradient(circle at 12% 10%,#ffd7e9,transparent 35%),
-        radial-gradient(circle at 90% 80%,#d4ece8,transparent 35%),
+        radial-gradient(circle at 12% 10%, #ffd7e9, transparent 35%),
+        radial-gradient(circle at 90% 80%, #d4ece8, transparent 35%),
         #fff5fa;
     }
 
-    a { text-decoration:none; color:inherit; }
-    button { font:inherit; cursor:pointer; }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
 
     .top {
-      background:#302c35;
-      color:white;
-      padding:15px 6%;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:15px;
-      border-bottom:6px solid var(--pink);
+      background: #302c35;
+      color: white;
+      padding: 15px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      border-bottom: 6px solid var(--pink);
     }
 
     .brand {
-      font-weight:900;
-      font-size:20px;
+      font-weight: 900;
+      font-size: 20px;
     }
 
-    .top a, .top button {
-      color:white;
-      font-weight:900;
+    .top a,
+    .top button {
+      color: white;
+      font-weight: 900;
     }
 
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .top-link,
     .signout {
-      border:2px solid #ffffff66;
-      background:transparent;
-      padding:9px 16px;
-      border-radius:25px;
+      border: 2px solid #ffffff66;
+      background: transparent;
+      padding: 9px 16px;
+      border-radius: 25px;
     }
 
     .hero {
-      text-align:center;
-      padding:65px 20px;
-      background:linear-gradient(135deg,#ffd1e4,#f1a3c8,#b5dbd6);
-      border-bottom:7px solid #473845;
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(
+        135deg,
+        #ffd1e4,
+        #f1a3c8,
+        #b5dbd6
+      );
+      border-bottom: 7px solid #473845;
     }
 
     .kicker {
-      display:inline-block;
-      background:#ffffffbb;
-      border-radius:30px;
-      padding:9px 18px;
-      font-weight:900;
+      display: inline-block;
+      background: #ffffffbb;
+      border-radius: 30px;
+      padding: 9px 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-size: 12px;
     }
 
     h1 {
-      font:clamp(32px,6vw,65px) Bungee,sans-serif;
-      color:#f34b99;
-      -webkit-text-stroke:1px white;
-      text-shadow:4px 5px 0 #70485d;
-      margin:20px 0 8px;
+      font: clamp(32px, 6vw, 65px) Bungee, sans-serif;
+      color: #f34b99;
+      -webkit-text-stroke: 1px white;
+      text-shadow: 4px 5px 0 #70485d;
+      margin: 20px 0 8px;
     }
 
     .script {
-      font:25px Pacifico,cursive;
-      color:#70485d;
+      font: 25px Pacifico, cursive;
+      color: #70485d;
     }
 
     .wrap {
-      max-width:1150px;
-      margin:auto;
-      padding:35px 20px 70px;
+      max-width: 1150px;
+      margin: auto;
+      padding: 35px 20px 70px;
     }
 
-    .panel {
-      background:white;
-      border:3px solid #e8abc8;
-      border-radius:23px;
-      box-shadow:6px 7px 0 #e9bfd2;
-      padding:25px;
-      margin-bottom:25px;
+    .section-title {
+      font: 22px Bungee, sans-serif;
+      color: var(--teal);
+      margin: 35px 0 20px;
     }
 
-    .panel h2 {
-      color:var(--teal);
-      font:22px Bungee,sans-serif;
-      margin-top:0;
+    /* =====================================
+       CAMPUS STUDENT ID
+    ===================================== */
+
+    .id-shell {
+      max-width: 970px;
+      margin: 0 auto 35px;
     }
 
-    .status {
-      display:inline-block;
-      background:#dff3e8;
-      color:#286a55;
-      padding:9px 16px;
-      border-radius:25px;
-      font-weight:900;
+    .id-label {
+      text-align: center;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #965071;
+      font-size: 12px;
+      margin-bottom: 15px;
     }
+
+    .student-id {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          #ffffff90,
+          transparent 35%
+        ),
+        linear-gradient(
+          135deg,
+          #ffe6f0 0%,
+          #ffd0e3 45%,
+          #d1eeea 100%
+        );
+      border: 4px solid #6a455d;
+      border-radius: 30px;
+      box-shadow:
+        9px 11px 0 #e4a7c4,
+        0 20px 35px #75425d22;
+    }
+
+    .id-header {
+      background: #40303d;
+      color: white;
+      padding: 18px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .id-school {
+      font: clamp(14px, 2.5vw, 21px) Bungee, sans-serif;
+    }
+
+    .id-campus {
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 900;
+      color: #ffbad7;
+    }
+
+    .id-body {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 30px;
+      padding: 30px;
+      align-items: start;
+    }
+
+    .id-portrait-area {
+      text-align: center;
+    }
+
+    .id-portrait {
+      width: 190px;
+      height: 210px;
+      max-width: 100%;
+      margin: auto;
+      border: 7px solid white;
+      outline: 3px solid #c75c94;
+      border-radius: 17px;
+      background: #ffe3ee;
+      box-shadow: 5px 6px 0 #a65a7c55;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .id-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .portrait-placeholder {
+      font-size: 70px;
+    }
+
+    .portrait-caption {
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-top: 18px;
+      color: #925174;
+    }
+
+    .id-details {
+      min-width: 0;
+    }
+
+    .id-name {
+      font: clamp(22px, 4vw, 35px) Bungee, sans-serif;
+      color: #b63e7c;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+
+    .id-subtitle {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--teal);
+      margin: 7px 0 18px;
+    }
+
+    .id-status {
+      display: inline-block;
+      background: #e0f4e9;
+      color: #286a55;
+      border: 2px solid #86c6a7;
+      border-radius: 30px;
+      padding: 8px 15px;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+
+    .id-field {
+      margin-bottom: 15px;
+    }
+
+    .id-field-label {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #9b527a;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .id-field-value {
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .genre-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .genre-tag {
+      display: inline-block;
+      background: #ffffffc9;
+      border: 1px solid #d68eb1;
+      border-radius: 20px;
+      padding: 6px 11px;
+      color: #8c416a;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .id-footer {
+      background: #286e70;
+      color: white;
+      padding: 14px 25px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .edit-profile {
+      display: block;
+      width: fit-content;
+      margin: 28px auto 0;
+      padding: 15px 28px;
+      background: linear-gradient(
+        135deg,
+        #e94b96,
+        #a84b83
+      );
+      color: white;
+      border-radius: 30px;
+      font-weight: 900;
+      box-shadow: 4px 5px 0 #e6b3ce;
+      text-align: center;
+    }
+
+    .locker-note {
+      background: #fff0f7;
+      border: 2px solid #e8b4cc;
+      padding: 18px;
+      border-radius: 15px;
+      font-weight: 800;
+      line-height: 1.7;
+      margin-top: 30px;
+    }
+
+    /* =====================================
+       CAMPUS NAVIGATION
+    ===================================== */
 
     .grid {
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
     }
 
     .card {
-      display:block;
-      background:white;
-      border:3px solid #e8abc8;
-      border-radius:22px;
-      padding:27px 20px;
-      box-shadow:5px 6px 0 #e9bfd2;
-      transition:transform .2s;
+      display: block;
+      background: white;
+      border: 3px solid #e8abc8;
+      border-radius: 22px;
+      padding: 27px 20px;
+      box-shadow: 5px 6px 0 #e9bfd2;
+      transition: transform .2s;
     }
 
-    .card:hover { transform:translateY(-4px); }
+    .card:hover {
+      transform: translateY(-4px);
+    }
 
-    .emoji { font-size:35px; }
+    .card:focus-visible,
+    .edit-profile:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 5px;
+    }
+
+    .emoji {
+      font-size: 35px;
+    }
 
     .card h3 {
-      color:var(--teal);
-      margin-bottom:9px;
+      color: var(--teal);
+      margin-bottom: 9px;
     }
 
-    .card p { line-height:1.6; }
-
-    .note {
-      background:#fff0f7;
-      padding:18px;
-      border-radius:15px;
-      font-weight:800;
-      margin-top:25px;
+    .card p {
+      line-height: 1.6;
     }
 
     .gate {
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .gate .panel {
-      max-width:520px;
-      width:100%;
-      text-align:center;
+    .gate-panel {
+      background: white;
+      border: 3px solid #e8abc8;
+      border-radius: 23px;
+      box-shadow: 6px 7px 0 #e9bfd2;
+      padding: 30px;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
     }
 
-    .btn {
-      display:inline-block;
-      border:0;
-      background:var(--teal);
-      color:white;
-      border-radius:25px;
-      padding:12px 20px;
-      font-weight:900;
-      margin-top:15px;
+    .gate-panel h2 {
+      color: var(--teal);
+      font: 22px Bungee, sans-serif;
+    }
+
+    .gate-button {
+      display: inline-block;
+      border: 0;
+      background: var(--teal);
+      color: white;
+      border-radius: 25px;
+      padding: 12px 20px;
+      font-weight: 900;
+      margin-top: 15px;
     }
 
     footer {
-      text-align:center;
-      padding:25px;
-      background:#302c35;
-      color:white;
-      font-weight:900;
+      text-align: center;
+      padding: 25px;
+      background: #302c35;
+      color: white;
+      font-weight: 900;
     }
 
-    @media(max-width:800px) {
-      .grid { grid-template-columns:repeat(2,1fr); }
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .id-body {
+        grid-template-columns: 190px 1fr;
+        gap: 22px;
+      }
+
+      .id-portrait {
+        width: 165px;
+        height: 185px;
+      }
     }
 
-    @media(max-width:560px) {
-      .grid { grid-template-columns:1fr; }
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .id-body {
+        grid-template-columns: 1fr;
+        padding: 23px;
+      }
+
+      .id-header {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .id-portrait {
+        width: 175px;
+        height: 190px;
+      }
+
+      .id-details {
+        text-align: center;
+      }
+
+      .genre-tags {
+        justify-content: center;
+      }
+
+      .id-footer {
+        justify-content: center;
+        text-align: center;
+      }
+
+      .top {
+        justify-content: center;
+      }
     }
   </style>
 </head>
 
 <body>
 
+  <!-- MEMBERSHIP GATE -->
+
   <div id="lockerGate" class="gate">
-    <div class="panel">
+    <div class="gate-panel">
       <h2>🎀 BESTIE LOCKER</h2>
+
       <p id="gateMessage" role="status">
         Checking your campus membership...
       </p>
-      <a class="btn" href="login.html">Campus Login</a>
+
+      <a class="gate-button" href="login.html">
+        Campus Login
+      </a>
     </div>
   </div>
+
+  <!-- APPROVED MEMBER CONTENT -->
 
   <div id="lockerContent" hidden>
 
     <header class="top">
+
       <a class="brand" href="index.html#home">
         🎓 BESTIE UNIVERSITY
       </a>
 
-      <button class="signout" id="signOut">
-        Sign Out ♡
-      </button>
+      <div class="top-actions">
+
+        <a class="top-link" href="profile.html">
+          🎀 My Profile
+        </a>
+
+        <button class="signout" id="signOut">
+          Sign Out ♡
+        </button>
+
+      </div>
+
     </header>
 
     <section class="hero">
-      <span class="kicker">✦ YOUR CAMPUS, YOUR CORNER ✦</span>
+
+      <span class="kicker">
+        ✦ YOUR CAMPUS, YOUR CORNER ✦
+      </span>
+
       <h1>BESTIE LOCKER</h1>
+
       <div class="script" id="welcomeName">
         Heyyy, Bestie! ♡
       </div>
+
     </section>
 
     <main class="wrap">
 
-      <section class="panel">
-        <h2>🎀 YOUR CAMPUS ID</h2>
-        <p id="memberName"></p>
-        <span class="status">
-          ✓ APPROVED BESTIE
-        </span>
-        <p>
-          Welcome to the campus, gorgeous!
-          Your Books & Besties membership is active.
-        </p>
+      <!-- STUDENT ID CARD -->
+
+      <section class="id-shell">
+
+        <div class="id-label">
+          ✦ OFFICIAL CAMPUS IDENTIFICATION ✦
+        </div>
+
+        <div class="student-id">
+
+          <div class="id-header">
+
+            <div class="id-school">
+              🎓 BESTIE UNIVERSITY
+            </div>
+
+            <div class="id-campus">
+              BOOKS &amp; BESTIES
+            </div>
+
+          </div>
+
+          <div class="id-body">
+
+            <div class="id-portrait-area">
+
+              <div class="id-portrait">
+
+                <img
+                  id="studentPortrait"
+                  alt="Bestie campus portrait"
+                  hidden
+                >
+
+                <span
+                  id="portraitPlaceholder"
+                  class="portrait-placeholder"
+                >
+                  🎀
+                </span>
+
+              </div>
+
+              <div class="portrait-caption">
+                CAMPUS PORTRAIT ♡
+              </div>
+
+            </div>
+
+            <div class="id-details">
+
+              <div class="id-name" id="studentName">
+                BESTIE
+              </div>
+
+              <div class="id-subtitle">
+                OFFICIAL BOOKISH BESTIE
+              </div>
+
+              <div class="id-status">
+                ✓ APPROVED MEMBER
+              </div>
+
+              <div class="id-field">
+
+                <div class="id-field-label">
+                  Reading Personality
+                </div>
+
+                <div
+                  class="id-field-value"
+                  id="studentPersonality"
+                >
+                  Not selected yet ♡
+                </div>
+
+              </div>
+
+              <div class="id-field">
+
+                <div class="id-field-label">
+                  All-Time Favorite Book
+                </div>
+
+                <div
+                  class="id-field-value"
+                  id="studentFavoriteBook"
+                >
+                  Still deciding...
+                </div>
+
+              </div>
+
+              <div class="id-field">
+
+                <div class="id-field-label">
+                  About This Bestie
+                </div>
+
+                <div
+                  class="id-field-value"
+                  id="studentBio"
+                >
+                  A bookish icon in the making!
+                </div>
+
+              </div>
+
+              <div class="id-field">
+
+                <div class="id-field-label">
+                  Favorite Genres
+                </div>
+
+                <div
+                  class="genre-tags"
+                  id="studentGenres"
+                ></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="id-footer">
+
+            <span>💗 READ • CONNECT • BELONG</span>
+
+            <span>VALID WHILE MEMBERSHIP IS ACTIVE</span>
+
+          </div>
+
+        </div>
+
+        <a class="edit-profile" href="profile.html">
+          🎀 EDIT MY PROFILE ♡
+        </a>
+
       </section>
 
-      <h2>💗 EXPLORE YOUR CAMPUS</h2>
+      <!-- CAMPUS NAVIGATION -->
+
+      <h2 class="section-title">
+        💗 EXPLORE YOUR CAMPUS
+      </h2>
 
       <div class="grid">
 
@@ -254,7 +705,7 @@
           <div class="emoji">👑</div>
           <h3>Crown Commons</h3>
           <p>
-            Chat, connect, share posts,
+            Connect with Besties, share posts,
             and catch campus announcements.
           </p>
         </a>
@@ -264,7 +715,7 @@
           <h3>Campus Activities</h3>
           <p>
             Bingo, Side Quests, Alphabet Rush,
-            and other Bestie adventures.
+            and more bookish adventures.
           </p>
         </a>
 
@@ -272,7 +723,7 @@
           <div class="emoji">📚</div>
           <h3>Campus Library</h3>
           <p>
-            Book picks, reading discussions,
+            Monthly book picks, discussions,
             and community voting.
           </p>
         </a>
@@ -290,7 +741,7 @@
           <div class="emoji">💎</div>
           <h3>Honors Society</h3>
           <p>
-            Exclusive VIP experiences
+            Exclusive experiences and perks
             for invited Besties.
           </p>
         </a>
@@ -306,10 +757,12 @@
 
       </div>
 
-      <div class="note">
-        🎀 Being an approved Bestie gives you general campus
-        membership. Monthly Crown enrollment and Honors
-        Society invitations are separate.
+      <div class="locker-note">
+        🎀 Your Bestie University membership gives you
+        access to general campus spaces. Monthly Crown
+        participation and Honors Society invitations
+        are separate. Some campus experiences are still
+        under construction.
       </div>
 
     </main>
@@ -349,8 +802,10 @@
       );
 
       try {
-        const { data: { user }, error: authError } =
-          await client.auth.getUser();
+        const {
+          data: { user },
+          error: authError
+        } = await client.auth.getUser();
 
         if (authError || !user) {
           message.textContent =
@@ -358,38 +813,148 @@
           return;
         }
 
-        const { data: profile, error: profileError } =
-          await client
-            .from("profiles")
-            .select("display_name, membership_status")
-            .eq("id", user.id)
-            .maybeSingle();
+        const {
+          data: profile,
+          error: profileError
+        } = await client
+          .from("profiles")
+          .select(
+            "display_name, membership_status, bio, " +
+            "favorite_book, favorite_genres, " +
+            "reading_personality, avatar_path"
+          )
+          .eq("id", user.id)
+          .maybeSingle();
 
         if (profileError) throw profileError;
 
-        if (!profile || profile.membership_status !== "approved") {
+        if (
+          !profile ||
+          profile.membership_status !== "approved"
+        ) {
           message.textContent =
-            "Your campus membership must be approved before you can enter.";
+            "Your campus membership must be approved " +
+            "before you can enter.";
           return;
         }
+
+        // MEMBER NAME
 
         const name = profile.display_name || "Bestie";
 
         document.getElementById("welcomeName").textContent =
           `Heyyy, ${name}! ♡`;
 
-        document.getElementById("memberName").textContent =
-          `Campus Member: ${name}`;
+        document.getElementById("studentName").textContent =
+          name;
+
+        // READING PERSONALITY
+
+        document.getElementById(
+          "studentPersonality"
+        ).textContent =
+          profile.reading_personality ||
+          "Not selected yet ♡";
+
+        // FAVORITE BOOK
+
+        document.getElementById(
+          "studentFavoriteBook"
+        ).textContent =
+          profile.favorite_book ||
+          "Still deciding...";
+
+        // BIO
+
+        document.getElementById(
+          "studentBio"
+        ).textContent =
+          profile.bio ||
+          "A bookish icon in the making!";
+
+        // FAVORITE GENRES
+
+        const genresContainer =
+          document.getElementById("studentGenres");
+
+        const genres = Array.isArray(
+          profile.favorite_genres
+        ) ? profile.favorite_genres : [];
+
+        if (genres.length === 0) {
+          const tag = document.createElement("span");
+          tag.className = "genre-tag";
+          tag.textContent = "Genre explorer ♡";
+          genresContainer.appendChild(tag);
+        } else {
+          genres.forEach(genre => {
+            const tag = document.createElement("span");
+            tag.className = "genre-tag";
+            tag.textContent = genre;
+            genresContainer.appendChild(tag);
+          });
+        }
+
+        // PROFILE PICTURE
+
+        if (profile.avatar_path) {
+          const expectedPrefix = user.id + "/";
+
+          if (
+            profile.avatar_path.startsWith(
+              expectedPrefix
+            )
+          ) {
+            const { data: avatarData } =
+              client.storage
+                .from("bestie-avatars")
+                .getPublicUrl(profile.avatar_path);
+
+            if (avatarData?.publicUrl) {
+              const portrait =
+                document.getElementById(
+                  "studentPortrait"
+                );
+
+              portrait.src = avatarData.publicUrl;
+              portrait.hidden = false;
+
+              document.getElementById(
+                "portraitPlaceholder"
+              ).hidden = true;
+
+              portrait.addEventListener(
+                "error",
+                () => {
+                  portrait.hidden = true;
+
+                  document.getElementById(
+                    "portraitPlaceholder"
+                  ).hidden = false;
+                },
+                { once: true }
+              );
+            }
+          }
+        }
+
+        // SHOW APPROVED LOCKER
 
         gate.hidden = true;
         content.hidden = false;
 
+        // SIGN OUT
+
         document.getElementById("signOut")
           .addEventListener("click", async () => {
-            const { error } = await client.auth.signOut();
+            const { error } =
+              await client.auth.signOut();
 
             if (error) {
-              alert("Unable to sign out: " + error.message);
+              alert(
+                "Unable to sign out: " +
+                error.message
+              );
               return;
             }
 
@@ -398,8 +963,10 @@
 
       } catch (error) {
         console.error("Bestie Locker:", error);
+
         message.textContent =
-          "Unable to load your Locker. Please try again.";
+          "Unable to load your Locker. " +
+          "Please try again.";
       }
     })();
   </script>
