@@ -110,6 +110,7 @@
     .section-heading p {
       font-size: 14px;
       opacity: .75;
+      line-height: 1.6;
     }
 
     .rooms {
@@ -160,6 +161,119 @@
       cursor: not-allowed;
     }
 
+    /* ==========================================
+       MEET YOUR ROOMIES
+       ========================================== */
+
+    .roster-shell {
+      background: #ffffffd9;
+      border: 1px solid #e9ddd7;
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 12px 35px #563b3b12;
+    }
+
+    .roster-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .roster-label {
+      font: 700 11px Arial, sans-serif;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .roster-count {
+      background: var(--pink);
+      color: var(--espresso);
+      border-radius: 40px;
+      padding: 10px 16px;
+      font: 700 12px Arial, sans-serif;
+    }
+
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .roomie-card {
+      background: var(--cream);
+      border: 1px solid #eadce0;
+      border-radius: 19px;
+      padding: 23px 15px;
+      text-align: center;
+      min-width: 0;
+      transition: transform .2s;
+    }
+
+    .roomie-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .roomie-avatar {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: var(--pink);
+      border: 3px solid white;
+      box-shadow: 0 4px 15px #563b3b16;
+      margin: 0 auto 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .roomie-name {
+      font-size: 18px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+      margin-bottom: 9px;
+    }
+
+    .roomie-tag {
+      display: inline-block;
+      background: #f3e6eb;
+      border-radius: 20px;
+      padding: 7px 12px;
+      font: 700 10px Arial, sans-serif;
+      letter-spacing: .5px;
+    }
+
+    .roomie-you {
+      border: 2px solid var(--accent);
+    }
+
+    .roomie-you .roomie-tag {
+      background: var(--accent);
+      color: white;
+    }
+
+    .roster-message {
+      grid-column: 1 / -1;
+      padding: 30px 15px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--espresso);
+    }
+
+    .roster-footnote {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 12px;
+      opacity: .75;
+      line-height: 1.7;
+    }
+
     .notice {
       margin-top: 35px;
       background: #ffffffbb;
@@ -172,9 +286,35 @@
     }
 
     @media (max-width: 800px) {
-      .rooms { grid-template-columns: 1fr; }
-      .room-card p { min-height: auto; }
-      .hero { padding: 40px 20px; }
+      .rooms {
+        grid-template-columns: 1fr;
+      }
+
+      .room-card p {
+        min-height: auto;
+      }
+
+      .hero {
+        padding: 40px 20px;
+      }
+
+      .roster-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .roster-shell {
+        padding: 20px 15px;
+      }
+
+      .roster-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -195,12 +335,18 @@
     </nav>
 
     <header class="hero" id="dormHero">
-      <div class="eyebrow">BESTIE UNIVERSITY · RESIDENTIAL LIFE</div>
+      <div class="eyebrow">
+        BESTIE UNIVERSITY · RESIDENTIAL LIFE
+      </div>
+
       <div class="hero-emoji" id="dormEmoji">🏡</div>
+
       <h1 id="dormName">Your Campus Dorm</h1>
+
       <p class="hero-description" id="dormDescription">
         Loading your team home...
       </p>
+
       <div class="season-label" id="seasonLabel">
         NOVEMBER 2026
       </div>
@@ -208,12 +354,56 @@
 
     <section class="section-heading">
       <h2>Explore Your Dorm ✨</h2>
-      <p>Your shared spaces for reading, chatting, and connecting.</p>
+      <p>
+        Your shared spaces for reading, chatting,
+        and connecting.
+      </p>
     </section>
 
     <div class="rooms" id="roomGrid">
       <p>Loading dorm rooms...</p>
     </div>
+
+    <!-- =====================================
+         MEET YOUR ROOMIES
+         ===================================== -->
+
+    <section id="roomiesSection">
+
+      <div class="section-heading">
+        <h2>Meet Your Roomies 💌</h2>
+        <p>
+          The Besties making this dorm feel like home.
+          Same team, same crown, endless memories!
+        </p>
+      </div>
+
+      <div class="roster-shell">
+
+        <div class="roster-topline">
+          <div class="roster-label">
+            ✨ YOUR OFFICIAL DORM ROSTER
+          </div>
+
+          <div class="roster-count" id="rosterCount">
+            Loading residents...
+          </div>
+        </div>
+
+        <div class="roster-grid" id="rosterGrid">
+          <div class="roster-message">
+            Gathering your roomies... 💗
+          </div>
+        </div>
+
+        <p class="roster-footnote">
+          💗 Only approved residents assigned to this team
+          for this Monthly Crown season appear here.
+        </p>
+
+      </div>
+
+    </section>
 
     <div class="notice">
       💗 Your dorm belongs to your Monthly Crown team.
@@ -229,6 +419,7 @@
 
   <script>
     (async function () {
+
       const gate = document.getElementById("campusGate");
       const gateMessage =
         document.getElementById("campusGateMessage");
@@ -237,6 +428,7 @@
 
       function deny(message) {
         content.hidden = true;
+        content.style.display = "none";
         gate.hidden = false;
         gate.style.display = "block";
         gateMessage.textContent = message;
@@ -271,6 +463,7 @@
       content.hidden = true;
 
       const client = result.client || guard.getClient();
+
       const teamId =
         new URLSearchParams(location.search).get("team");
 
@@ -330,11 +523,13 @@
         return;
       }
 
-      // Database RLS independently checks membership.
+      // Database RLS independently checks room access.
       const { data: rooms, error: roomsError } =
         await client
           .from("housing_rooms")
-          .select("id, name, room_type, description, is_available")
+          .select(
+            "id, name, room_type, description, is_available"
+          )
           .eq("dorm_id", dorm.id)
           .order("display_order");
 
@@ -343,6 +538,10 @@
         deny("Unable to load your dorm rooms.");
         return;
       }
+
+      // ==========================================
+      // EXISTING DORM DETAILS
+      // ==========================================
 
       document.getElementById("dormName").textContent =
         team.name;
@@ -359,6 +558,15 @@
       document.getElementById("dormHero").style.background =
         dorm.primary_color || "#e8b4c8";
 
+      document.documentElement.style.setProperty(
+        "--pink",
+        dorm.primary_color || "#e8b4c8"
+      );
+
+      // ==========================================
+      // EXISTING THREE DORM ROOMS
+      // ==========================================
+
       const grid = document.getElementById("roomGrid");
       grid.replaceChildren();
 
@@ -369,80 +577,227 @@
       };
 
       for (const room of rooms || []) {
+
         const card = document.createElement("article");
         card.className = "room-card";
 
         const icon = document.createElement("div");
         icon.className = "room-icon";
-        icon.textContent = icons[room.room_type] || "🏡";
+        icon.textContent =
+          icons[room.room_type] || "🏡";
 
         const heading = document.createElement("h3");
         heading.textContent = room.name;
 
         const description = document.createElement("p");
-        description.textContent = room.description || "";
+        description.textContent =
+          room.description || "";
 
-        
         const button = document.createElement("button");
         button.className = "room-button";
 
-        
         if (
-        
-        ["lounge", "bulletin_board", "reading_nook"].includes(room.room_type)
-        &&
-        room.is_available
+          [
+            "lounge",
+            "bulletin_board",
+            "reading_nook"
+          ].includes(room.room_type)
+          && room.is_available
         ) {
 
-        
-        
-        button.textContent =
-        room.room_type === "lounge"
-            ? "ENTER MAIN LOUNGE 💬"
-            : room.room_type === "reading_nook"
-            ? "ENTER READING NOOK 📚"
-            : "OPEN BULLETIN BOARD 📌";
+          button.textContent =
+            room.room_type === "lounge"
+              ? "ENTER MAIN LOUNGE 💬"
+              : room.room_type === "reading_nook"
+              ? "ENTER READING NOOK 📚"
+              : "OPEN BULLETIN BOARD 📌";
 
+          button.disabled = false;
 
-        button.disabled = false;
-
-        button.addEventListener("click", () => {
+          button.addEventListener("click", () => {
             window.location.href =
-            
-        
-        room.room_type === "lounge"
-        ? `lounge.html?room=${encodeURIComponent(room.id)}`
-        : room.room_type === "reading_nook"
-            ? `nook.html?room=${encodeURIComponent(room.id)}`
-            : `bulletin.html?room=${encodeURIComponent(room.id)}`;
+              room.room_type === "lounge"
+                ? `lounge.html?room=${encodeURIComponent(room.id)}`
+                : room.room_type === "reading_nook"
+                ? `nook.html?room=${encodeURIComponent(room.id)}`
+                : `bulletin.html?room=${encodeURIComponent(room.id)}`;
+          });
 
-
-        });
         } else {
-        button.textContent = room.is_available
+          button.textContent = room.is_available
             ? "COMING SOON ✨"
             : "ROOM UNAVAILABLE 🔒";
-        button.disabled = true;
+
+          button.disabled = true;
         }
 
+        card.append(
+          icon,
+          heading,
+          description,
+          button
+        );
 
-        card.append(icon, heading, description, button);
         grid.appendChild(card);
       }
 
       if (!rooms?.length) {
-        grid.textContent = "No shared rooms are available yet.";
+        grid.textContent =
+          "No shared rooms are available yet.";
       }
 
+      // ==========================================
+      // MEET YOUR ROOMIES
+      // ==========================================
+      // Reuses the existing secure Monthly Crown
+      // member leaderboard RPC.
+      //
+      // Only approved enrollments are returned
+      // by that function.
+      //
+      // We filter to the current dorm's team.
+      // ==========================================
+
+      async function loadRoomies() {
+
+        const rosterGrid =
+          document.getElementById("rosterGrid");
+
+        const rosterCount =
+          document.getElementById("rosterCount");
+
+        function showRosterMessage(message) {
+          const empty = document.createElement("div");
+          empty.className = "roster-message";
+          empty.textContent = message;
+
+          rosterGrid.replaceChildren(empty);
+        }
+
+        const { data: members, error: rosterError } =
+          await client.rpc(
+            "get_crown_member_leaderboard",
+            {
+              p_season_id: team.season_id
+            }
+          );
+
+        if (rosterError) {
+          console.error(
+            "Dorm roster error:",
+            rosterError
+          );
+
+          rosterCount.textContent = "Unavailable";
+
+          showRosterMessage(
+            "We couldn't load your roomies right now. 💗"
+          );
+
+          return;
+        }
+
+        const roomies = (members || [])
+          .filter(member => member.team_id === team.id)
+          .sort((a, b) => {
+            return (a.display_name || "")
+              .localeCompare(b.display_name || "");
+          });
+
+        rosterCount.textContent =
+          `${roomies.length} ` +
+          (roomies.length === 1
+            ? "RESIDENT"
+            : "RESIDENTS");
+
+        rosterGrid.replaceChildren();
+
+        if (!roomies.length) {
+          showRosterMessage(
+            "No approved residents have been listed yet. 💌"
+          );
+          return;
+        }
+
+        roomies.forEach(member => {
+
+          const isMe =
+            member.user_id === result.user.id;
+
+          const card =
+            document.createElement("article");
+
+          card.className =
+            "roomie-card" +
+            (isMe ? " roomie-you" : "");
+
+          const avatar =
+            document.createElement("div");
+
+          avatar.className = "roomie-avatar";
+
+          const name =
+            member.display_name || "Bestie";
+
+          avatar.textContent =
+            name.trim().charAt(0).toUpperCase() || "💗";
+
+          const nameElement =
+            document.createElement("div");
+
+          nameElement.className = "roomie-name";
+          nameElement.textContent = name;
+
+          const tag =
+            document.createElement("div");
+
+          tag.className = "roomie-tag";
+
+          tag.textContent = isMe
+            ? "💗 THAT'S YOU!"
+            : "🎀 OFFICIAL ROOMIE";
+
+          card.append(
+            avatar,
+            nameElement,
+            tag
+          );
+
+          rosterGrid.appendChild(card);
+        });
+      }
+
+      // Show the verified dorm immediately.
       gate.hidden = true;
       gate.style.display = "none";
+
       content.hidden = false;
       content.style.display = "block";
+
+      // Load the roster without blocking
+      // the existing room navigation.
+      await loadRoomies();
+
     })().catch(error => {
-      console.error("Dorm initialization error:", error);
-      document.getElementById("campusGateMessage").textContent =
+      console.error(
+        "Dorm initialization error:",
+        error
+      );
+
+      const content =
+        document.getElementById("campusContent");
+
+      content.hidden = true;
+      content.style.display = "none";
+
+      document.getElementById(
+        "campusGateMessage"
+      ).textContent =
         "Something went wrong loading your dorm.";
-      document.getElementById("campusGate").style.display = "block";
+
+      document.getElementById(
+        "campusGate"
+      ).style.display = "block";
     });
   </script>
 
