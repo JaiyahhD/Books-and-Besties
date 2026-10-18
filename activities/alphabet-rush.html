@@ -7,10 +7,11 @@
 <meta name="theme-color" content="#6b4439">
 <title>Espresso Your ABCs | Bestie University</title>
 <link rel="icon" href="../assets/logo.png">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
 
-:root{
+:root {
   --espresso:#4c302d;
   --mocha:#785047;
   --caramel:#c18a67;
@@ -20,8 +21,11 @@
   --teal:#367c78;
   --ink:#3d2b2a;
 }
-*{box-sizing:border-box}
-body{
+
+* {box-sizing:border-box}
+[hidden] {display:none!important}
+
+body {
   margin:0;
   font-family:Nunito,sans-serif;
   color:var(--ink);
@@ -30,10 +34,12 @@ body{
     radial-gradient(circle at 90% 75%,#e9d1b7,transparent 35%),
     #fff8f1;
 }
-a{text-decoration:none;color:inherit}
-button,input{font:inherit}
-button{cursor:pointer}
-.top{
+
+a {text-decoration:none;color:inherit}
+button,input {font:inherit}
+button {cursor:pointer}
+
+.top {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -44,23 +50,40 @@ button{cursor:pointer}
   color:white;
   padding:14px max(20px,calc((100% - 1250px)/2));
 }
-.brand{
+
+.brand {
   display:flex;
   align-items:center;
   gap:12px;
   font-weight:900;
   font-size:19px;
 }
-.brand img{width:52px;height:52px;object-fit:contain}
-nav{display:flex;gap:9px;flex-wrap:wrap}
-nav a{
+
+.brand img {
+  width:52px;
+  height:52px;
+  object-fit:contain;
+}
+
+nav {
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+}
+
+nav a {
   background:#ffffff19;
   padding:10px 14px;
   border-radius:25px;
   font-weight:900;
 }
-nav a.active{background:var(--pink);color:#30232a}
-.hero{
+
+nav a.active {
+  background:var(--pink);
+  color:#30232a;
+}
+
+.hero {
   text-align:center;
   padding:60px 20px 70px;
   background:
@@ -72,7 +95,8 @@ nav a.active{background:var(--pink);color:#30232a}
     linear-gradient(135deg,#f6c8dc,#d5ad94 55%,#8e6253);
   border-bottom:8px solid var(--espresso);
 }
-.kicker{
+
+.kicker {
   display:inline-block;
   background:#fff8ed;
   border:2px solid white;
@@ -83,7 +107,8 @@ nav a.active{background:var(--pink);color:#30232a}
   font-weight:900;
   letter-spacing:1px;
 }
-h1{
+
+.hero h1 {
   font-family:Bungee,sans-serif;
   font-size:clamp(35px,7vw,78px);
   line-height:1.1;
@@ -92,23 +117,27 @@ h1{
   -webkit-text-stroke:1px var(--espresso);
   text-shadow:5px 6px 0 var(--mocha);
 }
-.script{
+
+.script {
   font-family:Pacifico,cursive;
   font-size:clamp(20px,3vw,29px);
   color:var(--espresso);
 }
-.hero p{
+
+.hero p {
   max-width:680px;
   margin:18px auto;
   font-size:19px;
   font-weight:900;
 }
-.wrap{
+
+.wrap {
   max-width:1250px;
   margin:auto;
   padding:30px 20px 65px;
 }
-.notice{
+
+.notice {
   padding:18px 22px;
   background:white;
   border:3px solid #dfb5a4;
@@ -117,75 +146,92 @@ h1{
   font-weight:800;
   margin-bottom:26px;
 }
-.layout{
+
+.layout {
   display:grid;
   grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);
   gap:27px;
 }
-.panel{
+
+.panel {
   background:white;
   border:3px solid #dfb5a4;
   border-radius:23px;
   box-shadow:6px 7px 0 #ddc0b4;
   overflow:hidden;
 }
-.panel-head{
+
+.panel-head {
   background:linear-gradient(110deg,#68453e,#a67666);
   padding:17px 22px;
   color:white;
   font-size:18px;
   font-weight:900;
 }
-.panel-body{padding:23px}
-.section-title{
+
+.panel-body {padding:23px}
+
+.section-title {
   font-family:Bungee,sans-serif;
   color:var(--espresso);
   font-size:clamp(19px,3vw,27px);
   margin:5px 0 12px;
 }
-.small{
+
+.small {
   color:#78625b;
   font-size:13px;
   line-height:1.6;
 }
-.stats{
+
+.stats {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
   margin:20px 0;
 }
-.stat{
+
+.stat {
   background:#fff1e8;
   border-radius:15px;
   text-align:center;
   padding:15px 7px;
 }
-.stat strong{
+
+.stat strong {
   display:block;
   font:23px Bungee,sans-serif;
   color:var(--espresso);
 }
-.stat span{font-size:11px;font-weight:900}
-.track{
+
+.stat span {
+  font-size:11px;
+  font-weight:900;
+}
+
+.track {
   height:18px;
   background:#f2e0d5;
   border-radius:30px;
   overflow:hidden;
   margin:14px 0;
 }
-.fill{
+
+.fill {
   height:100%;
   width:0;
   background:linear-gradient(90deg,#e98ab1,#8b5e4e);
   transition:width .25s;
 }
-.alphabet{
+
+.alphabet {
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
   gap:12px;
   margin:25px 0;
 }
-.letter{
+
+.letter {
   position:relative;
   min-height:104px;
   border:3px solid #d4a88f;
@@ -201,35 +247,48 @@ h1{
   justify-content:center;
   gap:3px;
 }
-.letter strong{
+
+.letter strong {
   font-family:Bungee,sans-serif;
   font-size:clamp(22px,3vw,38px);
   line-height:1;
 }
-.letter span{font-size:10px;font-weight:900}
-.letter:hover{transform:translateY(-2px)}
-.letter.claimed{
+
+.letter span {
+  font-size:10px;
+  font-weight:900;
+}
+
+.letter:hover {transform:translateY(-2px)}
+
+.letter.claimed {
   background:linear-gradient(145deg,#b7ddd4,#e7f6ef);
   border-color:var(--teal);
   color:#245c58;
 }
-.letter.claimed:after{
+
+.letter.claimed:after {
   content:"✓";
   position:absolute;
   top:4px;
   right:8px;
   font-weight:900;
 }
-.letter.selected{
+
+.letter.selected {
   outline:4px solid var(--pink);
   outline-offset:2px;
 }
-.letter:focus-visible,.btn:focus-visible,
-input:focus-visible{
+
+.letter:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+a:focus-visible {
   outline:3px solid var(--teal);
   outline-offset:3px;
 }
-.btn{
+
+.btn {
   display:inline-block;
   text-align:center;
   background:linear-gradient(#f7a9ca,#e36b9d);
@@ -240,15 +299,32 @@ input:focus-visible{
   box-shadow:0 4px 0 #b45a80;
   font-weight:900;
 }
-.btn.secondary{
+
+.btn.secondary {
   background:var(--espresso);
   box-shadow:0 4px 0 #2c1b1b;
   color:white;
 }
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:19px}
-.field{display:block;margin:14px 0}
-.field span{display:block;font-weight:900;margin-bottom:7px}
-.field input{
+
+.actions {
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:19px;
+}
+
+.field {
+  display:block;
+  margin:14px 0;
+}
+
+.field span {
+  display:block;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.field input {
   width:100%;
   border:2px solid #d9b5a2;
   border-radius:13px;
@@ -256,19 +332,22 @@ input:focus-visible{
   background:#fffaf6;
   color:var(--ink);
 }
-.selected-letter{
+
+.selected-letter {
   text-align:center;
   background:#fff0e7;
   border-radius:18px;
   padding:18px;
   margin:15px 0;
 }
-.selected-letter strong{
+
+.selected-letter strong {
   display:block;
   font:48px Bungee,sans-serif;
   color:var(--espresso);
 }
-.detail{
+
+.detail {
   background:#fdf0f4;
   border-left:5px solid var(--pink);
   border-radius:0 14px 14px 0;
@@ -276,21 +355,26 @@ input:focus-visible{
   margin:15px 0;
   line-height:1.65;
 }
-.hidden{display:none!important}
-.log{
+
+.hidden {display:none!important}
+
+.log {
   display:grid;
   gap:11px;
   margin-top:17px;
 }
-.entry{
+
+.entry {
   padding:14px;
   background:#fff4ed;
   border:2px solid #ead2c3;
   border-radius:14px;
 }
-.entry strong{color:var(--espresso)}
-.entry p{margin:5px 0;overflow-wrap:anywhere}
-.celebrate{
+
+.entry strong {color:var(--espresso)}
+.entry p {margin:5px 0;overflow-wrap:anywhere}
+
+.celebrate {
   text-align:center;
   padding:20px;
   background:#fff0c5;
@@ -299,487 +383,781 @@ input:focus-visible{
   margin-top:20px;
   font-weight:900;
 }
-footer{
+
+/* CAMPUS MEMBERSHIP GATE */
+
+.campus-gate {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:25px;
+}
+
+.gate-card {
+  width:min(520px,100%);
+  background:white;
+  border:3px solid #dfb5a4;
+  border-radius:25px;
+  padding:38px 25px;
+  box-shadow:7px 8px 0 #ddc0b4;
+  text-align:center;
+}
+
+.gate-card h2 {
+  font-family:Bungee,sans-serif;
+  color:var(--espresso);
+  font-size:clamp(23px,4vw,33px);
+}
+
+.gate-card p {
+  font-weight:800;
+  line-height:1.8;
+}
+
+.gate-actions {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:22px;
+}
+
+.gate-actions a {
+  display:inline-block;
+  background:var(--espresso);
+  color:white;
+  padding:13px 20px;
+  border-radius:30px;
+  font-weight:900;
+}
+
+.gate-actions a.secondary {
+  background:#f9dce7;
+  color:var(--espresso);
+}
+
+footer {
   text-align:center;
   padding:32px 20px;
   background:#302d30;
   color:white;
   font-weight:900;
 }
-@media(max-width:850px){
-  .layout{grid-template-columns:1fr}
+
+@media(max-width:850px) {
+  .layout {grid-template-columns:1fr}
 }
-@media(max-width:550px){
-  .top,nav{justify-content:center}
-  .alphabet{gap:7px}
-  .letter{min-height:80px;border-radius:11px}
-  .letter strong{font-size:24px}
-  .letter span{font-size:9px}
-  .panel-body{padding:15px}
-  .stats{gap:5px}
+
+@media(max-width:550px) {
+  .top,nav {justify-content:center}
+  .alphabet {gap:7px}
+  .letter {min-height:80px;border-radius:11px}
+  .letter strong {font-size:24px}
+  .letter span {font-size:9px}
+  .panel-body {padding:15px}
+  .stats {gap:5px}
 }
 </style>
 </head>
+
 <body>
 
-<header class="top">
-  <a class="brand" href="../index.html#home">
-    <img src="../assets/logo.png" alt="Books & Besties logo">
-    <span>BESTIE UNIVERSITY 🎓</span>
-  </a>
-  <nav aria-label="Campus navigation">
-    <a href="../index.html#home">Campus Quad</a>
-    <a href="../activities.html" class="active">Campus Activities</a>
-    <a href="../commons.html">Crown Commons</a>
-    <a href="../index.html#dashboard">Bestie Locker</a>
-  </nav>
-</header>
+<!-- MEMBERSHIP ACCESS GATE -->
 
-<section class="hero">
-  <span class="kicker">✦ THE VELVET LATTE LOUNGE PRESENTS ✦</span>
-  <h1>ESPRESSO<br>YOUR ABCs</h1>
-  <div class="script">A Little Espresso, A Lot of Letters. ♡</div>
-  <p>26 letters. One community board. A whole latte teamwork!</p>
-  <span class="kicker">☕ NOVEMBER 2026 · COMMUNITY CHALLENGE 🤎</span>
-</section>
+<div id="campusGate" class="campus-gate">
+  <div class="gate-card">
+    <div style="font-size:55px">☕</div>
+    <h2>ESPRESSO YOUR ABCs</h2>
 
-<main class="wrap">
+    <p id="campusGateMessage" role="status">
+      🎓 Checking your campus membership...
+    </p>
 
-  <div class="notice">
-    ☕ DESIGN PREVIEW: This interactive board simulates a community
-    A–Z challenge. Submissions save only in this browser.
-    Different members cannot see one another's submissions yet.
-    Shared participation and verified member accounts will be
-    connected through Supabase later.
+    <div class="gate-actions">
+      <a href="../login.html">Campus Login ♡</a>
+      <a href="../index.html#home" class="secondary">
+        Campus Quad
+      </a>
+    </div>
   </div>
+</div>
 
-  <div class="layout">
+<!-- APPROVED MEMBER CONTENT -->
 
-    <section class="panel">
-      <div class="panel-head">☕ THE COMMUNITY ALPHABET BOARD</div>
-      <div class="panel-body">
+<div id="campusContent" hidden>
 
-        <h2 class="section-title">Brewing Our Way from A to Z ♡</h2>
-        <p>Pick an available letter and add a book to the community board!</p>
+  <header class="top">
+    <a class="brand" href="../index.html#home">
+      <img src="../assets/logo.png" alt="Books & Besties logo">
+      <span>BESTIE UNIVERSITY 🎓</span>
+    </a>
 
-        <div class="stats">
-          <div class="stat">
-            <strong id="completeCount">0</strong>
-            <span>LETTERS DONE</span>
-          </div>
-          <div class="stat">
-            <strong id="remainingCount">26</strong>
-            <span>REMAINING</span>
-          </div>
-          <div class="stat">
-            <strong id="progressPercent">0%</strong>
-            <span>PROGRESS</span>
-          </div>
-        </div>
+    <nav aria-label="Campus navigation">
+      <a href="../index.html#home">Campus Quad</a>
+      <a href="../activities.html" class="active">
+        Campus Activities
+      </a>
+      <a href="../commons.html">Crown Commons</a>
+      <a href="../locker.html">Bestie Locker</a>
+    </nav>
+  </header>
 
-        <div class="track" id="progressTrack"
-          role="progressbar"
-          aria-label="Alphabet completion progress"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow="0">
-          <div class="fill" id="progressFill"></div>
-        </div>
+  <section class="hero">
+    <span class="kicker">
+      ✦ THE VELVET LATTE LOUNGE PRESENTS ✦
+    </span>
 
-        <div class="alphabet" id="alphabet"
-          aria-label="Interactive A to Z board"></div>
+    <h1>ESPRESSO<br>YOUR ABCs</h1>
 
-        <div class="celebrate hidden" id="celebrate" role="status">
-          👑 THE ENTIRE ALPHABET IS COMPLETE!
-          The Besties brewed up something AMAZING!
-        </div>
+    <div class="script">
+      A Little Espresso, A Lot of Letters. ♡
+    </div>
 
-        <div class="actions">
-          <button class="btn secondary" id="resetBoard" type="button">
-            ↻ Reset Demo Board
-          </button>
-          <a class="btn" href="../activities.html">
-            ← Activity Directory
-          </a>
-        </div>
+    <p>
+      26 letters. One community board.
+      A whole latte teamwork!
+    </p>
 
-      </div>
-    </section>
+    <span class="kicker">
+      ☕ NOVEMBER 2026 · COMMUNITY CHALLENGE 🤎
+    </span>
+  </section>
 
-    <aside>
+  <main class="wrap">
+
+    <div class="notice">
+      ☕ DESIGN PREVIEW: This interactive board simulates
+      a community A–Z challenge. Submissions save only
+      in this browser. Different members cannot see one
+      another's submissions yet. Shared participation
+      will be connected through Supabase later.
+    </div>
+
+    <div class="layout">
+
+      <!-- ALPHABET BOARD -->
 
       <section class="panel">
-        <div class="panel-head">💌 THE LETTER CLAIM COUNTER</div>
+        <div class="panel-head">
+          ☕ THE COMMUNITY ALPHABET BOARD
+        </div>
+
         <div class="panel-body">
+          <h2 class="section-title">
+            Brewing Our Way from A to Z ♡
+          </h2>
 
-          <h2 class="section-title">Claim Your Letter!</h2>
-          <p>Select an available letter on the board to get started.</p>
+          <p>
+            Pick an available letter and add a book
+            to the community board!
+          </p>
 
-          <div class="selected-letter">
-            <strong id="chosenLetter">?</strong>
-            <span id="chosenStatus">Waiting for your selection ♡</span>
+          <div class="stats">
+            <div class="stat">
+              <strong id="completeCount">0</strong>
+              <span>LETTERS DONE</span>
+            </div>
+
+            <div class="stat">
+              <strong id="remainingCount">26</strong>
+              <span>REMAINING</span>
+            </div>
+
+            <div class="stat">
+              <strong id="progressPercent">0%</strong>
+              <span>PROGRESS</span>
+            </div>
           </div>
 
-          <div id="claimedDetail" class="detail hidden"></div>
+          <div
+            class="track"
+            id="progressTrack"
+            role="progressbar"
+            aria-label="Alphabet completion progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <div class="fill" id="progressFill"></div>
+          </div>
 
-          <form id="claimForm" class="hidden">
+          <div
+            class="alphabet"
+            id="alphabet"
+            aria-label="Interactive A to Z board"
+          ></div>
 
-            <label class="field">
-              <span>🎀 Bestie Display Name</span>
-              <input id="bestieName" type="text"
-                maxlength="50" required
-                placeholder="Your Bestie name">
-            </label>
+          <div
+            class="celebrate hidden"
+            id="celebrate"
+            role="status"
+          >
+            👑 THE ENTIRE ALPHABET IS COMPLETE!
+            The Besties brewed up something AMAZING!
+          </div>
 
-            <label class="field">
-              <span>📚 Book Title</span>
-              <input id="bookTitle" type="text"
-                maxlength="150" required
-                placeholder="Title of your book">
-            </label>
-
-            <label class="field">
-              <span>✍🏽 Author</span>
-              <input id="bookAuthor" type="text"
-                maxlength="100" required
-                placeholder="Book author">
-            </label>
-
-            <p class="small">
-              For this preview, the book title must begin
-              with your chosen letter. We ignore leading
-              "A", "An", and "The".
-            </p>
-
-            <button class="btn" type="submit">
-              ☕ Complete This Letter!
+          <div class="actions">
+            <button
+              class="btn secondary"
+              id="resetBoard"
+              type="button"
+            >
+              ↻ Reset Demo Board
             </button>
 
-          </form>
-
-          <p id="formMessage" class="small" role="status"></p>
-
+            <a class="btn" href="../activities.html">
+              ← Activity Directory
+            </a>
+          </div>
         </div>
       </section>
 
-      <section class="panel" style="margin-top:25px">
-        <div class="panel-head">🤎 THE BARISTA'S RULEBOOK</div>
-        <div class="panel-body">
+      <!-- ALPHABET SIDEBAR -->
 
-          <h3>How to Play ♡</h3>
+      <aside>
 
-          <ol style="line-height:1.9;font-weight:700;padding-left:20px">
-            <li>Choose an available letter from A to Z.</li>
-            <li>Enter a book title beginning with that letter.</li>
-            <li>Add the author and your Bestie display name.</li>
-            <li>Submit to complete that letter.</li>
-            <li>Once completed, the letter is locked.</li>
-            <li>Work together until the entire alphabet is complete!</li>
-          </ol>
-
-          <div class="detail">
-            🤎 <strong>One letter. One contribution.</strong>
-            Every completed letter celebrates the Bestie
-            who contributed it!
+        <section class="panel">
+          <div class="panel-head">
+            💌 THE LETTER CLAIM COUNTER
           </div>
 
-          <p class="small">
-            These are preview rules. Campus HQ can establish
-            final eligibility and verification rules before
-            November's official challenge.
-          </p>
+          <div class="panel-body">
+            <h2 class="section-title">
+              Claim Your Letter!
+            </h2>
 
-        </div>
-      </section>
+            <p>
+              Select an available letter on the board
+              to get started.
+            </p>
 
-      <section class="panel" style="margin-top:25px">
-        <div class="panel-head">📚 THE BESTIE BOOK RECEIPTS</div>
-        <div class="panel-body">
+            <div class="selected-letter">
+              <strong id="chosenLetter">?</strong>
+              <span id="chosenStatus">
+                Waiting for your selection ♡
+              </span>
+            </div>
 
-          <h3>Our Alphabet Contributions ♡</h3>
-          <p class="small">
-            Completed letters and their contributors appear here.
-          </p>
+            <div
+              id="claimedDetail"
+              class="detail hidden"
+            ></div>
 
-          <div class="log" id="contributionLog"></div>
+            <form id="claimForm" class="hidden">
 
-        </div>
-      </section>
+              <label class="field">
+                <span>🎀 Bestie Display Name</span>
+                <input
+                  id="bestieName"
+                  type="text"
+                  maxlength="50"
+                  required
+                  placeholder="Your Bestie name"
+                >
+              </label>
 
-    </aside>
+              <label class="field">
+                <span>📚 Book Title</span>
+                <input
+                  id="bookTitle"
+                  type="text"
+                  maxlength="150"
+                  required
+                  placeholder="Title of your book"
+                >
+              </label>
 
-  </div>
-</main>
+              <label class="field">
+                <span>✍🏽 Author</span>
+                <input
+                  id="bookAuthor"
+                  type="text"
+                  maxlength="100"
+                  required
+                  placeholder="Book author"
+                >
+              </label>
 
-<footer>
-  BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
-  <p>© <span id="year"></span> Bestie University</p>
-</footer>
+              <p class="small">
+                For this preview, the book title must
+                begin with your chosen letter. We ignore
+                leading "A", "An", and "The".
+              </p>
+
+              <button class="btn" type="submit">
+                ☕ Complete This Letter!
+              </button>
+
+            </form>
+
+            <p
+              id="formMessage"
+              class="small"
+              role="status"
+            ></p>
+
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:25px">
+          <div class="panel-head">
+            🤎 THE BARISTA'S RULEBOOK
+          </div>
+
+          <div class="panel-body">
+            <h3>How to Play ♡</h3>
+
+            <ol style="line-height:1.9;font-weight:700;padding-left:20px">
+              <li>Choose an available letter from A to Z.</li>
+              <li>Enter a book title beginning with that letter.</li>
+              <li>Add the author and your Bestie display name.</li>
+              <li>Submit to complete that letter.</li>
+              <li>Once completed, the letter is locked.</li>
+              <li>Work together until the entire alphabet is complete!</li>
+            </ol>
+
+            <div class="detail">
+              🤎 <strong>One letter. One contribution.</strong>
+              Every completed letter celebrates the Bestie
+              who contributed it!
+            </div>
+
+            <p class="small">
+              These are preview rules. Campus HQ can establish
+              final eligibility and verification rules before
+              November's official challenge.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:25px">
+          <div class="panel-head">
+            📚 THE BESTIE BOOK RECEIPTS
+          </div>
+
+          <div class="panel-body">
+            <h3>Our Alphabet Contributions ♡</h3>
+
+            <p class="small">
+              Completed letters and their contributors
+              appear here.
+            </p>
+
+            <div
+              class="log"
+              id="contributionLog"
+            ></div>
+          </div>
+        </section>
+
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
+    <p>
+      © <span id="year"></span> Bestie University
+    </p>
+  </footer>
+
+</div>
+
+<!-- SUPABASE + APPROVED MEMBER GUARD -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/campus-guard.js"></script>
 
 <script>
-(() => {
+(async () => {
   "use strict";
 
-  const STORAGE_KEY = "bb_espresso_abcs_demo_v1";
-  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  const gateMessage =
+    document.getElementById("campusGateMessage");
 
-  const board = document.getElementById("alphabet");
-  const form = document.getElementById("claimForm");
-  const detail = document.getElementById("claimedDetail");
-  const log = document.getElementById("contributionLog");
-  const message = document.getElementById("formMessage");
+  document.getElementById("year").textContent =
+    new Date().getFullYear();
 
-  let contributions = {};
-  let selectedLetter = null;
+  const guard = window.BB_CAMPUS_GUARD;
+
+  if (!guard) {
+    gateMessage.textContent =
+      "Campus access verification is unavailable. Please try again.";
+    return;
+  }
 
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const result = await guard.protectPage({
+      level:"approved",
+      gateId:"campusGate",
+      contentId:"campusContent",
+      messageId:"campusGateMessage"
+    });
 
-    if (saved && typeof saved === "object" &&
-        !Array.isArray(saved)) {
-      for (const letter of LETTERS) {
-        const item = saved[letter];
+    if (!result.allowed) return;
 
-        if (item &&
+    initializeAlphabetRush(result.profile);
+
+  } catch (error) {
+    console.error("Alphabet Rush access error:",error);
+
+    document.getElementById("campusContent").hidden = true;
+    document.getElementById("campusGate").hidden = false;
+
+    gateMessage.textContent =
+      "We couldn't load Espresso Your ABCs. Please try again.";
+  }
+
+  function initializeAlphabetRush(profile) {
+
+    // Keep the existing storage key to preserve demo submissions.
+    const STORAGE_KEY = "bb_espresso_abcs_demo_v1";
+    const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    const board = document.getElementById("alphabet");
+    const form = document.getElementById("claimForm");
+    const detail = document.getElementById("claimedDetail");
+    const log = document.getElementById("contributionLog");
+    const message = document.getElementById("formMessage");
+
+    const nameInput = document.getElementById("bestieName");
+
+    // Prefill the approved member's campus display name.
+    if (profile && profile.display_name) {
+      nameInput.value = profile.display_name;
+    }
+
+    let contributions = {};
+    let selectedLetter = null;
+
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(STORAGE_KEY)
+      );
+
+      if (
+        saved &&
+        typeof saved === "object" &&
+        !Array.isArray(saved)
+      ) {
+        for (const letter of LETTERS) {
+          const item = saved[letter];
+
+          if (
+            item &&
             typeof item.name === "string" &&
             typeof item.title === "string" &&
-            typeof item.author === "string") {
-          contributions[letter] = item;
+            typeof item.author === "string"
+          ) {
+            contributions[letter] = item;
+          }
         }
       }
-    }
-  } catch (error) {
-    console.warn("Unable to restore alphabet preview:", error);
-  }
-
-  function save() {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(contributions)
-      );
-      return true;
     } catch (error) {
-      message.textContent =
-        "Your browser could not save this submission.";
-      return false;
-    }
-  }
-
-  function cleanTitle(title) {
-    return title.trim()
-      .replace(/^(the|an|a)\s+/i, "")
-      .trim();
-  }
-
-  function chooseLetter(letter) {
-    selectedLetter = letter;
-
-    document.getElementById("chosenLetter").textContent = letter;
-    message.textContent = "";
-
-    const entry = contributions[letter];
-
-    if (entry) {
-      document.getElementById("chosenStatus").textContent =
-        "☕ This letter has been completed!";
-
-      form.classList.add("hidden");
-      detail.classList.remove("hidden");
-      detail.replaceChildren();
-
-      const heading = document.createElement("strong");
-      heading.textContent = "🤎 Claimed by " + entry.name;
-
-      const book = document.createElement("p");
-      book.textContent = entry.title + " — " + entry.author;
-
-      detail.append(heading, book);
-    } else {
-      document.getElementById("chosenStatus").textContent =
-        "💌 Available to complete!";
-
-      form.classList.remove("hidden");
-      detail.classList.add("hidden");
-
-      form.reset();
+      console.warn(
+        "Unable to restore alphabet preview:",
+        error
+      );
     }
 
-    renderBoard();
-  }
-
-  function renderBoard() {
-    board.replaceChildren();
-
-    LETTERS.forEach(letter => {
-      const claimed = Boolean(contributions[letter]);
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "letter";
-
-      if (claimed) button.classList.add("claimed");
-      if (selectedLetter === letter) {
-        button.classList.add("selected");
+    function save() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(contributions)
+        );
+        return true;
+      } catch (error) {
+        message.textContent =
+          "Your browser could not save this submission.";
+        return false;
       }
-
-      const heading = document.createElement("strong");
-      heading.textContent = letter;
-
-      const status = document.createElement("span");
-      status.textContent = claimed ? "COMPLETED ☕" : "AVAILABLE ♡";
-
-      button.append(heading, status);
-
-      button.setAttribute(
-        "aria-label",
-        letter + ", " + (claimed ? "completed" : "available")
-      );
-
-      button.setAttribute(
-        "aria-pressed",
-        String(selectedLetter === letter)
-      );
-
-      button.addEventListener("click", () => {
-        chooseLetter(letter);
-      });
-
-      board.append(button);
-    });
-
-    updateProgress();
-    renderLog();
-  }
-
-  function updateProgress() {
-    const completed = LETTERS.filter(
-      letter => Boolean(contributions[letter])
-    ).length;
-
-    const remaining = 26 - completed;
-    const percent = Math.round(completed / 26 * 100);
-
-    document.getElementById("completeCount").textContent =
-      completed;
-
-    document.getElementById("remainingCount").textContent =
-      remaining;
-
-    document.getElementById("progressPercent").textContent =
-      percent + "%";
-
-    document.getElementById("progressFill").style.width =
-      percent + "%";
-
-    document.getElementById("progressTrack").setAttribute(
-      "aria-valuenow",
-      String(percent)
-    );
-
-    document.getElementById("celebrate").classList.toggle(
-      "hidden",
-      completed !== 26
-    );
-  }
-
-  function renderLog() {
-    log.replaceChildren();
-
-    const completed = LETTERS.filter(
-      letter => Boolean(contributions[letter])
-    );
-
-    if (!completed.length) {
-      const empty = document.createElement("p");
-      empty.className = "small";
-      empty.textContent =
-        "No letters completed yet! Be the first Bestie to brew one up.";
-      log.append(empty);
-      return;
     }
 
-    completed.forEach(letter => {
+    function cleanTitle(title) {
+      return title.trim()
+        .replace(/^(the|an|a)\s+/i,"")
+        .trim();
+    }
+
+    function chooseLetter(letter) {
+      selectedLetter = letter;
+
+      document.getElementById(
+        "chosenLetter"
+      ).textContent = letter;
+
+      message.textContent = "";
+
       const entry = contributions[letter];
 
-      const card = document.createElement("div");
-      card.className = "entry";
+      if (entry) {
+        document.getElementById(
+          "chosenStatus"
+        ).textContent =
+          "☕ This letter has been completed!";
 
-      const heading = document.createElement("strong");
-      heading.textContent = "☕ " + letter + " — " + entry.name;
+        form.classList.add("hidden");
+        detail.classList.remove("hidden");
+        detail.replaceChildren();
 
-      const book = document.createElement("p");
-      book.textContent = "📚 " + entry.title;
+        const heading =
+          document.createElement("strong");
 
-      const author = document.createElement("p");
-      author.className = "small";
-      author.textContent = "By " + entry.author;
+        heading.textContent =
+          "🤎 Claimed by " + entry.name;
 
-      card.append(heading, book, author);
-      log.append(card);
+        const book =
+          document.createElement("p");
+
+        book.textContent =
+          entry.title + " — " + entry.author;
+
+        detail.append(heading,book);
+
+      } else {
+        document.getElementById(
+          "chosenStatus"
+        ).textContent =
+          "💌 Available to complete!";
+
+        form.classList.remove("hidden");
+        detail.classList.add("hidden");
+
+        form.reset();
+
+        if (profile && profile.display_name) {
+          nameInput.value = profile.display_name;
+        }
+      }
+
+      renderBoard();
+    }
+
+    function renderBoard() {
+      board.replaceChildren();
+
+      LETTERS.forEach(letter => {
+        const claimed =
+          Boolean(contributions[letter]);
+
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.className = "letter";
+
+        if (claimed) {
+          button.classList.add("claimed");
+        }
+
+        if (selectedLetter === letter) {
+          button.classList.add("selected");
+        }
+
+        const heading =
+          document.createElement("strong");
+
+        heading.textContent = letter;
+
+        const status =
+          document.createElement("span");
+
+        status.textContent = claimed
+          ? "COMPLETED ☕"
+          : "AVAILABLE ♡";
+
+        button.append(heading,status);
+
+        button.setAttribute(
+          "aria-label",
+          letter + ", " +
+          (claimed ? "completed" : "available")
+        );
+
+        button.setAttribute(
+          "aria-pressed",
+          String(selectedLetter === letter)
+        );
+
+        button.addEventListener("click",() => {
+          chooseLetter(letter);
+        });
+
+        board.append(button);
+      });
+
+      updateProgress();
+      renderLog();
+    }
+
+    function updateProgress() {
+      const completed = LETTERS.filter(
+        letter => Boolean(contributions[letter])
+      ).length;
+
+      const remaining = 26 - completed;
+      const percent =
+        Math.round(completed / 26 * 100);
+
+      document.getElementById(
+        "completeCount"
+      ).textContent = completed;
+
+      document.getElementById(
+        "remainingCount"
+      ).textContent = remaining;
+
+      document.getElementById(
+        "progressPercent"
+      ).textContent = percent + "%";
+
+      document.getElementById(
+        "progressFill"
+      ).style.width = percent + "%";
+
+      document.getElementById(
+        "progressTrack"
+      ).setAttribute(
+        "aria-valuenow",
+        String(percent)
+      );
+
+      document.getElementById(
+        "celebrate"
+      ).classList.toggle(
+        "hidden",
+        completed !== 26
+      );
+    }
+
+    function renderLog() {
+      log.replaceChildren();
+
+      const completed = LETTERS.filter(
+        letter => Boolean(contributions[letter])
+      );
+
+      if (!completed.length) {
+        const empty =
+          document.createElement("p");
+
+        empty.className = "small";
+
+        empty.textContent =
+          "No letters completed yet! Be the first Bestie to brew one up.";
+
+        log.append(empty);
+        return;
+      }
+
+      completed.forEach(letter => {
+        const entry = contributions[letter];
+
+        const card =
+          document.createElement("div");
+
+        card.className = "entry";
+
+        const heading =
+          document.createElement("strong");
+
+        heading.textContent =
+          "☕ " + letter + " — " + entry.name;
+
+        const book =
+          document.createElement("p");
+
+        book.textContent =
+          "📚 " + entry.title;
+
+        const author =
+          document.createElement("p");
+
+        author.className = "small";
+        author.textContent =
+          "By " + entry.author;
+
+        card.append(heading,book,author);
+        log.append(card);
+      });
+    }
+
+    form.addEventListener("submit",event => {
+      event.preventDefault();
+
+      if (!selectedLetter) {
+        message.textContent =
+          "Please select a letter first.";
+        return;
+      }
+
+      if (contributions[selectedLetter]) {
+        message.textContent =
+          "This letter is already completed!";
+
+        chooseLetter(selectedLetter);
+        return;
+      }
+
+      const name =
+        nameInput.value.trim();
+
+      const title =
+        document.getElementById(
+          "bookTitle"
+        ).value.trim();
+
+      const author =
+        document.getElementById(
+          "bookAuthor"
+        ).value.trim();
+
+      if (!name || !title || !author) {
+        message.textContent =
+          "Please complete all three fields.";
+        return;
+      }
+
+      const normalized = cleanTitle(title);
+
+      const firstLetter =
+        normalized.charAt(0).toUpperCase();
+
+      if (firstLetter !== selectedLetter) {
+        message.textContent =
+          "That book title doesn't match letter " +
+          selectedLetter +
+          ". Please choose a matching title.";
+        return;
+      }
+
+      const letter = selectedLetter;
+
+      contributions[letter] = {
+        name,
+        title,
+        author
+      };
+
+      if (!save()) {
+        delete contributions[letter];
+        return;
+      }
+
+      chooseLetter(letter);
+
+      message.textContent =
+        "☕ Letter " + letter +
+        " completed! Thank you for contributing, Bestie!";
+
+      renderBoard();
     });
-  }
 
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-
-    if (!selectedLetter) {
-      message.textContent = "Please select a letter first.";
-      return;
-    }
-
-    if (contributions[selectedLetter]) {
-      message.textContent =
-        "This letter is already completed!";
-      chooseLetter(selectedLetter);
-      return;
-    }
-
-    const name = document.getElementById("bestieName").value.trim();
-    const title = document.getElementById("bookTitle").value.trim();
-    const author = document.getElementById("bookAuthor").value.trim();
-
-    if (!name || !title || !author) {
-      message.textContent = "Please complete all three fields.";
-      return;
-    }
-
-    const normalized = cleanTitle(title);
-    const firstLetter = normalized.charAt(0).toUpperCase();
-
-    if (firstLetter !== selectedLetter) {
-      message.textContent =
-        "That book title doesn't match letter " +
-        selectedLetter +
-        ". Please choose a matching title.";
-      return;
-    }
-
-    const letter = selectedLetter;
-
-    contributions[letter] = {
-      name,
-      title,
-      author
-    };
-
-    if (!save()) {
-      delete contributions[letter];
-      return;
-    }
-
-    chooseLetter(letter);
-
-    message.textContent =
-      "☕ Letter " + letter +
-      " completed! Thank you for contributing, Bestie!";
-
-    renderBoard();
-  });
-
-  document.getElementById("resetBoard").addEventListener(
-    "click",
-    () => {
+    document.getElementById(
+      "resetBoard"
+    ).addEventListener("click",() => {
       if (!confirm(
         "Reset all demo letters and contributions?"
       )) return;
@@ -789,23 +1167,29 @@ footer{
 
       save();
 
-      document.getElementById("chosenLetter").textContent = "?";
-      document.getElementById("chosenStatus").textContent =
+      document.getElementById(
+        "chosenLetter"
+      ).textContent = "?";
+
+      document.getElementById(
+        "chosenStatus"
+      ).textContent =
         "Waiting for your selection ♡";
 
       form.classList.add("hidden");
       detail.classList.add("hidden");
 
-      message.textContent = "Demo board reset!";
+      message.textContent =
+        "Demo board reset!";
+
       renderBoard();
-    }
-  );
+    });
 
-  document.getElementById("year").textContent =
-    new Date().getFullYear();
+    renderBoard();
+  }
 
-  renderBoard();
 })();
 </script>
+
 </body>
 </html>
