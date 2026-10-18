@@ -526,10 +526,9 @@
 
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
-        Member Admissions is connected to real Supabase
-        accounts. The remaining management tools are
-        browser-local previews and do not publish changes
-        to the live website.
+        Member Admissions, Campus Overview, and Campus Mail
+        announcements are live. Other management tools remain
+        browser-local previews and do not publish changes.
       </div>
 
       <div class="layout">
@@ -1051,16 +1050,27 @@
                   </p>
                 </div>
 
-                <div class="item">
-                  <h4>📣 Campus Announcements</h4>
-                  <p>
-                    Publish important news for all Besties.
-                  </p>
+                <div class="item" id="announcementComposerPanel">
+                  <h4>📣 LIVE CAMPUS ANNOUNCEMENTS</h4>
+                  <p class="mini">Administrators can send an announcement to every currently approved Bestie's Campus Mail inbox. Sending is immediate.</p>
+                  <p id="announcementAccess" class="mini" role="status">💗 Campus Mail publishing is connected. Administrator access required.</p>
+                  <form id="announcementForm" hidden>
+                    <label class="field" for="announcementTitle">
+                      <span>Announcement Title</span>
+                      <input id="announcementTitle" maxlength="150" required placeholder="What's happening on campus?">
+                    </label>
+                    <label class="field" for="announcementMessage">
+                      <span>Announcement Message</span>
+                      <textarea id="announcementMessage" maxlength="2000" required placeholder="Tell the Besties the news..."></textarea>
+                    </label>
+                    <button class="btn secondary" id="publishAnnouncement" type="submit">💌 Publish to Approved Besties</button>
+                    <p id="announcementResult" role="status" aria-live="polite"></p>
+                  </form>
                 </div>
 
                 <p class="mini">
-                  No real messages or moderation actions
-                  are connected to this preview.
+                  Chat and Bulletin moderation are still previews.
+                  Campus Mail announcements are now live.
                 </p>
 
                 <a class="btn secondary" href="commons.html">
@@ -1239,7 +1249,6 @@
         // Demo records must not overwrite the live counters.
 
 
-        $("statVIP").textContent = state.vips.length;
 
         const list = $("todoList");
 
@@ -1682,6 +1691,7 @@
   <script src="js/campus-admissions.js"></script>
   <script src="js/campus-hq-auth.js"></script>
   <script src="js/campus-overview.js"></script>
+  <script src="js/campus-announcements.js"></script>
 
 </body>
 </html>
