@@ -194,9 +194,32 @@
     // Refresh chat when the Bestie opens its tab.
     $("#chatTab").addEventListener("click", loadMessages);
 
-    await loadMessages();
+    
+await loadMessages();
 
-    window.BB_COMMONS_CHAT_REFRESH = loadMessages;
+// Automatically check for new messages every 5 seconds
+// while the Bestie Chat tab is open.
+const chatRefreshInterval = setInterval(() => {
+  const chatSection = document.querySelector("#chatSection");
+
+  if (
+    chatSection &&
+    !chatSection.classList.contains("hidden") &&
+    document.visibilityState === "visible"
+  ) {
+    loadMessages();
+  }
+}, 5000);
+
+// Stop checking when leaving Crown Commons.
+window.addEventListener(
+  "pagehide",
+  () => clearInterval(chatRefreshInterval),
+  { once: true }
+);
+
+window.BB_COMMONS_CHAT_REFRESH = loadMessages;
+
   }
 
   window.BB_COMMONS_CHAT = { startChat };
