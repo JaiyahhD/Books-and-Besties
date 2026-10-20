@@ -353,7 +353,7 @@ body.invite-open{overflow:hidden}
 
   <div id="vipExperience" hidden>
     <div class="notice" id="vipWelcome">💎 Welcome to your Honors Society lounge!</div>
-    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive is now LIVE! Pink Ballot and Bestie Access are still previews; their sample votes and RSVPs remain browser-only.</div>
+    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive and Pink Ballot are LIVE! Bestie Access signups are still a browser-only preview.</div>
 <div class="layout">
 
     <aside class="sidebar">
@@ -388,18 +388,12 @@ body.invite-open{overflow:hidden}
           <h2 class="section-title">Your Opinion Has a Pink Seat! ♡</h2>
           <p>Campus HQ wants the inside scoop! Honors Society members will help shape upcoming activities, events, and community experiences through special polls.</p>
 
-          <div class="card" style="margin-top:20px">
-            <span class="tag">SAMPLE VIP POLL · NOT OFFICIAL</span>
-            <h3>What should our next cozy campus social be?</h3>
-            <div id="pollOptions"></div>
-            <button class="btn" id="voteBtn" type="button">Cast My Pink Ballot 💗</button>
-            <p id="pollMessage" class="small" role="status"></p>
-            <div id="pollResults" hidden></div>
+          <div class="insider-toolbar">
+            <span class="tag">💗 OFFICIAL VIP VOTING</span>
+            <button class="btn secondary" type="button" id="refreshBallots">↻ Refresh Ballots</button>
           </div>
-
-          <div class="status">
-            🗳️ Future feature: Shared voting, poll deadlines, and admin-managed results.
-          </div>
+          <p id="ballotStatus" class="small" role="status" aria-live="polite">Preparing the Pink Ballot...</p>
+          <div id="liveBallots" class="insider-feed" aria-live="polite"></div>
         </div>
       </section>
 
@@ -725,169 +719,183 @@ body.invite-open{overflow:hidden}
 </script>
 
 <script>
+/* Phase 7.3C — Supabase Pink Ballot: one vote per user, private tallies */
 (() => {
-  "use strict";
-
-  const STORAGE_KEY = "bb_honors_demo_v1";
-
-  const pollChoices = [
-    "☕ Cozy Coffeehouse Chat",
-    "🎨 Bestie Craft & Create",
-    "📚 Pajama Reading Party",
-    "🎬 Books-to-Screen Movie Night"
-  ];
-
-  let state = {
-    vote: null,
-    rsvps: []
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const make = (tag,cls,content) => {
+    const element=document.createElement(tag);
+    if(cls) element.className=cls;
+    if(content!==undefined) element.textContent=content;
+    return element;
   };
-
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved && typeof saved === "object" && !Array.isArray(saved)) {
-      if (Number.isInteger(saved.vote) &&
-          saved.vote >= 0 &&
-          saved.vote < pollChoices.length) {
-        state.vote = saved.vote;
-      }
-      if (Array.isArray(saved.rsvps)) {
-        state.rsvps = saved.rsvps.filter(
-          value => ["social","creative"].includes(value)
-        );
-      }
-    }
-  } catch (error) {
-    console.warn("Could not restore Honors Society demo:", error);
-  }
-
-  let selectedVote = state.vote;
-
-  function save() {
+  const formatDate = value => value ? new Date(value).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : '';
+  const errorText = error => error?.message || String(error);
+  let client,user,loading=false,initialized=false;
+  const status = text => { $('ballotStatus').textContent=text; };
+  async function load(){
+    if(!client || !user || loading) return;
+    loading=true;
+    $('refreshBallots').disabled=true;
+    status('🗳️ Opening the official Pink Ballot...');
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      return true;
-    } catch (error) {
-      console.warn("Could not save Honors Society demo:", error);
-      return false;
-    }
+      const {data:polls,error}=await client.from('honors_polls')
+        .select('id,question,description,status,opens_at,closes_at,show_results_before_vote,created_at')
+        .in('status',['published','closed'])
+        .order('created_at',{ascending:false});
+      if(error) throw error;
+      const container=$('liveBallots');
+      container.replaceChildren();
+      const visible=(polls||[]).filter(p=>!p.opens_at || new Date(p.opens_at)<=new Date());
+      if(!visible.length){
+        container.append(make('div','insider-empty','🎀 No official ballots are open or published just yet. Check back for your next chance to help shape campus!'));
+        status('💗 No ballots to show right now.');
+        return;
+      }
+      const {data:options,error:optionError}=await client.from('honors_poll_options')
+        .select('id,poll_id,option_text,sort_order')
+        .in('poll_id',visible.map(p=>p.id))
+        .order('sort_order',{ascending:true});
+      if(optionError) throw optionError;
+      for(const poll of visible){
+        const choices=(options||[]).filter(o=>o.poll_id===poll.id);
+        const card=make('article','insider-post');
+        const inner=make('div','insider-post-body');
+        const now=Date.now();
+        const closed=poll.status==='closed'||(poll.closes_at && new Date(poll.closes_at).getTime()<=now);
+        inner.append(make('span','tag',closed?'🔒 VOTING CLOSED':'🗳️ VOTING OPEN'));
+        inner.append(make('h3','',poll.question));
+        if(poll.description) inner.append(make('p','',poll.description));
+        const schedule=[];
+        if(poll.opens_at) schedule.push('Opened '+formatDate(poll.opens_at));
+        if(poll.closes_at) schedule.push('Closes '+formatDate(poll.closes_at));
+        if(schedule.length) inner.append(make('p','small',schedule.join(' · ')));
+        const feedback=make('p','small','');
+        feedback.setAttribute('role','status');
+        const choiceBox=make('div','');
+        const resultsBox=make('div','');
+        const submit=make('button','btn','Cast My Pink Ballot 💗');
+        submit.type='button';
+        let selected=null, own=null, tallies=null, busy=false;
+        async function refreshResult(){
+          const {data,error}=await client.rpc('honors_poll_results',{p_poll_id:poll.id});
+          if(error) throw error;
+          const rows=Array.isArray(data)?data:[];
+          tallies=rows;
+          own=rows.length?rows[0].my_option_id:null;
+          const canShow=rows.length && rows[0].results_visible===true;
+          resultsBox.replaceChildren();
+          if(canShow){
+            const total=Number(rows[0].total_votes||0);
+            resultsBox.append(make('h4','',`💗 Community Results · ${total} ${total===1?'vote':'votes'}`));
+            for(const option of choices){
+              const r=rows.find(entry=>entry.option_id===option.id);
+              const count=Number(r?.vote_count||0);
+              const pct=total?Math.round(100*count/total):0;
+              resultsBox.append(make('p','small',`${option.option_text} · ${count} (${pct}%)${own===option.id?' · Your vote':''}`));
+              const track=make('div','result-track');
+              const fill=make('div','result-fill');
+              fill.style.width=pct+'%';
+              track.append(fill);resultsBox.append(track);
+            }
+          } else if(own){
+            resultsBox.append(make('p','small','💌 Your ballot was received. Results are currently hidden by campus staff.'));
+          } else if(closed){
+            resultsBox.append(make('p','small','🔒 Voting has ended. Results are not available yet.'));
+          } else {
+            resultsBox.append(make('p','small','💗 Cast your vote to unlock the community results when available.'));
+          }
+          choiceBox.replaceChildren();
+          for(const option of choices){
+            const button=make('button','poll-option',option.option_text);
+            button.type='button';
+            const active=(own||selected)===option.id;
+            button.classList.toggle('selected',active);
+            button.setAttribute('aria-pressed',String(active));
+            button.disabled=Boolean(own)||Boolean(closed)||busy;
+            button.addEventListener('click',()=>{selected=option.id;refreshSelection();});
+            choiceBox.append(button);
+          }
+          submit.hidden=Boolean(own)||Boolean(closed);
+          submit.disabled=!selected||busy||choices.length<2;
+          if(own) feedback.textContent='✓ Your official Pink Ballot has been submitted!';
+          else if(closed) feedback.textContent='🔒 This ballot is closed.';
+        }
+        function refreshSelection(){
+          [...choiceBox.children].forEach((button,index)=>{
+            const active=choices[index]?.id===selected;
+            button.classList.toggle('selected',active);
+            button.setAttribute('aria-pressed',String(active));
+          });
+          submit.disabled=!selected||busy;
+        }
+        submit.addEventListener('click',async()=>{
+          if(!selected||busy||own||closed) return;
+          busy=true;submit.disabled=true;
+          feedback.textContent='💌 Submitting your official vote...';
+          try{
+            const {error}=await client.from('honors_poll_votes').insert({poll_id:poll.id,option_id:selected,user_id:user.id});
+            if(error) throw error;
+            await refreshResult();
+          }catch(error){
+            console.error('Pink Ballot vote:',error);
+            feedback.textContent='⚠️ Could not submit vote: '+errorText(error);
+          }finally{busy=false;submit.disabled=Boolean(own)||!selected;}
+        });
+        inner.append(choiceBox,submit,feedback,resultsBox);
+        card.append(inner);container.append(card);
+        try {await refreshResult();}
+        catch(error){
+          console.error('Pink Ballot results:',error);
+          feedback.textContent='⚠️ Could not load this ballot: '+errorText(error);
+          submit.disabled=true;
+        }
+      }
+      status('💎 '+visible.length+' official '+(visible.length===1?'ballot':'ballots')+' available.');
+    }catch(error){
+      console.error('Pink Ballot:',error);
+      status('⚠️ Could not load ballots: '+errorText(error));
+    }finally{loading=false;$('refreshBallots').disabled=false;}
   }
-
-  function renderPoll() {
-    const options = document.getElementById("pollOptions");
-    const results = document.getElementById("pollResults");
-    const button = document.getElementById("voteBtn");
-
-    options.replaceChildren();
-    results.replaceChildren();
-
-    pollChoices.forEach((choice,index) => {
-      const option = document.createElement("button");
-      option.type = "button";
-      option.className = "poll-option";
-      if (selectedVote === index) option.classList.add("selected");
-      option.textContent = choice;
-      option.disabled = state.vote !== null;
-      option.setAttribute("aria-pressed", String(selectedVote === index));
-
-      option.addEventListener("click", () => {
-        selectedVote = index;
-        renderPoll();
-      });
-
-      options.append(option);
-    });
-
-    const voted = state.vote !== null;
-    button.disabled = voted;
-    button.textContent = voted ? "✓ Ballot Submitted" : "Cast My Pink Ballot 💗";
-    results.hidden = !voted;
-
-    if (voted) {
-      const heading = document.createElement("h3");
-      heading.textContent = "💗 Your Demo Ballot";
-      results.append(heading);
-
-      pollChoices.forEach((choice,index) => {
-        const label = document.createElement("p");
-        label.textContent = choice + (index === state.vote ? " · Your choice" : "");
-
-        const track = document.createElement("div");
-        track.className = "result-track";
-
-        const fill = document.createElement("div");
-        fill.className = "result-fill";
-        fill.style.width = index === state.vote ? "100%" : "0%";
-
-        track.append(fill);
-        results.append(label,track);
-      });
-
-      const note = document.createElement("p");
-      note.className = "small";
-      note.textContent =
-        "This only shows your own demo vote, not community voting results.";
-      results.append(note);
-    }
-  }
-
-  document.getElementById("voteBtn").addEventListener("click", () => {
-    if (selectedVote === null) {
-      document.getElementById("pollMessage").textContent =
-        "Choose an option first, Bestie!";
-      return;
-    }
-
-    state.vote = selectedVote;
-
-    document.getElementById("pollMessage").textContent = save()
-      ? "💗 Your demo Pink Ballot has been saved!"
-      : "Your vote could not be saved in this browser.";
-
-    renderPoll();
+  document.addEventListener('bb:honors-vip-ready',event=>{
+    client=event.detail.client;user=event.detail.user;
+    if(!initialized){initialized=true;$('refreshBallots').addEventListener('click',load);}
+    load();
   });
-
-  function renderRsvps() {
-    const items = [
-      ["social","rsvpSocial"],
-      ["creative","rsvpCreative"]
-    ];
-
-    items.forEach(([key,id]) => {
-      const joined = state.rsvps.includes(key);
-      const button = document.getElementById(id);
-      button.textContent = joined ? "✓ On Demo List" : "Join Demo List";
-      button.setAttribute("aria-pressed",String(joined));
-    });
-  }
-
-  function toggleRsvp(key) {
-    if (state.rsvps.includes(key)) {
-      state.rsvps = state.rsvps.filter(item => item !== key);
-    } else {
-      state.rsvps.push(key);
+})();
+</script>
+<script>
+/* Bestie Access remains a browser-only preview until Phase 7.4 */
+(() => {
+  'use strict';
+  const KEY='bb_honors_demo_v1';
+  let rsvps=[];
+  try{
+    const saved=JSON.parse(localStorage.getItem(KEY));
+    if(Array.isArray(saved?.rsvps)) rsvps=saved.rsvps.filter(x=>['social','creative'].includes(x));
+  }catch(error){console.warn('Could not restore demo RSVPs:',error);}
+  function render(){
+    for(const [key,id] of [['social','rsvpSocial'],['creative','rsvpCreative']]){
+      const button=document.getElementById(id);
+      const joined=rsvps.includes(key);
+      button.textContent=joined?'✓ On Demo List':'Join Demo List';
+      button.setAttribute('aria-pressed',String(joined));
     }
-
-    const saved = save();
-    renderRsvps();
-
-    document.getElementById("rsvpMessage").textContent = saved
-      ? "💌 Demo signup preference updated in this browser!"
-      : "Unable to save your demo signup preference.";
   }
-
-  document.getElementById("rsvpSocial").addEventListener(
-    "click",() => toggleRsvp("social")
-  );
-
-  document.getElementById("rsvpCreative").addEventListener(
-    "click",() => toggleRsvp("creative")
-  );
-
-  document.getElementById("year").textContent =
-    new Date().getFullYear();
-
-  renderPoll();
-  renderRsvps();
+  function toggle(key){
+    rsvps=rsvps.includes(key)?rsvps.filter(x=>x!==key):[...rsvps,key];
+    try{
+      localStorage.setItem(KEY,JSON.stringify({rsvps}));
+      document.getElementById('rsvpMessage').textContent='💌 Demo signup preference updated in this browser!';
+    }catch(error){
+      document.getElementById('rsvpMessage').textContent='Unable to save your demo signup preference.';
+    }
+    render();
+  }
+  document.getElementById('rsvpSocial').addEventListener('click',()=>toggle('social'));
+  document.getElementById('rsvpCreative').addEventListener('click',()=>toggle('creative'));
+  document.getElementById('year').textContent=new Date().getFullYear();
+  render();
 })();
 </script>
 </body>

@@ -869,52 +869,27 @@
             <div class="panel"><div class="panel-head">📋 INSIDER POST REGISTRY</div><div class="panel-body"><button class="btn light" id="exclusiveRefresh" type="button">🔄 Refresh Posts</button><div id="exclusivePostList" aria-live="polite"><p class="empty">Loading VIP posts...</p></div></div></div>
           </section>
 
-          <!-- PINK BALLOT -->
-
+          <!-- PHASE 7.3B: LIVE PINK BALLOT STUDIO -->
           <section class="section" id="section-polls">
-            <h2 class="section-heading">
-              🗳️ Pink Ballot Manager
-            </h2>
-
-            <p class="section-description">
-              Plan VIP polls and community feedback opportunities.
-            </p>
-
-            <div class="panel">
-              <div class="panel-head">
-                🎀 CREATE A PINK BALLOT
-              </div>
-
-              <div class="panel-body">
-                <form id="pollForm">
-
-                  <label class="field">
-                    <span>Poll Question</span>
-                    <input
-                      id="pollQuestion"
-                      required
-                      maxlength="180"
-                      placeholder="What should we host next?"
-                    >
-                  </label>
-
-                  <label class="field">
-                    <span>Choices (one per line)</span>
-                    <textarea
-                      id="pollChoices"
-                      required
-                      placeholder="Coffeehouse Social&#10;Craft Night&#10;Reading Party"
-                    ></textarea>
-                  </label>
-
-                  <button class="btn" type="submit">
-                    🗳️ Create Demo Poll
-                  </button>
-                </form>
-
-                <div id="pollList"></div>
-              </div>
-            </div>
+            <h2 class="section-heading">🗳️ Pink Ballot Studio</h2>
+            <p class="section-description">Create private Honors Society ballots, schedule voting windows, and manage live polls. Admins and moderators share full access.</p>
+            <div class="panel"><div class="panel-head">🎀 DESIGN A PINK BALLOT</div><div class="panel-body">
+              <p id="pinkStudioStatus" class="mini" role="status" aria-live="polite">Preparing your live ballot desk...</p>
+              <form id="pinkLiveForm">
+                <input type="hidden" id="pinkLiveId">
+                <label class="field"><span>Poll question</span><input id="pinkLiveQuestion" required maxlength="180" placeholder="What should our next Bestie social be?"></label>
+                <label class="field"><span>Description (optional)</span><textarea id="pinkLiveDescription" maxlength="2000" placeholder="Give your VIP Besties the inside scoop..."></textarea></label>
+                <label class="field"><span>Choices (one per line, 2–12 choices)</span><textarea id="pinkLiveOptions" required maxlength="3600" style="min-height:135px" placeholder="☕ Coffeehouse Chat&#10;🎨 Craft Night&#10;📚 Reading Party"></textarea></label>
+                <div class="form-grid">
+                  <label class="field"><span>Opens at (optional, local time)</span><input id="pinkLiveOpens" type="datetime-local"></label>
+                  <label class="field"><span>Closes at (optional, local time)</span><input id="pinkLiveCloses" type="datetime-local"></label>
+                </div>
+                <label class="field"><span>Visibility</span><select id="pinkLiveStatus"><option value="draft">Draft · staff only</option><option value="published">Published · opens on schedule</option><option value="closed">Closed · results only</option><option value="archived">Archived · staff only</option></select></label>
+                <p class="mini">For ballot integrity, choices can only be edited while a poll is a draft. Published polls can be closed or archived. Each member gets one vote.</p>
+                <div class="actions"><button class="btn secondary" id="pinkLiveSave" type="submit">💗 Save Pink Ballot</button><button class="btn light" id="pinkLiveClear" type="button">Clear Editor</button></div>
+              </form>
+            </div></div>
+            <div class="panel"><div class="panel-head">📋 LIVE PINK BALLOT REGISTRY</div><div class="panel-body"><button class="btn light" id="pinkLiveRefresh" type="button">🔄 Refresh Ballots</button><div id="pinkLiveList" aria-live="polite"><p class="empty">Loading ballots...</p></div></div></div>
           </section>
 
           <!-- BESTIE ACCESS -->
@@ -1387,7 +1362,7 @@
           ],
           [
             "🗳️ Pink Ballots",
-            state.polls.length + " demo polls created."
+            "Live polls are managed in the Pink Ballot Studio."
           ],
           [
             "💌 Early Access",
@@ -1496,56 +1471,6 @@
         });
       }
 
-      function renderPolls() {
-        const list = $("pollList");
-        list.replaceChildren();
-
-        if (!state.polls.length) {
-          list.append(
-            el("p", "No demo Pink Ballots yet.", "empty")
-          );
-          return;
-        }
-
-        state.polls.forEach(poll => {
-          const node = item(
-            "🗳️ " + poll.question,
-            poll.choices.join(" · "),
-            poll.status,
-            poll.status === "Published" ? "green" : "gray"
-          );
-
-          const actions = el("div", undefined, "actions");
-
-          if (poll.status !== "Published") {
-            actions.append(
-              button("Publish", () => {
-                if (update(() => {
-                  poll.status = "Published";
-                })) {
-                  toast("Published in demo registry only.");
-                }
-              }, "secondary")
-            );
-          }
-
-          actions.append(
-            button("Delete", () => {
-              if (update(() => {
-                state.polls = state.polls.filter(
-                  entry => entry.id !== poll.id
-                );
-              })) {
-                toast("Demo poll deleted.");
-              }
-            }, "danger")
-          );
-
-          node.append(actions);
-          list.append(node);
-        });
-      }
-
       function renderEvents() {
         const list = $("eventList");
         list.replaceChildren();
@@ -1600,7 +1525,6 @@
       function renderDemo() {
         renderDemoOverview();
         renderActivities();
-        renderPolls();
         renderEvents();
       }
 
@@ -1682,34 +1606,6 @@
         $("clearActivity").addEventListener("click", () => {
           $("activityForm").reset();
           $("activityId").value = "";
-        });
-
-        $("pollForm").addEventListener("submit", event => {
-          event.preventDefault();
-
-          const question = $("pollQuestion").value.trim();
-
-          const choices = $("pollChoices").value
-            .split("\n")
-            .map(choice => choice.trim())
-            .filter(Boolean);
-
-          if (choices.length < 2) {
-            toast("Enter at least two choices.");
-            return;
-          }
-
-          if (update(() => {
-            state.polls.push({
-              id: makeId(),
-              question,
-              choices,
-              status: "Draft"
-            });
-          })) {
-            event.target.reset();
-            toast("Demo Pink Ballot created!");
-          }
         });
 
         $("eventForm").addEventListener("submit", event => {
@@ -2342,6 +2238,7 @@
           const result = id ? await client.from(table).update(payload).eq("id",id).select("id").single() : await client.from(table).insert(payload).select("id").single();
           if (result.error) throw result.error;
           reset();
+          busyState(false);
           await load();
           msg("💗 Insider Room post saved successfully!" + (payload.status === "published" && schedule && schedule > new Date() ? " It will reveal at the scheduled time." : ""));
         } catch (error) {
@@ -2365,6 +2262,171 @@
       $("exclusiveImage").addEventListener("change",()=>{const f=$("exclusiveImage").files[0];if(f) {removeImage=false;$("exclusiveImageInfo").textContent=`New image: ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;}});
       document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
     })();
+  </script>
+
+
+  <!-- PHASE 7.3B: PINK BALLOT SUPABASE STAFF STUDIO -->
+  <script>
+  (() => {
+    "use strict";
+    const $ = id => document.getElementById(id);
+    const dbTable = "honors_polls", optionTable = "honors_poll_options";
+    let client = null, polls = [], busy = false;
+    const say = message => { $("pinkStudioStatus").textContent = message; };
+    const errorMessage = e => e?.message || String(e);
+    const element = (tag, content, cls) => {
+      const e = document.createElement(tag);
+      if (content !== undefined) e.textContent = content;
+      if (cls) e.className = cls;
+      return e;
+    };
+    const button = (label, handler, cls="light") => {
+      const b = element("button",label,"btn "+cls); b.type="button";
+      b.addEventListener("click",handler); return b;
+    };
+    const lock = flag => {
+      busy = flag;
+      ["pinkLiveSave","pinkLiveClear","pinkLiveRefresh"].forEach(id=>$(id).disabled=flag);
+    };
+    const dateText = v => v ? new Date(v).toLocaleString() : "Not set";
+    const toLocal = v => {
+      if (!v) return "";
+      const d = new Date(v);
+      return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    };
+    const toUtc = id => $(id).value ? new Date($(id).value).toISOString() : null;
+    const reset = () => {$("pinkLiveForm").reset();$("pinkLiveId").value="";$("pinkLiveOptions").disabled=false;$("pinkLiveQuestion").disabled=false;};
+    function edit(p) {
+      $("pinkLiveId").value=p.id;
+      $("pinkLiveQuestion").value=p.question;
+      $("pinkLiveDescription").value=p.description || "";
+      $("pinkLiveOptions").value=(p.options||[]).map(o=>o.option_text).join("\n");
+      $("pinkLiveOpens").value=toLocal(p.opens_at);
+      $("pinkLiveCloses").value=toLocal(p.closes_at);
+      $("pinkLiveStatus").value=p.status;
+      const frozen = p.status!=="draft";
+      $("pinkLiveOptions").disabled=frozen;
+      $("pinkLiveQuestion").disabled=frozen;
+      say(frozen ? "Published ballot: question and choices are locked. You can update description, schedule or status." : "Editing draft. Save to apply your changes.");
+      $("pinkLiveForm").scrollIntoView({behavior:"smooth",block:"center"});
+    }
+    function render() {
+      const list=$("pinkLiveList"); list.replaceChildren();
+      if (!polls.length) {list.append(element("p","No Pink Ballots yet, Bestie! Create your first draft.","empty"));return;}
+      for (const p of polls) {
+        const box=element("article",undefined,"item");
+        box.append(element("h4","🗳️ "+p.question));
+        box.append(element("span",p.status.toUpperCase(),"tag "+(p.status==="published"?"green":"gray")));
+        if (p.description) box.append(element("p",p.description));
+        box.append(element("p",(p.options||[]).map(o=>o.option_text).join("  ·  "),"mini"));
+        box.append(element("p","Opens: "+dateText(p.opens_at)+" · Closes: "+dateText(p.closes_at),"mini"));
+        const actions=element("div",undefined,"actions");
+        actions.append(button("✏️ Edit",()=>edit(p)));
+        if (p.status==="draft") actions.append(button("💗 Publish",()=>setStatus(p,"published"),"secondary"));
+        if (p.status==="published") actions.append(button("🔒 Close Voting",()=>setStatus(p,"closed")));
+        if (p.status!=="archived") actions.append(button("📦 Archive",()=>setStatus(p,"archived")));
+        if (p.status==="draft") actions.append(button("🗑️ Delete Draft",()=>deleteDraft(p),"danger"));
+        box.append(actions); list.append(box);
+      }
+    }
+    async function load() {
+      if (!client || busy) return;
+      say("Loading live Pink Ballots...");
+      const {data,error}=await client.from(dbTable).select("id,question,description,status,opens_at,closes_at,created_at,honors_poll_options(id,option_text,sort_order)").order("created_at",{ascending:false});
+      if (error) {say("Unable to load ballots: "+errorMessage(error));return;}
+      polls=(data||[]).map(p=>({...p,options:(p.honors_poll_options||[]).sort((a,b)=>a.sort_order-b.sort_order)}));
+      render();say(polls.length+" live Pink Ballot(s) loaded from Supabase.");
+    }
+    async function setStatus(p,status) {
+      if (busy || !confirm(`Change “${p.question}” to ${status}?`)) return;
+      if (status==="published" && (p.options||[]).length<2) {say("A poll needs at least two choices.");return;}
+      lock(true);
+      const {error}=await client.from(dbTable).update({status}).eq("id",p.id);
+      lock(false);
+      if (error) {say("Could not update ballot: "+errorMessage(error));return;}
+      if ($("pinkLiveId").value===p.id) reset();
+      await load();say("💗 Ballot status updated!");
+    }
+    async function deleteDraft(p) {
+      if (busy || !confirm(`Permanently delete draft “${p.question}”?`)) return;
+      lock(true);
+      const {error}=await client.from(dbTable).delete().eq("id",p.id).eq("status","draft");
+      lock(false);
+      if (error) {say("Could not delete draft: "+errorMessage(error));return;}
+      if ($("pinkLiveId").value===p.id) reset();
+      await load();say("Draft deleted.");
+    }
+    async function save(e) {
+      e.preventDefault();if (busy || !client) return;
+      const id=$("pinkLiveId").value;
+      const existing=polls.find(p=>p.id===id);
+      const question=$("pinkLiveQuestion").value.trim();
+      const description=$("pinkLiveDescription").value.trim()||null;
+      const choices=$("pinkLiveOptions").value.split("\n").map(s=>s.trim()).filter(Boolean);
+      if (!existing || existing.status==="draft") {
+        if (!question || question.length>180 || choices.length<2 || choices.length>12 || choices.some(x=>x.length>300)) {say("Enter a question and 2–12 choices, each no longer than 300 characters.");return;}
+        if (new Set(choices.map(x=>x.toLowerCase())).size!==choices.length) {say("Each choice must be unique.");return;}
+      }
+      const opens=toUtc("pinkLiveOpens"),closes=toUtc("pinkLiveCloses");
+      if (opens && closes && new Date(closes)<=new Date(opens)) {say("Closing time must be after opening time.");return;}
+      const status=$("pinkLiveStatus").value;
+      if (existing && existing.status!=="draft" && status==="draft") {say("A published/closed ballot cannot return to draft.");return;}
+      lock(true);
+      try {
+        let pollId=id;
+        if (existing && existing.status!=="draft") {
+          const {error}=await client.from(dbTable).update({description,opens_at:opens,closes_at:closes,status}).eq("id",id);
+          if (error) throw error;
+        } else if (existing) {
+          // Keep the poll in draft until all choices are successfully saved.
+          const {error}=await client.from(dbTable).update({question,description,opens_at:opens,closes_at:closes,status:"draft"}).eq("id",id);
+          if (error) throw error;
+          const old=existing.options||[];
+          // Upsert existing choices in place to avoid a destructive delete-first update.
+          for (let i=0;i<choices.length;i++) {
+            if (old[i]) {
+              const {error:e}=await client.from(optionTable).update({option_text:choices[i]}).eq("id",old[i].id);
+              if (e) throw e;
+            } else {
+              const {error:e}=await client.from(optionTable).insert({poll_id:id,option_text:choices[i],sort_order:i});
+              if (e) throw e;
+            }
+          }
+          for (const oldOption of old.slice(choices.length)) {
+            const {error:e}=await client.from(optionTable).delete().eq("id",oldOption.id);
+            if (e) throw e;
+          }
+          if (status!=="draft") {
+            const {error:e}=await client.from(dbTable).update({status}).eq("id",id);
+            if (e) throw e;
+          }
+        } else {
+          const {data,error}=await client.from(dbTable).insert({question,description,opens_at:opens,closes_at:closes,status:"draft"}).select("id").single();
+          if (error) throw error;
+          pollId=data.id;
+          const {error:choiceError}=await client.from(optionTable).insert(choices.map((option_text,i)=>({poll_id:pollId,option_text,sort_order:i})));
+          if (choiceError) throw choiceError;
+          if (status!=="draft") {
+            const {error:e}=await client.from(dbTable).update({status}).eq("id",pollId);
+            if (e) throw e;
+          }
+        }
+        reset();lock(false);await load();say("💗 Pink Ballot saved to Supabase!"+(status==="published"?" VIP visibility follows its opening time.":""));
+      } catch(err) {say("Could not save ballot: "+errorMessage(err)+". If this was a new ballot, check the draft registry before retrying.");}
+      finally {lock(false);}
+    }
+    async function init() {
+      client=window.BB_CAMPUS_CLIENT;
+      if (!client) {say("Campus HQ Supabase connection unavailable.");return;}
+      const {data,error}=await client.rpc("is_campus_staff");
+      if (error || data!==true) {say("Campus staff verification required.");$("pinkLiveSave").disabled=true;return;}
+      await load();
+    }
+    $("pinkLiveForm").addEventListener("submit",save);
+    $("pinkLiveClear").addEventListener("click",()=>{reset();say("Editor cleared.");});
+    $("pinkLiveRefresh").addEventListener("click",load);
+    document.addEventListener("bb:campus-hq-ready",init,{once:true});
+  })();
   </script>
 
 </body>
