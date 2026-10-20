@@ -352,6 +352,7 @@ body.invite-open{overflow:hidden}
   </section>
 
   <div id="vipExperience" hidden>
+    <div class="notice" id="seasonBanner" hidden>📅 Loading current season...</div>
     <div class="notice" id="vipWelcome">💎 Welcome to your Honors Society lounge!</div>
     <div class="notice" style="font-size:13px">🎀 Bestie Exclusive and Pink Ballot are LIVE! Bestie Access signups are still a browser-only preview.</div>
 <div class="layout">
@@ -463,6 +464,24 @@ body.invite-open{overflow:hidden}
   const vip = el('vipExperience');
   const modal = el('inviteModal');
   let client, invitation, currentUser, memberName = 'Bestie', busy = false;
+  let activeSeason = null, isStaff = false;
+  const seasonLabel = season => season ? `${season.name} · ${season.starts_on} to ${season.ends_on}` : 'No active season';
+  const activeSeasonForMember = season => {
+    if (!season || season.status !== 'active') return false;
+    const today = new Date().toISOString().slice(0,10);
+    return today >= season.starts_on && today <= season.ends_on;
+  };
+  async function loadSeason() {
+    const {data,error} = await client.from('honors_seasons')
+      .select('id,name,starts_on,ends_on,status')
+      .eq('status','active').order('starts_on',{ascending:false}).limit(1);
+    if (error) throw error;
+    activeSeason = data?.[0] || null;
+    el('seasonBanner').textContent = activeSeason
+      ? `📅 ${seasonLabel(activeSeason)} · ${activeSeasonForMember(activeSeason) ? 'Season underway' : 'Founding season preview'}`
+      : '📅 No Honors Society season is currently active.';
+    return activeSeason;
+  }
   const setGate = (icon, title, message, back = false) => {
     gate.hidden = false; vip.hidden = true;
     el('gateIcon').textContent = icon;
@@ -475,13 +494,15 @@ body.invite-open{overflow:hidden}
   const closeModal = () => {modal.hidden = true; document.body.classList.remove('invite-open');};
   const showVip = (staff = false) => {
     closeModal(); gate.hidden = true; vip.hidden = false;
+    el('seasonBanner').hidden = false;
     el('heroBadge').textContent = staff ? '💎 CAMPUS STAFF · VIP ACCESS' : '💎 OFFICIAL HONORS SOCIETY VIP';
-    el('vipWelcome').textContent = staff ? '💎 Welcome, Campus Staff! Your Honors Society access is active.' : `💎 Welcome to the Honors Society, ${memberName}! Your VIP membership is active.`;
-    document.dispatchEvent(new CustomEvent('bb:honors-vip-ready', {detail:{client,user:currentUser}}));
+    el('vipWelcome').textContent = staff ? '💎 Welcome, Campus Staff! Your Honors Society access is active.' : `💎 Welcome to the Honors Society, ${memberName}! Your VIP membership belongs to ${activeSeason?.name || 'the current season'}.`;
+    document.dispatchEvent(new CustomEvent('bb:honors-vip-ready', {detail:{client,user:currentUser,seasonId:activeSeason?.id || null,staff}}));
   };
   const showInvitation = () => {
     setGate('💌', `${memberName}, You're Invited!`, 'You have been personally selected to join the Honors Society at Bestie University.');
     el('invitationDetails').hidden = false;
+    el('gateMessage').textContent += ` Your invitation is for ${activeSeason?.name || 'the active season'}.`;
     el('invitationMessage').textContent = invitation.invitation_message?.trim() || 'A little more sparkle, a little more sisterhood, and a VIP seat at the Bestie University planning table. We would love to welcome you into the Honors Society! 💗';
     const key = `bb_honors_envelope_seen_${currentUser.id}_${invitation.id}`;
     let seen = false;
@@ -511,7 +532,7 @@ body.invite-open{overflow:hidden}
     el('acceptInvite').disabled = el('declineInvite').disabled = false;
     if (error) {el('gateFeedback').textContent = `Couldn't update your invitation: ${errorText(error)}`; return;}
     invitation = null;
-    if (accept) showVip();
+    if (accept) { const {data:access} = await client.rpc('has_honors_access'); if (access === true) showVip(); else setGate('📅','Membership Saved','Your invitation was accepted. Your VIP lounge will unlock when your season begins.',true); }
     else {setGate('💗', 'Thank You, Bestie!', 'You have declined this invitation. If you change your mind, contact campus staff.', true);}
   }
   el('acceptInvite').addEventListener('click', () => respond(true));
@@ -530,19 +551,24 @@ body.invite-open{overflow:hidden}
       if (profile?.membership_status !== 'approved') {setGate('🎓','Campus Approval Required','Your campus membership must be approved before Honors Society access can be activated.',true);return;}
       const {data: staff, error: staffError} = await client.rpc('is_campus_staff');
       if (staffError) throw staffError;
-      if (staff === true) {showVip(true);return;}
+      isStaff = staff === true;
+      await loadSeason();
+      if (isStaff) {showVip(true);return;}
       const {data: access, error: accessError} = await client.rpc('has_honors_access');
       if (accessError) throw accessError;
       if (access === true) {showVip();return;}
-      const {data: invites, error: inviteError} = await client.from('honors_invitations').select('id,invitation_message,created_at').eq('invitee_id',currentUser.id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
+      const {data: invites, error: inviteError} = activeSeason
+        ? await client.from('honors_invitations').select('id,invitation_message,created_at,season_id').eq('invitee_id',currentUser.id).eq('season_id',activeSeason.id).eq('status','pending').order('created_at',{ascending:false}).limit(1)
+        : {data:[],error:null};
       if (inviteError) throw inviteError;
       if (invites?.length) {invitation = invites[0];showInvitation();return;}
-      setGate('💎','An Invitation-Only Society','The Honors Society is a special space for personally invited Besties. Keep shining around campus!',true);
+      setGate('💎','An Invitation-Only Society', activeSeason ? `The ${activeSeason.name} is invitation-only. If your previous season ended, campus staff can invite you again for a new season.` : 'There is no active Honors Society season right now. Please check back soon!',true);
     } catch (e) {
       console.error('Honors Society initialization:',e);
       setGate('⚠️','Unable to Check VIP Access',`We couldn't verify your invitation right now: ${errorText(e)}`,true);
     }
   }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && currentUser && !busy) { vip.hidden=true; gate.hidden=false; closeModal(); init(); } });
   init();
 })();
 </script>
@@ -558,7 +584,7 @@ body.invite-open{overflow:hidden}
     {key:'eyes',emoji:'👀',label:'The Tea!'},
     {key:'bow',emoji:'🎀',label:'So Cute!'}
   ];
-  let client, user, loading = false, initialized = false;
+  let client, user, seasonId, loading = false, initialized = false;
   const status = message => { $('exclusiveStatus').textContent = message; };
   const node = (tag, cls, content) => {
     const el = document.createElement(tag);
@@ -586,6 +612,7 @@ body.invite-open{overflow:hidden}
       const {data:posts,error:postError} = await client
         .from('honors_exclusive_posts')
         .select('id,title,body,post_type,image_path,is_featured,published_at,created_at,scheduled_at')
+        .eq('season_id',seasonId)
         .eq('status','published')
         .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
         .order('created_at',{ascending:false});
@@ -709,11 +736,12 @@ body.invite-open{overflow:hidden}
   document.addEventListener('bb:honors-vip-ready',event=>{
     client=event.detail.client;
     user=event.detail.user;
+    seasonId=event.detail.seasonId;
     if (!initialized) {
       initialized=true;
       $('refreshExclusive').addEventListener('click',load);
     }
-    load();
+    if (seasonId) load(); else status('📅 No current season content to display.');
   });
 })();
 </script>
@@ -731,7 +759,7 @@ body.invite-open{overflow:hidden}
   };
   const formatDate = value => value ? new Date(value).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : '';
   const errorText = error => error?.message || String(error);
-  let client,user,loading=false,initialized=false;
+  let client,user,seasonId,loading=false,initialized=false;
   const status = text => { $('ballotStatus').textContent=text; };
   async function load(){
     if(!client || !user || loading) return;
@@ -741,6 +769,7 @@ body.invite-open{overflow:hidden}
     try {
       const {data:polls,error}=await client.from('honors_polls')
         .select('id,question,description,status,opens_at,closes_at,show_results_before_vote,created_at')
+        .eq('season_id',seasonId)
         .in('status',['published','closed'])
         .order('created_at',{ascending:false});
       if(error) throw error;
@@ -858,9 +887,9 @@ body.invite-open{overflow:hidden}
     }finally{loading=false;$('refreshBallots').disabled=false;}
   }
   document.addEventListener('bb:honors-vip-ready',event=>{
-    client=event.detail.client;user=event.detail.user;
+    client=event.detail.client;user=event.detail.user;seasonId=event.detail.seasonId;
     if(!initialized){initialized=true;$('refreshBallots').addEventListener('click',load);}
-    load();
+    if(seasonId) load(); else status('📅 No current season ballots to display.');
   });
 })();
 </script>
