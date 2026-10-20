@@ -817,48 +817,30 @@
             </div>
           </section>
 
-          <!-- HONORS SOCIETY -->
-
+          <!-- LIVE HONORS SOCIETY INVITATION MANAGER -->
           <section class="section" id="section-honors">
-            <h2 class="section-heading">
-              💎 Honors Society Management
-            </h2>
-
-            <p class="section-description">
-              Plan VIP invitations for your most active Besties.
-              This roster is a local preview only.
-            </p>
-
+            <h2 class="section-heading">💎 Honors Society Management</h2>
+            <p class="section-description">Your live, invitation-only VIP roster. Administrators and moderators share the same Honors Society management permissions.</p>
+            <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+              <div class="stat"><strong id="honorsActiveCount">—</strong><span>ACTIVE VIPS</span></div>
+              <div class="stat"><strong id="honorsPendingCount">—</strong><span>PENDING INVITES</span></div>
+              <div class="stat"><strong id="honorsInvitedCount">—</strong><span>TOTAL INVITATIONS</span></div>
+            </div>
             <div class="panel">
-              <div class="panel-head">
-                💎 THE VIP ROSTER
-              </div>
-
+              <div class="panel-head">💌 INVITE AN APPROVED BESTIE</div>
               <div class="panel-body">
-                <form id="vipForm">
-                  <label class="field">
-                    <span>Bestie Display Name</span>
-                    <input
-                      id="vipName"
-                      required
-                      maxlength="60"
-                      placeholder="Enter a Bestie name"
-                    >
-                  </label>
-
-                  <button class="btn" type="submit">
-                    💎 Add Demo VIP
-                  </button>
+                <p class="mini">Choose an approved campus account, not just a typed name. Invitations appear in the member's account once the Honors Society invitation page is connected.</p>
+                <p id="honorsStatus" class="mini" role="status" aria-live="polite">Preparing your VIP invitation desk...</p>
+                <form id="honorsInviteForm">
+                  <label class="field"><span>Search approved Besties</span><input type="search" id="honorsSearch" placeholder="Search by display name" autocomplete="off"></label>
+                  <label class="field"><span>Select a Bestie</span><select id="honorsInvitee" required><option value="">Loading approved members...</option></select></label>
+                  <label class="field"><span>Personal invitation message (optional)</span><textarea id="honorsMessage" maxlength="1000" placeholder="You've been invited to the Honors Society, Bestie! 💎"></textarea></label>
+                  <div class="actions"><button class="btn secondary" id="honorsSend" type="submit">💎 Send VIP Invitation</button><button class="btn light" id="honorsRefresh" type="button">🔄 Refresh Roster</button></div>
                 </form>
-
-                <p class="mini">
-                  Real Honors Society invitations will
-                  eventually connect to approved member accounts.
-                </p>
-
-                <div id="vipList"></div>
               </div>
             </div>
+            <div class="panel"><div class="panel-head">💌 INVITATIONS & RESPONSES</div><div class="panel-body"><div id="honorsInvitationsList" aria-live="polite"><p class="empty">Loading invitations...</p></div></div></div>
+            <div class="panel"><div class="panel-head">💎 ACTIVE VIP MEMBERSHIPS</div><div class="panel-body"><div id="honorsMembershipsList" aria-live="polite"><p class="empty">Loading memberships...</p></div></div></div>
           </section>
 
           <!-- PINK BALLOT -->
@@ -1488,41 +1470,6 @@
         });
       }
 
-      function renderVIPs() {
-        const list = $("vipList");
-        list.replaceChildren();
-
-        if (!state.vips.length) {
-          list.append(
-            el("p", "No demo VIPs added yet.", "empty")
-          );
-          return;
-        }
-
-        state.vips.forEach(vip => {
-          const node = item(
-            "💎 " + vip.name,
-            "Honors Society demo roster",
-            "VIP",
-            "green"
-          );
-
-          node.append(
-            button("Remove", () => {
-              if (update(() => {
-                state.vips = state.vips.filter(
-                  entry => entry.id !== vip.id
-                );
-              })) {
-                toast("Demo VIP removed.");
-              }
-            }, "danger")
-          );
-
-          list.append(node);
-        });
-      }
-
       function renderPolls() {
         const list = $("pollList");
         list.replaceChildren();
@@ -1627,7 +1574,6 @@
       function renderDemo() {
         renderDemoOverview();
         renderActivities();
-        renderVIPs();
         renderPolls();
         renderEvents();
       }
@@ -1710,24 +1656,6 @@
         $("clearActivity").addEventListener("click", () => {
           $("activityForm").reset();
           $("activityId").value = "";
-        });
-
-        $("vipForm").addEventListener("submit", event => {
-          event.preventDefault();
-
-          const name = $("vipName").value.trim();
-
-          if (!name) return;
-
-          if (update(() => {
-            state.vips.push({
-              id: makeId(),
-              name
-            });
-          })) {
-            event.target.reset();
-            toast("Demo VIP added!");
-          }
         });
 
         $("pollForm").addEventListener("submit", event => {
@@ -2105,6 +2033,152 @@
         } finally { button.disabled = !isAdmin; }
       });
       document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
+    })();
+  </script>
+
+  <script>
+    // Phase 7.1B — Live Honors Society HQ management.
+    // Runs only after the existing campus-hq-auth.js staff gate succeeds.
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      let client;
+      let approved = [], invitations = [], memberships = [];
+      let busy = false;
+      const status = message => { $("honorsStatus").textContent = message; };
+      const errorText = error => error?.message || "Unknown database error";
+      const nameFor = id => approved.find(person => person.id === id)?.display_name || `Member ${id.slice(0,8)}…`;
+      const make = (tag, value, cls) => {
+        const node = document.createElement(tag);
+        if (value !== undefined) node.textContent = value;
+        if (cls) node.className = cls;
+        return node;
+      };
+      const dateText = value => value ? new Date(value).toLocaleDateString() : "—";
+      function setBusy(value) {
+        busy = value;
+        $("honorsSend").disabled = value;
+        $("honorsRefresh").disabled = value;
+      }
+      function options() {
+        const search = $("honorsSearch").value.trim().toLowerCase();
+        const select = $("honorsInvitee");
+        const selected = select.value;
+        select.replaceChildren(new Option("Choose an approved Bestie", ""));
+        approved.filter(p => (p.display_name || "").toLowerCase().includes(search))
+          .sort((a,b) => (a.display_name || "").localeCompare(b.display_name || ""))
+          .forEach(person => {
+            const active = memberships.some(m => m.user_id === person.id && m.status === "active");
+            const pending = invitations.some(i => i.invitee_id === person.id && i.status === "pending");
+            const suffix = active ? " · Active VIP" : pending ? " · Pending invitation" : "";
+            const option = new Option(`${person.display_name || "Unnamed Bestie"}${suffix}`, person.id);
+            option.disabled = active || pending;
+            select.add(option);
+          });
+        if ([...select.options].some(o => o.value === selected && !o.disabled)) select.value = selected;
+      }
+      function actionButton(label, onClick, danger = false) {
+        const btn = make("button", label, danger ? "btn danger" : "btn light");
+        btn.type = "button";
+        btn.disabled = busy;
+        btn.addEventListener("click", onClick);
+        return btn;
+      }
+      function card(title, description, badge) {
+        const node = make("div", undefined, "item");
+        node.append(make("h4", title), make("p", description, "mini"));
+        if (badge) node.append(make("span", badge, "tag " + (badge === "active" || badge === "accepted" ? "green" : "gray")));
+        return node;
+      }
+      function render() {
+        $("honorsActiveCount").textContent = memberships.filter(m => m.status === "active").length;
+        $("honorsPendingCount").textContent = invitations.filter(i => i.status === "pending").length;
+        $("honorsInvitedCount").textContent = invitations.length;
+        const invites = $("honorsInvitationsList");
+        invites.replaceChildren();
+        if (!invitations.length) invites.append(make("p", "No invitations sent yet, Bestie!", "empty"));
+        invitations.forEach(inv => {
+          const node = card(`💌 ${nameFor(inv.invitee_id)}`, `Sent ${dateText(inv.created_at)}${inv.invitation_message ? " · Message: " + inv.invitation_message : ""}`, inv.status);
+          if (inv.status === "pending") node.append(actionButton("Revoke Invitation", async () => {
+            if (!confirm(`Revoke the pending invitation for ${nameFor(inv.invitee_id)}?`)) return;
+            await mutate("honors_revoke_invitation", {p_invitation_id: inv.id}, "Invitation revoked.");
+          }, true));
+          invites.append(node);
+        });
+        const roster = $("honorsMembershipsList");
+        roster.replaceChildren();
+        const active = memberships.filter(m => m.status === "active");
+        if (!active.length) roster.append(make("p", "No active VIP memberships yet. Invitations must be accepted first.", "empty"));
+        active.forEach(member => {
+          const node = card(`💎 ${nameFor(member.user_id)}`, `VIP since ${dateText(member.activated_at)}`, "active");
+          node.append(actionButton("Revoke VIP Membership", async () => {
+            if (!confirm(`Remove ${nameFor(member.user_id)} from the Honors Society? Their VIP access will end immediately.`)) return;
+            await mutate("honors_revoke_membership", {p_user_id: member.user_id}, "VIP membership revoked.");
+          }, true));
+          roster.append(node);
+        });
+        options();
+      }
+      async function load() {
+        if (!client) return;
+        setBusy(true);
+        status("Loading approved Besties, invitations, and VIP memberships...");
+        try {
+          const [membersResult, invitesResult, rosterResult] = await Promise.all([
+            client.from("profiles").select("id,display_name").eq("membership_status","approved").order("display_name"),
+            client.from("honors_invitations").select("id,invitee_id,invited_by,status,invitation_message,created_at,responded_at").order("created_at",{ascending:false}),
+            client.from("honors_memberships").select("id,user_id,status,activated_at,revoked_at").order("activated_at",{ascending:false})
+          ]);
+          const problem = membersResult.error || invitesResult.error || rosterResult.error;
+          if (problem) throw problem;
+          approved = membersResult.data || [];
+          invitations = invitesResult.data || [];
+          memberships = rosterResult.data || [];
+          render();
+          status(`${approved.length} approved Besties found · ${invitations.length} invitations · ${memberships.filter(m => m.status === "active").length} active VIPs.`);
+        } catch (error) {
+          status("Unable to load Honors Society records: " + errorText(error));
+        } finally { setBusy(false); }
+      }
+      async function mutate(rpc, params, success) {
+        if (busy) return;
+        setBusy(true);
+        status("Saving to Supabase...");
+        try {
+          const { error } = await client.rpc(rpc, params);
+          if (error) throw error;
+          await load();
+          status("💗 " + success);
+        } catch (error) {
+          status("Could not save: " + errorText(error));
+        } finally { setBusy(false); }
+      }
+      async function initialize() {
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) { status("Campus staff connection unavailable. Refresh the page."); return; }
+        const role = await client.rpc("is_campus_staff");
+        if (role.error || role.data !== true) {
+          status("Only verified campus staff can manage VIP memberships.");
+          $("honorsSend").disabled = true;
+          return;
+        }
+        await load();
+      }
+      $("honorsSearch").addEventListener("input", options);
+      $("honorsRefresh").addEventListener("click", load);
+      $("honorsInviteForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const id = $("honorsInvitee").value;
+        if (!id || busy) { status("Select an eligible approved Bestie first."); return; }
+        const name = nameFor(id);
+        if (!confirm(`Send an Honors Society invitation to ${name}?`)) return;
+        await mutate("honors_send_invitation", {
+          p_invitee_id: id,
+          p_message: $("honorsMessage").value.trim() || null
+        }, `Invitation sent to ${name}!`);
+        $("honorsMessage").value = "";
+      });
+      document.addEventListener("bb:campus-hq-ready", initialize, {once:true});
     })();
   </script>
 
