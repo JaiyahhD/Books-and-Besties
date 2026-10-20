@@ -290,6 +290,24 @@ footer{
 .envelope-card h2{font-family:Bungee,sans-serif;font-size:clamp(23px,5vw,35px);color:#a44879;margin:15px 0}
 .envelope-card p{line-height:1.7}.modal-close{position:absolute;right:12px;top:10px;border:0;background:transparent;font-size:25px;color:#683e55;padding:7px}
 body.invite-open{overflow:hidden}
+
+/* Phase 7.2C — live Insider Room */
+.insider-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin:20px 0 12px}
+.insider-feed{display:grid;gap:22px;margin-top:18px}
+.insider-post{border:2px solid #edbfd5;background:linear-gradient(145deg,#fffafd,#fff3f9);border-radius:20px;overflow:hidden;box-shadow:0 4px 0 #f0d0df}
+.insider-post.featured{border-color:#c68d42;box-shadow:0 5px 0 #f2d7a9}
+.insider-post-body{padding:clamp(18px,3vw,27px)}
+.insider-post h3{color:#a44879;font-size:clamp(20px,3vw,27px);margin:12px 0 9px}
+.insider-post p{line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.insider-post-image{width:100%;max-height:520px;object-fit:contain;display:block;background:#fbe5f0}
+.insider-meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.insider-date{font-size:12px;color:#806477;font-weight:800}
+.insider-reactions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}
+.insider-react{border:2px solid #eac0d4;background:#fff;border-radius:22px;padding:9px 12px;font-weight:900;color:#75415d;min-width:69px}
+.insider-react[aria-pressed="true"]{background:#ffe0ed;border-color:#c65e95;box-shadow:0 3px 0 #e9a4c6}
+.insider-react:disabled{opacity:.6;cursor:wait}
+.insider-react:focus-visible,#refreshExclusive:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.insider-empty{padding:30px;text-align:center;background:#fff6fb;border:2px dashed #e9b2ce;border-radius:18px;font-weight:800}
 </style>
 </head>
 <body>
@@ -335,7 +353,7 @@ body.invite-open{overflow:hidden}
 
   <div id="vipExperience" hidden>
     <div class="notice" id="vipWelcome">💎 Welcome to your Honors Society lounge!</div>
-    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive, Pink Ballot, and Bestie Access are currently previews. Sample votes and RSVPs on this page are browser-only until the next live phases.</div>
+    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive is now LIVE! Pink Ballot and Bestie Access are still previews; their sample votes and RSVPs remain browser-only.</div>
 <div class="layout">
 
     <aside class="sidebar">
@@ -355,24 +373,12 @@ body.invite-open{overflow:hidden}
           <h2 class="section-title">Psst... You're on the Inside! ♡</h2>
           <p>Here's where Honors Society Besties get sneak peeks of upcoming campus events, activities, and giveaways before everyone else.</p>
 
-          <div class="cards">
-            <article class="card">
-              <div class="emoji">☕</div>
-              <span class="tag">SAMPLE SNEAK PEEK</span>
-              <h3>The Velvet Latte Lounge</h3>
-              <p>November is bringing warm coffeehouse energy, cozy challenges, and sweet little reading moments to campus.</p>
-            </article>
-            <article class="card">
-              <div class="emoji">🎁</div>
-              <span class="tag">SAMPLE PREVIEW</span>
-              <h3>A Little Bestie Surprise</h3>
-              <p>Future giveaways and special event previews will make their first appearance right here.</p>
-            </article>
-          </div>
-
-          <div class="status">
-            💗 Future feature: Admins can publish, schedule, and remove VIP-only previews from Campus HQ.
-          </div>
+                     <div class="insider-toolbar">
+             <span class="tag">💎 VIP-ONLY DISPATCHES</span>
+             <button type="button" class="btn secondary" id="refreshExclusive">↻ Refresh the Room</button>
+           </div>
+           <p class="small" id="exclusiveStatus" role="status" aria-live="polite">Preparing your private Insider Room...</p>
+           <div id="exclusiveFeed" class="insider-feed" aria-live="polite"></div>
         </div>
       </section>
 
@@ -477,6 +483,7 @@ body.invite-open{overflow:hidden}
     closeModal(); gate.hidden = true; vip.hidden = false;
     el('heroBadge').textContent = staff ? '💎 CAMPUS STAFF · VIP ACCESS' : '💎 OFFICIAL HONORS SOCIETY VIP';
     el('vipWelcome').textContent = staff ? '💎 Welcome, Campus Staff! Your Honors Society access is active.' : `💎 Welcome to the Honors Society, ${memberName}! Your VIP membership is active.`;
+    document.dispatchEvent(new CustomEvent('bb:honors-vip-ready', {detail:{client,user:currentUser}}));
   };
   const showInvitation = () => {
     setGate('💌', `${memberName}, You're Invited!`, 'You have been personally selected to join the Honors Society at Bestie University.');
@@ -543,6 +550,177 @@ body.invite-open{overflow:hidden}
     }
   }
   init();
+})();
+</script>
+
+<script>
+/* Phase 7.2C — authenticated live VIP feed + emoji reactions */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const reactions = [
+    {key:'love',emoji:'💗',label:'Love It'},
+    {key:'obsessed',emoji:'😍',label:'Obsessed'},
+    {key:'eyes',emoji:'👀',label:'The Tea!'},
+    {key:'bow',emoji:'🎀',label:'So Cute!'}
+  ];
+  let client, user, loading = false, initialized = false;
+  const status = message => { $('exclusiveStatus').textContent = message; };
+  const node = (tag, cls, content) => {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (content !== undefined) el.textContent = content;
+    return el;
+  };
+  const errorText = error => error?.message || 'Please try again.';
+  const postTypes = {
+    announcement:'📣 CAMPUS ANNOUNCEMENT',
+    sneak_peek:'👀 SNEAK PEEK',
+    giveaway_preview:'🎁 GIVEAWAY PREVIEW'
+  };
+  function formatDate(value) {
+    if (!value) return '';
+    return new Date(value).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  }
+  async function load() {
+    if (!client || !user || loading) return;
+    loading = true;
+    $('refreshExclusive').disabled = true;
+    status('💌 Opening the latest VIP dispatches...');
+    try {
+      // Database RLS excludes non-VIPs, drafts, archived and future reveals.
+      const {data:posts,error:postError} = await client
+        .from('honors_exclusive_posts')
+        .select('id,title,body,post_type,image_path,is_featured,published_at,created_at,scheduled_at')
+        .eq('status','published')
+        .or('scheduled_at.is.null,scheduled_at.lte.' + new Date().toISOString())
+        .order('created_at',{ascending:false});
+      if (postError) throw postError;
+      const feed = $('exclusiveFeed');
+      feed.replaceChildren();
+      if (!posts?.length) {
+        feed.append(node('div','insider-empty','🎀 Nothing has been revealed just yet, Bestie! Check back soon for your first exclusive dispatch.'));
+        status('💗 You’re all caught up!');
+        return;
+      }
+      const ids = posts.map(p=>p.id);
+      const {data:allReactions,error:reactionError} = await client
+        .from('honors_exclusive_reactions')
+        .select('post_id,user_id,reaction')
+        .in('post_id',ids);
+      if (reactionError) throw reactionError;
+      posts.sort((a,b)=>Number(b.is_featured)-Number(a.is_featured) || new Date(b.created_at)-new Date(a.created_at));
+      const counts = new Map();
+      const mine = new Map();
+      for (const r of allReactions || []) {
+        const key = r.post_id + ':' + r.reaction;
+        counts.set(key,(counts.get(key)||0)+1);
+        if (r.user_id===user.id) mine.set(r.post_id,r.reaction);
+      }
+      for (const post of posts) {
+        const card = node('article','insider-post'+(post.is_featured?' featured':''));
+        const inner = node('div','insider-post-body');
+        const meta = node('div','insider-meta');
+        meta.append(node('span','tag',postTypes[post.post_type] || '💎 EXCLUSIVE'));
+        if (post.is_featured) meta.append(node('span','tag','✨ FEATURED'));
+        inner.append(meta,node('h3','',post.title),node('p','',post.body));
+        const date = post.scheduled_at || post.published_at || post.created_at;
+        inner.append(node('div','insider-date','💌 Revealed '+formatDate(date)));
+        card.append(inner);
+        if (post.image_path) {
+          const imageWrap = node('div','');
+          const img = node('img','insider-post-image');
+          img.alt = 'Graphic for '+post.title;
+          img.loading = 'lazy';
+          const {data:signed,error:imageError} = await client.storage
+            .from('honors-exclusive').createSignedUrl(post.image_path,3600);
+          if (!imageError && signed?.signedUrl) {
+            img.src = signed.signedUrl;
+            imageWrap.append(img);
+          } else {
+            imageWrap.append(node('p','small','🖼️ This graphic is temporarily unavailable.'));
+          }
+          card.append(imageWrap);
+        }
+        const bottom = node('div','insider-post-body');
+        bottom.append(node('div','small','HOW ARE WE FEELING, BESTIE? ♡'));
+        const bar = node('div','insider-reactions');
+        const feedback = node('p','small','');
+        feedback.setAttribute('role','status');
+        const current = {value:mine.get(post.id)||null};
+        const perPost = new Map(reactions.map(r=>[r.key,counts.get(post.id+':'+r.key)||0]));
+        const buttons = new Map();
+        function repaint() {
+          for (const r of reactions) {
+            const b = buttons.get(r.key);
+            b.textContent = r.emoji+' '+perPost.get(r.key);
+            b.title = r.label;
+            b.setAttribute('aria-label',r.label+', '+perPost.get(r.key)+' reactions');
+            b.setAttribute('aria-pressed',String(current.value===r.key));
+          }
+        }
+        let saving = false;
+        async function choose(next) {
+          if (saving) return;
+          saving = true;
+          buttons.forEach(b=>b.disabled=true);
+          feedback.textContent = 'Saving your reaction...';
+          const old = current.value;
+          let error;
+          if (old===next) {
+            ({error} = await client.from('honors_exclusive_reactions')
+              .delete().eq('post_id',post.id).eq('user_id',user.id));
+          } else if (old) {
+            ({error} = await client.from('honors_exclusive_reactions')
+              .update({reaction:next}).eq('post_id',post.id).eq('user_id',user.id));
+          } else {
+            ({error} = await client.from('honors_exclusive_reactions')
+              .insert({post_id:post.id,user_id:user.id,reaction:next}));
+          }
+          if (!error) {
+            if (old) perPost.set(old,Math.max(0,perPost.get(old)-1));
+            if (old!==next) {
+              perPost.set(next,perPost.get(next)+1);
+              current.value=next;
+            } else current.value=null;
+            repaint();
+            feedback.textContent = current.value ? '💗 Reaction saved!' : '💗 Reaction removed!';
+          } else {
+            feedback.textContent = 'Could not save your reaction: '+errorText(error);
+          }
+          saving=false;
+          buttons.forEach(b=>b.disabled=false);
+        }
+        for (const r of reactions) {
+          const button = node('button','insider-react');
+          button.type='button';
+          button.addEventListener('click',()=>choose(r.key));
+          buttons.set(r.key,button);
+          bar.append(button);
+        }
+        repaint();
+        bottom.append(bar,feedback);
+        card.append(bottom);
+        feed.append(card);
+      }
+      status('💎 '+posts.length+' exclusive '+(posts.length===1?'dispatch':'dispatches')+' waiting for you!');
+    } catch (error) {
+      console.error('Insider Room:',error);
+      status('⚠️ Could not load the Insider Room: '+errorText(error));
+    } finally {
+      loading=false;
+      $('refreshExclusive').disabled=false;
+    }
+  }
+  document.addEventListener('bb:honors-vip-ready',event=>{
+    client=event.detail.client;
+    user=event.detail.user;
+    if (!initialized) {
+      initialized=true;
+      $('refreshExclusive').addEventListener('click',load);
+    }
+    load();
+  });
 })();
 </script>
 

@@ -553,6 +553,8 @@
             💎 Honors Society
           </button>
 
+          <button class="nav-btn" data-section="exclusive-studio">🎀 Bestie Exclusive Studio</button>
+
           <button class="nav-btn" data-section="polls">
             🗳️ Pink Ballot
           </button>
@@ -841,6 +843,30 @@
             </div>
             <div class="panel"><div class="panel-head">💌 INVITATIONS & RESPONSES</div><div class="panel-body"><div id="honorsInvitationsList" aria-live="polite"><p class="empty">Loading invitations...</p></div></div></div>
             <div class="panel"><div class="panel-head">💎 ACTIVE VIP MEMBERSHIPS</div><div class="panel-body"><div id="honorsMembershipsList" aria-live="polite"><p class="empty">Loading memberships...</p></div></div></div>
+          </section>
+
+          <!-- PHASE 7.2B: LIVE BESTIE EXCLUSIVE PUBLISHING STUDIO -->
+          <section class="section" id="section-exclusive-studio">
+            <h2 class="section-heading">🎀 Bestie Exclusive Studio</h2>
+            <p class="section-description">Publish private VIP announcements, sneak peeks, and giveaway previews. Admins and moderators share publishing access.</p>
+            <div class="panel"><div class="panel-head">💌 COMPOSE AN INSIDER POST</div><div class="panel-body">
+              <p id="exclusiveStudioStatus" class="mini" role="status" aria-live="polite">Waiting for staff verification...</p>
+              <form id="exclusiveStudioForm">
+                <input id="exclusivePostId" type="hidden">
+                <label class="field"><span>Post title</span><input id="exclusiveTitle" required maxlength="180" placeholder="A little secret for our VIP Besties..."></label>
+                <label class="field"><span>Message</span><textarea id="exclusiveBody" required maxlength="10000" placeholder="Give your VIP Besties the inside scoop..." style="min-height:160px"></textarea></label>
+                <div class="form-grid">
+                  <label class="field"><span>Post category</span><select id="exclusiveType"><option value="announcement">💌 Announcement</option><option value="sneak_peek">👀 Sneak Peek</option><option value="giveaway_preview">🎁 Giveaway Preview</option></select></label>
+                  <label class="field"><span>Visibility</span><select id="exclusiveStatus"><option value="draft">Draft (staff only)</option><option value="published">Published / Scheduled</option><option value="archived">Archived (staff only)</option></select></label>
+                </div>
+                <label class="field"><span>Scheduled reveal (optional; your local time)</span><input id="exclusiveSchedule" type="datetime-local"></label>
+                <label class="field"><span>Image / flyer (optional, max 10 MB, JPG/PNG/WebP/GIF)</span><input id="exclusiveImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                <div id="exclusiveImageInfo" class="mini">No image attached.</div>
+                <label class="field" style="display:flex;gap:10px;align-items:center"><input id="exclusiveFeatured" type="checkbox" style="width:auto"><span style="margin:0">💎 Feature this post</span></label>
+                <div class="actions"><button id="exclusiveSave" class="btn secondary" type="submit">💗 Save Insider Post</button><button id="exclusiveClear" class="btn light" type="button">Clear Editor</button><button id="exclusiveRemoveImage" class="btn danger" type="button" hidden>Remove Attached Image</button></div>
+              </form>
+            </div></div>
+            <div class="panel"><div class="panel-head">📋 INSIDER POST REGISTRY</div><div class="panel-body"><button class="btn light" id="exclusiveRefresh" type="button">🔄 Refresh Posts</button><div id="exclusivePostList" aria-live="polite"><p class="empty">Loading VIP posts...</p></div></div></div>
           </section>
 
           <!-- PINK BALLOT -->
@@ -2179,6 +2205,165 @@
         $("honorsMessage").value = "";
       });
       document.addEventListener("bb:campus-hq-ready", initialize, {once:true});
+    })();
+  </script>
+
+  <script>
+    // PHASE 7.2B: live private VIP publishing, initialized after HQ staff auth.
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      const bucket = "honors-exclusive";
+      const table = "honors_exclusive_posts";
+      let client, userId, posts = [], busy = false, removeImage = false;
+      const msg = text => { $("exclusiveStudioStatus").textContent = text; };
+      const err = error => error?.message || String(error || "Unknown error");
+      const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+      function busyState(value) { busy = value; $("exclusiveSave").disabled = value; $("exclusiveRefresh").disabled = value; }
+      function reset() {
+        $("exclusiveStudioForm").reset();
+        $("exclusivePostId").value = "";
+        $("exclusiveImageInfo").textContent = "No image attached.";
+        $("exclusiveRemoveImage").hidden = true;
+        removeImage = false;
+        $("exclusiveSave").textContent = "💗 Save Insider Post";
+      }
+      function localValue(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return "";
+        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0,16);
+      }
+      function fmt(iso) { return iso ? new Date(iso).toLocaleString() : "Not set"; }
+      function node(tag, content, className) {
+        const n = document.createElement(tag);
+        if (content !== undefined) n.textContent = content;
+        if (className) n.className = className;
+        return n;
+      }
+      function action(text, fn, style="light") {
+        const b = node("button",text,"btn "+style);
+        b.type="button"; b.addEventListener("click",fn); return b;
+      }
+      function edit(post) {
+        $("exclusivePostId").value = post.id;
+        $("exclusiveTitle").value = post.title;
+        $("exclusiveBody").value = post.body;
+        $("exclusiveType").value = post.post_type;
+        $("exclusiveStatus").value = post.status;
+        $("exclusiveSchedule").value = localValue(post.scheduled_at);
+        $("exclusiveFeatured").checked = !!post.is_featured;
+        $("exclusiveImage").value = "";
+        $("exclusiveImageInfo").textContent = post.image_path ? "Current private image: " + post.image_path.split("/").pop() : "No image attached.";
+        $("exclusiveRemoveImage").hidden = !post.image_path;
+        removeImage = false;
+        $("exclusiveSave").textContent = "💗 Update Insider Post";
+        $("exclusiveStudioForm").scrollIntoView({behavior:"smooth",block:"center"});
+      }
+      async function load() {
+        if (!client || busy) return;
+        msg("Loading VIP posts...");
+        const {data,error} = await client.from(table).select("id,title,body,post_type,image_path,status,is_featured,scheduled_at,published_at,created_at,updated_at").order("created_at",{ascending:false});
+        if (error) { msg("Unable to load posts: " + err(error)); return; }
+        posts = data || [];
+        render();
+        msg(posts.length + " Insider Room post(s) loaded. Changes save to Supabase.");
+      }
+      function render() {
+        const list = $("exclusivePostList"); list.replaceChildren();
+        if (!posts.length) { list.append(node("p","No Insider Room posts yet. Create your first one!","empty")); return; }
+        for (const post of posts) {
+          const item = node("article",undefined,"item");
+          item.append(node("h4",(post.is_featured ? "💎 " : "") + post.title));
+          const tag = node("span",post.post_type.replaceAll("_"," ") + " · " + post.status + (post.status === "published" && post.scheduled_at && new Date(post.scheduled_at)>new Date() ? " · awaiting reveal" : ""),"tag " + (post.status === "published" ? "green" : "gray"));
+          item.append(tag,node("p",post.body.length>250 ? post.body.slice(0,250)+"…" : post.body),node("p","Created: " + fmt(post.created_at) + " · Reveal: " + fmt(post.scheduled_at),"mini"));
+          if (post.image_path) item.append(node("p","🖼️ Private image attached","mini"));
+          const buttons = node("div",undefined,"actions");
+          buttons.append(action("✏️ Edit",()=>edit(post)));
+          if (post.status !== "published") buttons.append(action("💗 Publish",()=>quickStatus(post,"published"),"secondary"));
+          if (post.status !== "draft") buttons.append(action("📋 Draft",()=>quickStatus(post,"draft")));
+          if (post.status !== "archived") buttons.append(action("📦 Archive",()=>quickStatus(post,"archived")));
+          buttons.append(action("🗑️ Delete",()=>deletePost(post),"danger"));
+          item.append(buttons); list.append(item);
+        }
+      }
+      async function quickStatus(post,status) {
+        if (busy) return;
+        if (!confirm(`Change “${post.title}” to ${status}?`)) return;
+        busyState(true);
+        const {error} = await client.from(table).update({status}).eq("id",post.id);
+        busyState(false);
+        if (error) {msg("Could not update: "+err(error));return;}
+        msg("Post updated."); await load();
+      }
+      async function deletePost(post) {
+        if (busy || !confirm(`Permanently delete “${post.title}”? This cannot be undone.`)) return;
+        busyState(true);
+        const {error} = await client.from(table).delete().eq("id",post.id);
+        busyState(false);
+        if (error) {msg("Could not delete: "+err(error));return;}
+        if ($("exclusivePostId").value === post.id) reset();
+        // Image objects are deliberately retained to avoid deleting an image
+        // referenced by another post. Cleanup can be added separately.
+        await load();
+      }
+      async function save(event) {
+        event.preventDefault();
+        if (busy || !client) return;
+        const id = $("exclusivePostId").value;
+        const previous = posts.find(p=>p.id===id);
+        const file = $("exclusiveImage").files[0];
+        if (file && (!validTypes.includes(file.type) || file.size > 10*1024*1024 || file.size === 0)) {msg("Choose a JPG, PNG, WebP, or GIF under 10 MB.");return;}
+        const title = $("exclusiveTitle").value.trim(), body = $("exclusiveBody").value.trim();
+        if (!title || !body) {msg("Add a title and message first.");return;}
+        const dateInput = $("exclusiveSchedule").value;
+        const schedule = dateInput ? new Date(dateInput) : null;
+        if (schedule && Number.isNaN(schedule.getTime())) {msg("Enter a valid scheduled date.");return;}
+        const payload = {
+          title,body,post_type:$("exclusiveType").value,
+          status:$("exclusiveStatus").value,
+          is_featured:$("exclusiveFeatured").checked,
+          scheduled_at:schedule ? schedule.toISOString() : null,
+          image_path:removeImage ? null : previous?.image_path || null
+        };
+        busyState(true);
+        let uploadedPath = null;
+        try {
+          if (file) {
+            const ext = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"}[file.type];
+            uploadedPath = `${userId}/${crypto.randomUUID()}.${ext}`;
+            msg("Uploading your private VIP graphic...");
+            const uploaded = await client.storage.from(bucket).upload(uploadedPath,file,{contentType:file.type,upsert:false});
+            if (uploaded.error) throw uploaded.error;
+            payload.image_path = uploadedPath;
+          }
+          msg("Saving Insider Room post...");
+          const result = id ? await client.from(table).update(payload).eq("id",id).select("id").single() : await client.from(table).insert(payload).select("id").single();
+          if (result.error) throw result.error;
+          reset();
+          await load();
+          msg("💗 Insider Room post saved successfully!" + (payload.status === "published" && schedule && schedule > new Date() ? " It will reveal at the scheduled time." : ""));
+        } catch (error) {
+          msg("Could not save post: " + err(error));
+          // Failed inserts can leave an unattached private file. Try cleanup.
+          if (uploadedPath) await client.storage.from(bucket).remove([uploadedPath]);
+        } finally { busyState(false); }
+      }
+      async function initialize() {
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) {msg("Campus HQ Supabase connection unavailable. Refresh.");return;}
+        const [staff,session] = await Promise.all([client.rpc("is_campus_staff"),client.auth.getUser()]);
+        if (staff.error || staff.data !== true || !session.data?.user) {msg("Verified campus staff access required.");$("exclusiveSave").disabled=true;return;}
+        userId = session.data.user.id;
+        await load();
+      }
+      $("exclusiveStudioForm").addEventListener("submit",save);
+      $("exclusiveClear").addEventListener("click",reset);
+      $("exclusiveRefresh").addEventListener("click",load);
+      $("exclusiveRemoveImage").addEventListener("click",()=>{removeImage=true;$("exclusiveImage").value="";$("exclusiveImageInfo").textContent="Existing image will be detached when you save.";});
+      $("exclusiveImage").addEventListener("change",()=>{const f=$("exclusiveImage").files[0];if(f) {removeImage=false;$("exclusiveImageInfo").textContent=`New image: ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;}});
+      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
     })();
   </script>
 
