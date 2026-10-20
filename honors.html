@@ -270,6 +270,15 @@ footer{
   .sidebar{position:static}
 }
 @media(max-width:600px){
+  .hero{padding:44px 16px 50px}
+  .top{padding:14px 16px}
+  nav a{padding:9px 11px;font-size:13px}
+  .wrap{padding:22px 15px 48px}
+  .gate{box-shadow:4px 5px 0 #e5b8cf}
+  .panel{box-shadow:4px 5px 0 #e5b8cf}
+  .insider-toolbar .btn{width:100%}
+  .invite-actions .btn{width:100%}
+  .event .btn{width:100%}
   .top,nav{justify-content:center}
   .cards{grid-template-columns:1fr}
   .event{flex-direction:column;align-items:stretch}
@@ -447,7 +456,7 @@ body.invite-open{overflow:hidden}
   const modal = el('inviteModal');
   let client, invitation, currentUser, memberName = 'Bestie', busy = false;
   let activeSeason = null, isStaff = false;
-  const seasonLabel = season => season ? `${season.name} · ${season.starts_on} to ${season.ends_on}` : 'No active season';
+  const seasonLabel = season => season ? `${season.name} · ${season.starts_on} to ${season.ends_on}` : 'Season details unavailable';
   const activeSeasonForMember = season => {
     if (!season || season.status !== 'active') return false;
     const today = new Date().toISOString().slice(0,10);
@@ -461,7 +470,7 @@ body.invite-open{overflow:hidden}
     activeSeason = data?.[0] || null;
     el('seasonBanner').textContent = activeSeason
       ? `📅 ${seasonLabel(activeSeason)} · ${activeSeasonForMember(activeSeason) ? 'Season underway' : 'Founding season preview'}`
-      : '📅 No Honors Society season is currently active.';
+      : '📅 Season details are not available to this account yet.';
     return activeSeason;
   }
   const setGate = (icon, title, message, back = false) => {
