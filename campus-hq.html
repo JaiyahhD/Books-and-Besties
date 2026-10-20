@@ -2127,7 +2127,7 @@
       function setBusy(value) {
         busy = value;
         ["honorsSend", "honorsRefresh", "honorsSeasonCreate", "honorsSeasonActivate", "honorsSeasonClose"].forEach(id => { $(id).disabled = value; });
-        if (!value) renderSeason();
+        if (!value) { renderSeason(); render(); }
       }
       function options() {
         const query = $("honorsSearch").value.trim().toLowerCase();
@@ -2145,7 +2145,7 @@
         $("honorsSend").disabled = busy || !accepting();
       }
       function actionButton(label, fn) {
-        const b = make("button", label, "btn danger"); b.type = "button"; b.disabled = busy || !accepting(); b.addEventListener("click", fn); return b;
+        const b = make("button", label, "btn danger"); b.type = "button"; b.disabled = busy; b.addEventListener("click", fn); return b;
       }
       function card(title, detail, badge) {
         const n = make("div", undefined, "item"); n.append(make("h4", title), make("p", detail, "mini"));
@@ -2170,7 +2170,7 @@
         if (!invitations.length) invites.append(make("p", "No invitations for this season.", "empty"));
         invitations.forEach(inv => {
           const n = card(`💌 ${nameFor(inv.invitee_id)}`, `Sent ${dateText(inv.created_at)}${inv.invitation_message ? " · Message: " + inv.invitation_message : ""}`, inv.status);
-          if (inv.status === "pending" && accepting()) n.append(actionButton("Revoke Invitation", async () => {
+          if (inv.status === "pending" && chosen()?.status === "active") n.append(actionButton("Revoke Invitation", async () => {
             if (confirm(`Revoke the invitation for ${nameFor(inv.invitee_id)}?`)) await mutate("honors_revoke_invitation", { p_invitation_id: inv.id }, "Invitation revoked.");
           }));
           invites.append(n);
@@ -2179,7 +2179,7 @@
         if (!memberships.length) roster.append(make("p", "No membership records for this season.", "empty"));
         memberships.forEach(m => {
           const n = card(`💎 ${nameFor(m.user_id)}`, `Activated ${dateText(m.activated_at)}${m.revoked_at ? " · Revoked " + dateText(m.revoked_at) : ""}`, m.status);
-          if (m.status === "active" && accepting()) n.append(actionButton("Revoke VIP Membership", async () => {
+          if (m.status === "active" && chosen()?.status === "active") n.append(actionButton("Revoke VIP Membership", async () => {
             if (confirm(`Revoke ${nameFor(m.user_id)}'s membership for this season?`)) await mutate("honors_revoke_membership", { p_user_id: m.user_id }, "Season membership revoked.");
           }));
           roster.append(n);
