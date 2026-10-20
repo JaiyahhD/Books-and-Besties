@@ -275,6 +275,21 @@ footer{
   .event{flex-direction:column;align-items:stretch}
   .panel-body{padding:17px}
 }
+
+/* Phase 7.1C: member invitation + secure UI gating */
+[hidden]{display:none!important}
+.gate{max-width:790px;margin:0 auto 32px;text-align:center;background:#fff;border:3px solid #e8a7c6;border-radius:26px;padding:clamp(24px,5vw,46px);box-shadow:7px 8px 0 #e5b8cf}
+.gate-icon{font-size:58px;line-height:1.2}.gate h2{font-family:Bungee,sans-serif;color:#a44879;font-size:clamp(21px,4vw,32px);line-height:1.3}
+.gate p{line-height:1.8}.gate .small{margin-top:16px}.invite-note{background:#fff3f8;border:2px dashed #e6a2c1;border-radius:18px;padding:22px;margin:22px 0;white-space:pre-wrap;line-height:1.7}
+.invite-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:20px}
+.btn.decline{background:#fff0f5;color:#7a4260;box-shadow:0 4px 0 #e2b5cb;border:2px solid #e2b5cb}
+.btn:focus-visible{outline:3px solid #246e70;outline-offset:3px}
+#inviteModal{position:fixed;inset:0;z-index:1000;background:#2d1927c9;display:grid;place-items:center;padding:18px;overflow:auto}
+.envelope-card{width:min(100%,550px);text-align:center;background:linear-gradient(155deg,#fffafd,#ffe2ef);border:5px solid #d5a45e;border-radius:28px;padding:clamp(22px,5vw,40px);box-shadow:0 20px 80px #27111f80;position:relative}
+.envelope-art{font-size:84px;filter:drop-shadow(0 8px 4px #c980a777)}
+.envelope-card h2{font-family:Bungee,sans-serif;font-size:clamp(23px,5vw,35px);color:#a44879;margin:15px 0}
+.envelope-card p{line-height:1.7}.modal-close{position:absolute;right:12px;top:10px;border:0;background:transparent;font-size:25px;color:#683e55;padding:7px}
+body.invite-open{overflow:hidden}
 </style>
 </head>
 <body>
@@ -298,19 +313,30 @@ footer{
   <h1>HONORS<br>SOCIETY</h1>
   <div class="script">The Pink Velvet VIP Lounge ♡</div>
   <p>Special previews, a seat at the planning table, and early access to the little things that make our campus magical.</p>
-  <span class="kicker">💎 EXCLUSIVE CAMPUS PREVIEW</span>
+  <span class="kicker" id="heroBadge">💎 AN INVITATION-ONLY CAMPUS EXPERIENCE</span>
 </section>
 
 <main class="wrap">
 
-  <div class="notice">
-    💎 DESIGN PREVIEW: This is a visual prototype of the Honors Society.
-    VIP membership is not verified yet. Poll votes and RSVPs are demo-only
-    and save in this browser, not across members. Real access restrictions,
-    shared polls, and registration will be connected later.
-  </div>
+  <section class="gate" id="honorsGate" aria-live="polite">
+    <div class="gate-icon" id="gateIcon">💌</div>
+    <h2 id="gateTitle">Checking your invitation...</h2>
+    <p id="gateMessage">We're checking your Bestie University account securely.</p>
+    <div id="invitationDetails" hidden>
+      <div class="invite-note" id="invitationMessage"></div>
+      <div class="invite-actions">
+        <button class="btn" type="button" id="acceptInvite">Accept My Invitation 💗</button>
+        <button class="btn decline" type="button" id="declineInvite">Decline Invitation</button>
+      </div>
+    </div>
+    <p id="gateFeedback" class="small" role="status"></p>
+    <a class="btn secondary" href="index.html#dashboard" id="backToLocker" hidden>Return to My Bestie Locker</a>
+  </section>
 
-  <div class="layout">
+  <div id="vipExperience" hidden>
+    <div class="notice" id="vipWelcome">💎 Welcome to your Honors Society lounge!</div>
+    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive, Pink Ballot, and Bestie Access are currently previews. Sample votes and RSVPs on this page are browser-only until the next live phases.</div>
+<div class="layout">
 
     <aside class="sidebar">
       <h2>💎 VIP DIRECTORY</h2>
@@ -318,7 +344,7 @@ footer{
       <a href="#ballot">🗳️ Pink Ballot</a>
       <a href="#access">💌 Bestie Access</a>
       <p>Three special spaces. One fabulous little society.</p>
-      <p>Honors Society invitations and VIP access will eventually be managed by Campus HQ.</p>
+      <p>Your VIP membership is managed securely through Campus HQ.</p>
     </aside>
 
     <div class="content">
@@ -407,12 +433,118 @@ footer{
 
     </div>
   </div>
+  </div>
 </main>
 
 <footer>
   BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
   <p>© <span id="year"></span> Bestie University</p>
 </footer>
+
+
+<div id="inviteModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+  <div class="envelope-card">
+    <button class="modal-close" type="button" id="dismissEnvelope" aria-label="Close invitation preview">✕</button>
+    <div class="envelope-art" aria-hidden="true">💌</div>
+    <span class="tag">✦ BESTIE UNIVERSITY · PRIVATE INVITATION ✦</span>
+    <h2 id="modalTitle">You've Been Invited!</h2>
+    <p id="modalGreeting">Something special is waiting for you, Bestie.</p>
+    <button class="btn" type="button" id="openEnvelope">Open My Invitation 💎</button>
+    <p class="small">You can always return to this invitation on your Honors Society page.</p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script>
+(() => {
+  'use strict';
+  const el = id => document.getElementById(id);
+  const gate = el('honorsGate');
+  const vip = el('vipExperience');
+  const modal = el('inviteModal');
+  let client, invitation, currentUser, memberName = 'Bestie', busy = false;
+  const setGate = (icon, title, message, back = false) => {
+    gate.hidden = false; vip.hidden = true;
+    el('gateIcon').textContent = icon;
+    el('gateTitle').textContent = title;
+    el('gateMessage').textContent = message;
+    el('invitationDetails').hidden = true;
+    el('backToLocker').hidden = !back;
+  };
+  const errorText = e => (e && e.message) ? e.message : String(e);
+  const closeModal = () => {modal.hidden = true; document.body.classList.remove('invite-open');};
+  const showVip = (staff = false) => {
+    closeModal(); gate.hidden = true; vip.hidden = false;
+    el('heroBadge').textContent = staff ? '💎 CAMPUS STAFF · VIP ACCESS' : '💎 OFFICIAL HONORS SOCIETY VIP';
+    el('vipWelcome').textContent = staff ? '💎 Welcome, Campus Staff! Your Honors Society access is active.' : `💎 Welcome to the Honors Society, ${memberName}! Your VIP membership is active.`;
+  };
+  const showInvitation = () => {
+    setGate('💌', `${memberName}, You're Invited!`, 'You have been personally selected to join the Honors Society at Bestie University.');
+    el('invitationDetails').hidden = false;
+    el('invitationMessage').textContent = invitation.invitation_message?.trim() || 'A little more sparkle, a little more sisterhood, and a VIP seat at the Bestie University planning table. We would love to welcome you into the Honors Society! 💗';
+    const key = `bb_honors_envelope_seen_${currentUser.id}_${invitation.id}`;
+    let seen = false;
+    try { seen = localStorage.getItem(key) === 'yes'; } catch (_) {}
+    if (!seen) {
+      modal.hidden = false; document.body.classList.add('invite-open');
+      el('modalGreeting').textContent = `${memberName}, a special invitation has arrived just for you!`;
+    }
+  };
+  function dismissEnvelope() {
+    if (currentUser && invitation) {
+      try {localStorage.setItem(`bb_honors_envelope_seen_${currentUser.id}_${invitation.id}`, 'yes');} catch (_) {}
+    }
+    closeModal();
+    el('acceptInvite').focus();
+  }
+  el('dismissEnvelope').addEventListener('click', dismissEnvelope);
+  el('openEnvelope').addEventListener('click', dismissEnvelope);
+  async function respond(accept) {
+    if (busy || !invitation) return;
+    if (!accept && !window.confirm('Decline this Honors Society invitation? You can contact campus staff if you change your mind.')) return;
+    busy = true;
+    el('acceptInvite').disabled = el('declineInvite').disabled = true;
+    el('gateFeedback').textContent = 'Updating your invitation...';
+    const {error} = await client.rpc('honors_respond_to_invitation', {p_invitation_id: invitation.id, p_accept: accept});
+    busy = false;
+    el('acceptInvite').disabled = el('declineInvite').disabled = false;
+    if (error) {el('gateFeedback').textContent = `Couldn't update your invitation: ${errorText(error)}`; return;}
+    invitation = null;
+    if (accept) showVip();
+    else {setGate('💗', 'Thank You, Bestie!', 'You have declined this invitation. If you change your mind, contact campus staff.', true);}
+  }
+  el('acceptInvite').addEventListener('click', () => respond(true));
+  el('declineInvite').addEventListener('click', () => respond(false));
+  async function init() {
+    try {
+      const cfg = window.BB_CONFIG;
+      if (!cfg?.SUPABASE_URL || !cfg?.SUPABASE_ANON_KEY || !window.supabase?.createClient) throw new Error('Supabase configuration is unavailable. Check js/config.js and the Supabase library.');
+      client = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      const {data: authData, error: authError} = await client.auth.getUser();
+      if (authError || !authData?.user) {setGate('🔒','Bestie Login Required','Sign in to Bestie University to check your private Honors Society invitation.',true);return;}
+      currentUser = authData.user;
+      const {data: profile, error: profileError} = await client.from('profiles').select('display_name,membership_status').eq('id',currentUser.id).maybeSingle();
+      if (profileError) throw profileError;
+      memberName = profile?.display_name?.trim() || 'Bestie';
+      if (profile?.membership_status !== 'approved') {setGate('🎓','Campus Approval Required','Your campus membership must be approved before Honors Society access can be activated.',true);return;}
+      const {data: staff, error: staffError} = await client.rpc('is_campus_staff');
+      if (staffError) throw staffError;
+      if (staff === true) {showVip(true);return;}
+      const {data: access, error: accessError} = await client.rpc('has_honors_access');
+      if (accessError) throw accessError;
+      if (access === true) {showVip();return;}
+      const {data: invites, error: inviteError} = await client.from('honors_invitations').select('id,invitation_message,created_at').eq('invitee_id',currentUser.id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
+      if (inviteError) throw inviteError;
+      if (invites?.length) {invitation = invites[0];showInvitation();return;}
+      setGate('💎','An Invitation-Only Society','The Honors Society is a special space for personally invited Besties. Keep shining around campus!',true);
+    } catch (e) {
+      console.error('Honors Society initialization:',e);
+      setGate('⚠️','Unable to Check VIP Access',`We couldn't verify your invitation right now: ${errorText(e)}`,true);
+    }
+  }
+  init();
+})();
+</script>
 
 <script>
 (() => {
