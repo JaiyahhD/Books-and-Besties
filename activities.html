@@ -388,6 +388,23 @@ footer {
     padding:48px 14px;
   }
 }
+
+/* Phase 7.5D — live campus-wide Bestie Access */
+.access-section{margin:10px 0 55px;scroll-margin-top:22px}
+.access-lead{max-width:800px;line-height:1.7;font-weight:700}
+.access-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:18px 0}
+.access-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.access-event{background:#fff;border:3px solid #e7a5c6;border-radius:22px;box-shadow:6px 7px 0 #e5acc6;padding:24px;min-width:0}
+.access-event h3{font-family:Bungee,sans-serif;color:var(--teal);font-size:clamp(18px,2.5vw,23px);margin:14px 0 8px;overflow-wrap:anywhere}
+.access-event p{line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.access-meta{font-size:13px;font-weight:800;color:#71566b;margin:9px 0}
+.access-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:15px}
+.access-actions .btn,.access-toolbar .btn{border:0;margin-top:0}
+.access-actions .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.access-secondary{background:#e2f5f2!important;color:#14565d!important;box-shadow:0 4px 0 #a4d4d0!important}
+.access-feedback{font-size:13px;font-weight:800;min-height:20px}
+.access-empty{background:#fff;border:2px dashed #e7a5c6;border-radius:18px;padding:23px;font-weight:800}
+@media(max-width:760px){.access-list{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -617,6 +634,19 @@ footer {
 
     </section>
 
+
+    <!-- Phase 7.5D: approved-member, campus-wide live events -->
+    <section class="access-section" id="bestieAccess" aria-labelledby="accessHeading">
+      <h2 class="section-title" id="accessHeading">💌 Bestie Access · Campus Events</h2>
+      <p class="access-lead">Some campus adventures have limited spots! Honors Society Besties get their early-access window first, then registration opens to all approved Besties for campus-wide events. VIP-only invitations stay inside the Honors Society lounge.</p>
+      <div class="access-toolbar">
+        <span class="pill">🎟️ OFFICIAL CAMPUS-WIDE SIGNUPS</span>
+        <button class="btn access-secondary" type="button" id="refreshCampusEvents">↻ Refresh Events</button>
+      </div>
+      <p id="campusEventsStatus" role="status" aria-live="polite">💗 Preparing the campus event desk...</p>
+      <div id="campusEventsList" class="access-list" aria-live="polite"></div>
+    </section>
+
     <h2 class="section-title">
       📣 The Activity Bulletin
     </h2>
@@ -753,6 +783,8 @@ footer {
     welcome.textContent =
       `Heyyy, ${memberName}! Pick Your Next Adventure! ✨`;
 
+    document.dispatchEvent(new CustomEvent("bb:activities-approved", {detail:{user:result.user || null}}));
+
   } catch (error) {
     console.error(
       "Campus Activities access:",
@@ -770,6 +802,156 @@ footer {
     gateMessage.textContent =
       "We couldn't load Campus Activities. Please try again.";
   }
+})();
+</script>
+
+
+<script>
+/* Phase 7.5D — live Supabase campus-wide registration desk.
+   The database RPCs are authoritative for eligibility, capacity and waitlist transitions. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const make = (tag, cls, value) => {
+    const element = document.createElement(tag);
+    if (cls) element.className = cls;
+    if (value !== undefined) element.textContent = value;
+    return element;
+  };
+  const format = value => value ? new Date(value).toLocaleString(undefined, {dateStyle:'medium',timeStyle:'short'}) : 'Not scheduled';
+  const errorText = error => error?.message || 'Please try again.';
+  let client, user, loading = false, initialized = false;
+  const status = message => { $('campusEventsStatus').textContent = message; };
+
+  async function load() {
+    if (!client || !user || loading) return;
+    loading = true;
+    $('refreshCampusEvents').disabled = true;
+    status('💌 Checking the campus-wide event registry...');
+    const list = $('campusEventsList');
+    try {
+      // RLS limits the visible records; the explicit audience filter keeps VIP-only events out.
+      const {data:events,error:eventError} = await client.from('honors_access_events')
+        .select('id,title,description,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,waitlist_enabled,status')
+        .eq('audience','campus_wide').eq('status','published')
+        .order('starts_at',{ascending:true});
+      if (eventError) throw eventError;
+      list.replaceChildren();
+      if (!events?.length) {
+        list.append(make('div','access-empty','🎀 No campus-wide event signups have been published yet. Check back soon, Bestie!'));
+        status('💗 You’re all caught up!');
+        return;
+      }
+      const ids = events.map(event => event.id);
+      const [{data:registrations,error:registrationError},{data:waitlist,error:waitError}] = await Promise.all([
+        client.from('honors_access_registrations').select('event_id,status').eq('user_id',user.id).in('event_id',ids),
+        client.from('honors_access_waitlist').select('event_id,status,offer_expires_at').eq('user_id',user.id).in('event_id',ids)
+      ]);
+      if (registrationError) throw registrationError;
+      if (waitError) throw waitError;
+      const registrationsByEvent = new Map((registrations||[]).map(row => [row.event_id,row]));
+      const waitByEvent = new Map((waitlist||[]).map(row => [row.event_id,row]));
+      for (const event of events) {
+        const card = make('article','access-event');
+        const tag = make('span','pill','🎟️ CAMPUS-WIDE EVENT');
+        const title = make('h3','',event.title);
+        card.append(tag,title);
+        if (event.description) card.append(make('p','',event.description));
+        card.append(make('div','access-meta','📅 '+format(event.starts_at)+' – '+format(event.ends_at)));
+        card.append(make('div','access-meta','🎀 VIP early access: '+format(event.vip_opens_at)));
+        card.append(make('div','access-meta','💗 General admission: '+format(event.general_opens_at)));
+        card.append(make('div','access-meta','🔒 Registration closes: '+format(event.registration_closes_at)));
+        if (event.capacity != null) card.append(make('div','access-meta','🎟️ Capacity: '+event.capacity+' total spots · live availability confirmed when registering'));
+        const feedback = make('p','access-feedback','');
+        feedback.setAttribute('role','status');
+        const actions = make('div','access-actions');
+        const button = make('button','btn');
+        button.type = 'button';
+        const vipLink = make('a','btn access-secondary','💎 VIP? Visit Honors Society ↗');
+        vipLink.href = 'honors.html#access';
+        const registration = registrationsByEvent.get(event.id);
+        const wait = waitByEvent.get(event.id);
+        const now = Date.now();
+        const generalStart = event.general_opens_at ? new Date(event.general_opens_at).getTime() : Infinity;
+        const close = event.registration_closes_at ? new Date(event.registration_closes_at).getTime() : Infinity;
+        const cancelClose = event.cancellation_closes_at ? new Date(event.cancellation_closes_at).getTime() : Infinity;
+        const confirmed = registration?.status === 'confirmed';
+        const waiting = wait?.status === 'waiting';
+        const offered = wait?.status === 'offered' && (!wait.offer_expires_at || new Date(wait.offer_expires_at).getTime() > now);
+        let action = null;
+        if (confirmed) {
+          feedback.textContent = '✅ You’re officially registered, Bestie!';
+          if (now < cancelClose) {action = 'cancel';button.textContent = 'Cancel My Registration';}
+          else feedback.textContent += ' Cancellation is closed.';
+        } else if (offered) {
+          feedback.textContent = '💌 A waitlist spot is waiting for you! Accept before '+format(wait.offer_expires_at)+'.';
+          action = 'accept';button.textContent = '💗 Accept My Spot';
+        } else if (waiting) {
+          feedback.textContent = '⏳ You’re on the waitlist.';
+          action = 'cancel';button.textContent = 'Leave Waitlist';
+        } else if (now >= close) {
+          feedback.textContent = '🔒 Registration is closed.';
+        } else if (now < generalStart) {
+          feedback.textContent = '⏳ General admission has not opened yet. Honors Society Besties may have early access.';
+          actions.append(vipLink);
+        } else {
+          action = 'register';button.textContent = '💗 Claim My Spot';
+          feedback.textContent = event.waitlist_enabled ? '🎟️ If spots are full, you may be offered the waitlist.' : '🎟️ Registration is open while spots remain.';
+        }
+        if (action) {
+          actions.prepend(button);
+          button.addEventListener('click', async () => {
+            if (button.disabled) return;
+            if (action === 'cancel' && !window.confirm(confirmed ? 'Cancel your event registration?' : 'Leave this event waitlist?')) return;
+            button.disabled = true;
+            feedback.textContent = '💌 Updating your event registration...';
+            const fn = action === 'register' ? 'honors_access_register' : action === 'accept' ? 'honors_access_accept_offer' : 'honors_access_cancel';
+            try {
+              const {error} = await client.rpc(fn,{p_event_id:event.id});
+              if (error) throw error;
+              // Reload authoritative registration/waitlist state, including waitlist placement.
+              await loadAfterAction();
+            } catch (error) {
+              console.error('Campus-wide event action:',error);
+              feedback.textContent = '⚠️ '+errorText(error);
+              button.disabled = false;
+            }
+          });
+        }
+        card.append(actions,feedback);
+        list.append(card);
+      }
+      status('💗 '+events.length+' published campus-wide '+(events.length === 1 ? 'event' : 'events')+' on the board.');
+    } catch (error) {
+      console.error('Campus-wide events:',error);
+      status('⚠️ Could not load campus-wide events: '+errorText(error));
+      list.replaceChildren(make('div','access-empty','Please refresh to try again.'));
+    } finally {
+      loading = false;
+      $('refreshCampusEvents').disabled = false;
+    }
+  }
+  async function loadAfterAction() {
+    // Called during an action while a prior load has already finished.
+    await load();
+  }
+  document.addEventListener('bb:activities-approved', async () => {
+    if (!initialized) {
+      initialized = true;
+      $('refreshCampusEvents').addEventListener('click',load);
+    }
+    try {
+      const config = window.BB_CONFIG;
+      if (!config?.SUPABASE_URL || !config?.SUPABASE_ANON_KEY || !window.supabase?.createClient) throw new Error('Supabase configuration unavailable.');
+      client = window.supabase.createClient(config.SUPABASE_URL,config.SUPABASE_ANON_KEY);
+      const {data,error} = await client.auth.getUser();
+      if (error || !data?.user) throw error || new Error('Please sign in again.');
+      user = data.user;
+      await load();
+    } catch (error) {
+      status('⚠️ Could not initialize Bestie Access: '+errorText(error));
+    }
+  });
 })();
 </script>
 

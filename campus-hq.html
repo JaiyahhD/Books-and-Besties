@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 
@@ -23,9 +22,13 @@
       --rose: #a84e79;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    [hidden] { display: none !important; }
+    [hidden] {
+      display: none !important;
+    }
 
     body {
       margin: 0;
@@ -37,9 +40,21 @@
         #fff5fa;
     }
 
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    a { color: inherit; text-decoration: none; }
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
     button:focus-visible,
     a:focus-visible,
@@ -98,11 +113,9 @@
       text-align: center;
       padding: 49px 20px 55px;
       background:
-        repeating-linear-gradient(
-          135deg,
+        repeating-linear-gradient(135deg,
           transparent 0 36px,
-          #ffffff15 36px 72px
-        ),
+          #ffffff15 36px 72px),
         linear-gradient(135deg, #ffd0e4, #ed9dc3 55%, #b4d9d6);
       border-bottom: 8px solid #453645;
     }
@@ -193,7 +206,9 @@
       color: var(--ink);
     }
 
-    .nav-btn:hover { background: #fff0f7; }
+    .nav-btn:hover {
+      background: #fff0f7;
+    }
 
     .nav-btn.active {
       background: #ffe1ef;
@@ -201,9 +216,17 @@
       color: #9e3d70;
     }
 
-    .workspace { min-width: 0; }
-    .section { display: none; }
-    .section.active { display: block; }
+    .workspace {
+      min-width: 0;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
 
     .section-heading {
       font: clamp(21px, 3vw, 29px) Bungee, sans-serif;
@@ -267,9 +290,18 @@
       font-size: 17px;
     }
 
-    .panel-body { padding: 21px; }
-    .panel h3 { color: var(--rose); margin-top: 0; }
-    .panel p { line-height: 1.6; }
+    .panel-body {
+      padding: 21px;
+    }
+
+    .panel h3 {
+      color: var(--rose);
+      margin-top: 0;
+    }
+
+    .panel p {
+      line-height: 1.6;
+    }
 
     .btn {
       border: 0;
@@ -358,7 +390,9 @@
       color: var(--rose);
     }
 
-    .item p { margin: 5px 0; }
+    .item p {
+      margin: 5px 0;
+    }
 
     .tag {
       display: inline-block;
@@ -407,7 +441,9 @@
       max-width: 350px;
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     .auth-screen {
       min-height: 75vh;
@@ -447,25 +483,47 @@
     }
 
     @media (max-width: 1050px) {
-      .stats { grid-template-columns: repeat(2, 1fr); }
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
       .sidebar {
         position: static;
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
       }
-      .sidebar h2 { width: 100%; }
-      .nav-btn { width: auto; }
+
+      .sidebar h2 {
+        width: 100%;
+      }
+
+      .nav-btn {
+        width: auto;
+      }
     }
 
     @media (max-width: 580px) {
-      .grid, .form-grid { grid-template-columns: 1fr; }
-      .top, .top nav { justify-content: center; }
-      .panel-body { padding: 15px; }
+
+      .grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top,
+      .top nav {
+        justify-content: center;
+      }
+
+      .panel-body {
+        padding: 15px;
+      }
     }
   </style>
 </head>
@@ -474,11 +532,7 @@
 
   <div id="campusAuthGate" class="auth-screen">
     <div class="auth-card">
-      <img
-        src="assets/logo.png"
-        alt="Books & Besties logo"
-        width="85"
-      >
+      <img src="assets/logo.png" alt="Books & Besties logo" width="85">
       <h2>🗝️ The Dean's Office</h2>
       <p id="campusAuthMessage" role="status">
         Verifying your campus staff credentials... ♡
@@ -528,7 +582,8 @@
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
         Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
-        Dorm Design Studio, and Dorm Assignments are live. The Activity Manager remains a browser-local preview. Honors Society, Pink Ballot, and Bestie Access event management are live.
+        Dorm Design Studio, and Dorm Assignments are live. The Activity Manager remains a browser-local preview. Honors
+        Society, Pink Ballot, and Bestie Access event management are live.
       </div>
 
       <div class="layout">
@@ -690,12 +745,7 @@
 
                     <label class="field">
                       <span>Activity Name</span>
-                      <input
-                        id="activityName"
-                        required
-                        maxlength="100"
-                        placeholder="e.g. Espresso Your ABCs"
-                      >
+                      <input id="activityName" required maxlength="100" placeholder="e.g. Espresso Your ABCs">
                     </label>
 
                     <label class="field">
@@ -742,11 +792,8 @@
 
                   <label class="field">
                     <span>Description & Instructions</span>
-                    <textarea
-                      id="activityDescription"
-                      maxlength="1500"
-                      placeholder="Tell the Besties all about this activity..."
-                    ></textarea>
+                    <textarea id="activityDescription" maxlength="1500"
+                      placeholder="Tell the Besties all about this activity..."></textarea>
                   </label>
 
                   <div class="actions">
@@ -754,11 +801,7 @@
                       💗 Save Demo Activity
                     </button>
 
-                    <button
-                      class="btn light"
-                      type="button"
-                      id="clearActivity"
-                    >
+                    <button class="btn light" type="button" id="clearActivity">
                       Clear Form
                     </button>
                   </div>
@@ -800,12 +843,7 @@
                   read-only access.
                 </p>
 
-                <p
-                  id="admissionsNotice"
-                  class="notice"
-                  role="status"
-                  aria-live="polite"
-                >
+                <p id="admissionsNotice" class="notice" role="status" aria-live="polite">
                   Waiting for campus staff verification...
                 </p>
 
@@ -821,21 +859,34 @@
           <!-- LIVE HONORS SOCIETY INVITATION MANAGER -->
           <section class="section" id="section-honors">
             <h2 class="section-heading">💎 Honors Society Management</h2>
-            <p class="section-description">Your live, invitation-only VIP roster. Administrators and moderators share the same Honors Society management permissions.</p>
-            <div class="panel"><div class="panel-head">📅 HONORS SOCIETY SEASON MANAGER</div><div class="panel-body">
-              <p id="honorsSeasonStatus" class="mini" role="status">Loading Honors Society seasons...</p>
-              <label class="field"><span>Browse season and its VIP history</span><select id="honorsSeasonSelect"><option value="">Loading seasons...</option></select></label>
-              <div id="honorsSeasonDetails" class="item">Select a season to view its dates and status.</div>
-              <form id="honorsSeasonForm">
-                <h3>🎀 Create a new two-month season</h3>
-                <div class="form-grid">
-                  <label class="field"><span>Season name</span><input id="honorsSeasonName" required maxlength="120" placeholder="January–February 2027"></label>
-                  <label class="field"><span>First day (must be the 1st)</span><input id="honorsSeasonStart" type="date" required></label>
-                </div>
-                <div class="actions"><button class="btn secondary" id="honorsSeasonCreate" type="submit">💗 Create Draft Season</button><button class="btn light" id="honorsSeasonActivate" type="button">👑 Activate Selected Draft</button><button class="btn danger" id="honorsSeasonClose" type="button">📦 Close Selected Season</button></div>
-              </form>
-              <p class="mini">Only the active season accepts invitations. Drafts and past seasons are available for roster/history review. VIP access expires at the end of the selected season regardless of its status.</p>
-            </div></div>
+            <p class="section-description">Your live, invitation-only VIP roster. Administrators and moderators share
+              the same Honors Society management permissions.</p>
+            <div class="panel">
+              <div class="panel-head">📅 HONORS SOCIETY SEASON MANAGER</div>
+              <div class="panel-body">
+                <p id="honorsSeasonStatus" class="mini" role="status">Loading Honors Society seasons...</p>
+                <label class="field"><span>Browse season and its VIP history</span><select id="honorsSeasonSelect">
+                    <option value="">Loading seasons...</option>
+                  </select></label>
+                <div id="honorsSeasonDetails" class="item">Select a season to view its dates and status.</div>
+                <form id="honorsSeasonForm">
+                  <h3>🎀 Create a new two-month season</h3>
+                  <div class="form-grid">
+                    <label class="field"><span>Season name</span><input id="honorsSeasonName" required maxlength="120"
+                        placeholder="January–February 2027"></label>
+                    <label class="field"><span>First day (must be the 1st)</span><input id="honorsSeasonStart"
+                        type="date" required></label>
+                  </div>
+                  <div class="actions"><button class="btn secondary" id="honorsSeasonCreate" type="submit">💗 Create
+                      Draft Season</button><button class="btn light" id="honorsSeasonActivate" type="button">👑 Activate
+                      Selected Draft</button><button class="btn danger" id="honorsSeasonClose" type="button">📦 Close
+                      Selected Season</button></div>
+                </form>
+                <p class="mini">Only the active season accepts invitations. Drafts and past seasons are available for
+                  roster/history review. VIP access expires at the end of the selected season regardless of its status.
+                </p>
+              </div>
+            </div>
             <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
               <div class="stat"><strong id="honorsActiveCount">—</strong><span>ACTIVE VIPS</span></div>
               <div class="stat"><strong id="honorsPendingCount">—</strong><span>PENDING INVITES</span></div>
@@ -844,107 +895,221 @@
             <div class="panel">
               <div class="panel-head">💌 INVITE AN APPROVED BESTIE</div>
               <div class="panel-body">
-                <p class="mini">Choose an approved campus account, not just a typed name. Invitations appear in the member's account once the Honors Society invitation page is connected.</p>
-                <p id="honorsStatus" class="mini" role="status" aria-live="polite">Preparing your VIP invitation desk...</p>
+                <p class="mini">Choose an approved campus account, not just a typed name. Invitations appear in the
+                  member's account once the Honors Society invitation page is connected.</p>
+                <p id="honorsStatus" class="mini" role="status" aria-live="polite">Preparing your VIP invitation desk...
+                </p>
                 <form id="honorsInviteForm">
-                  <label class="field"><span>Search approved Besties</span><input type="search" id="honorsSearch" placeholder="Search by display name" autocomplete="off"></label>
-                  <label class="field"><span>Select a Bestie</span><select id="honorsInvitee" required><option value="">Loading approved members...</option></select></label>
-                  <label class="field"><span>Personal invitation message (optional)</span><textarea id="honorsMessage" maxlength="1000" placeholder="You've been invited to the Honors Society, Bestie! 💎"></textarea></label>
-                  <div class="actions"><button class="btn secondary" id="honorsSend" type="submit">💎 Send VIP Invitation</button><button class="btn light" id="honorsRefresh" type="button">🔄 Refresh Roster</button></div>
+                  <label class="field"><span>Search approved Besties</span><input type="search" id="honorsSearch"
+                      placeholder="Search by display name" autocomplete="off"></label>
+                  <label class="field"><span>Select a Bestie</span><select id="honorsInvitee" required>
+                      <option value="">Loading approved members...</option>
+                    </select></label>
+                  <label class="field"><span>Personal invitation message (optional)</span><textarea id="honorsMessage"
+                      maxlength="1000"
+                      placeholder="You've been invited to the Honors Society, Bestie! 💎"></textarea></label>
+                  <div class="actions"><button class="btn secondary" id="honorsSend" type="submit">💎 Send VIP
+                      Invitation</button><button class="btn light" id="honorsRefresh" type="button">🔄 Refresh
+                      Roster</button></div>
                 </form>
               </div>
             </div>
-            <div class="panel"><div class="panel-head">💌 INVITATIONS & RESPONSES</div><div class="panel-body"><div id="honorsInvitationsList" aria-live="polite"><p class="empty">Loading invitations...</p></div></div></div>
-            <div class="panel"><div class="panel-head">💎 ACTIVE VIP MEMBERSHIPS</div><div class="panel-body"><div id="honorsMembershipsList" aria-live="polite"><p class="empty">Loading memberships...</p></div></div></div>
+            <div class="panel">
+              <div class="panel-head">💌 INVITATIONS & RESPONSES</div>
+              <div class="panel-body">
+                <div id="honorsInvitationsList" aria-live="polite">
+                  <p class="empty">Loading invitations...</p>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">💎 ACTIVE VIP MEMBERSHIPS</div>
+              <div class="panel-body">
+                <div id="honorsMembershipsList" aria-live="polite">
+                  <p class="empty">Loading memberships...</p>
+                </div>
+              </div>
+            </div>
           </section>
 
           <!-- PHASE 7.2B: LIVE BESTIE EXCLUSIVE PUBLISHING STUDIO -->
           <section class="section" id="section-exclusive-studio">
             <h2 class="section-heading">🎀 Bestie Exclusive Studio</h2>
-            <p class="section-description">Publish private VIP announcements, sneak peeks, and giveaway previews. Admins and moderators share publishing access.</p>
-            <div class="panel"><div class="panel-head">💌 COMPOSE AN INSIDER POST</div><div class="panel-body">
-              <p id="exclusiveStudioStatus" class="mini" role="status" aria-live="polite">Waiting for staff verification...</p>
-              <form id="exclusiveStudioForm">
-                <input id="exclusivePostId" type="hidden">
-                <label class="field"><span>Post title</span><input id="exclusiveTitle" required maxlength="180" placeholder="A little secret for our VIP Besties..."></label>
-                <label class="field"><span>Message</span><textarea id="exclusiveBody" required maxlength="10000" placeholder="Give your VIP Besties the inside scoop..." style="min-height:160px"></textarea></label>
-                <div class="form-grid">
-                  <label class="field"><span>Post category</span><select id="exclusiveType"><option value="announcement">💌 Announcement</option><option value="sneak_peek">👀 Sneak Peek</option><option value="giveaway_preview">🎁 Giveaway Preview</option></select></label>
-                  <label class="field"><span>Visibility</span><select id="exclusiveStatus"><option value="draft">Draft (staff only)</option><option value="published">Published / Scheduled</option><option value="archived">Archived (staff only)</option></select></label>
+            <p class="section-description">Publish private VIP announcements, sneak peeks, and giveaway previews. Admins
+              and moderators share publishing access.</p>
+            <div class="panel">
+              <div class="panel-head">💌 COMPOSE AN INSIDER POST</div>
+              <div class="panel-body">
+                <p id="exclusiveStudioStatus" class="mini" role="status" aria-live="polite">Waiting for staff
+                  verification...</p>
+                <form id="exclusiveStudioForm">
+                  <input id="exclusivePostId" type="hidden">
+                  <label class="field"><span>Post title</span><input id="exclusiveTitle" required maxlength="180"
+                      placeholder="A little secret for our VIP Besties..."></label>
+                  <label class="field"><span>Message</span><textarea id="exclusiveBody" required maxlength="10000"
+                      placeholder="Give your VIP Besties the inside scoop..."
+                      style="min-height:160px"></textarea></label>
+                  <div class="form-grid">
+                    <label class="field"><span>Post category</span><select id="exclusiveType">
+                        <option value="announcement">💌 Announcement</option>
+                        <option value="sneak_peek">👀 Sneak Peek</option>
+                        <option value="giveaway_preview">🎁 Giveaway Preview</option>
+                      </select></label>
+                    <label class="field"><span>Visibility</span><select id="exclusiveStatus">
+                        <option value="draft">Draft (staff only)</option>
+                        <option value="published">Published / Scheduled</option>
+                        <option value="archived">Archived (staff only)</option>
+                      </select></label>
+                  </div>
+                  <label class="field"><span>Scheduled reveal (optional; your local time)</span><input
+                      id="exclusiveSchedule" type="datetime-local"></label>
+                  <label class="field"><span>Image / flyer (optional, max 10 MB, JPG/PNG/WebP/GIF)</span><input
+                      id="exclusiveImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                  <div id="exclusiveImageInfo" class="mini">No image attached.</div>
+                  <label class="field" style="display:flex;gap:10px;align-items:center"><input id="exclusiveFeatured"
+                      type="checkbox" style="width:auto"><span style="margin:0">💎 Feature this post</span></label>
+                  <div class="actions"><button id="exclusiveSave" class="btn secondary" type="submit">💗 Save Insider
+                      Post</button><button id="exclusiveClear" class="btn light" type="button">Clear
+                      Editor</button><button id="exclusiveRemoveImage" class="btn danger" type="button" hidden>Remove
+                      Attached Image</button></div>
+                </form>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">📋 INSIDER POST REGISTRY</div>
+              <div class="panel-body"><button class="btn light" id="exclusiveRefresh" type="button">🔄 Refresh
+                  Posts</button>
+                <div id="exclusivePostList" aria-live="polite">
+                  <p class="empty">Loading VIP posts...</p>
                 </div>
-                <label class="field"><span>Scheduled reveal (optional; your local time)</span><input id="exclusiveSchedule" type="datetime-local"></label>
-                <label class="field"><span>Image / flyer (optional, max 10 MB, JPG/PNG/WebP/GIF)</span><input id="exclusiveImage" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
-                <div id="exclusiveImageInfo" class="mini">No image attached.</div>
-                <label class="field" style="display:flex;gap:10px;align-items:center"><input id="exclusiveFeatured" type="checkbox" style="width:auto"><span style="margin:0">💎 Feature this post</span></label>
-                <div class="actions"><button id="exclusiveSave" class="btn secondary" type="submit">💗 Save Insider Post</button><button id="exclusiveClear" class="btn light" type="button">Clear Editor</button><button id="exclusiveRemoveImage" class="btn danger" type="button" hidden>Remove Attached Image</button></div>
-              </form>
-            </div></div>
-            <div class="panel"><div class="panel-head">📋 INSIDER POST REGISTRY</div><div class="panel-body"><button class="btn light" id="exclusiveRefresh" type="button">🔄 Refresh Posts</button><div id="exclusivePostList" aria-live="polite"><p class="empty">Loading VIP posts...</p></div></div></div>
+              </div>
+            </div>
           </section>
 
           <!-- PHASE 7.3B: LIVE PINK BALLOT STUDIO -->
           <section class="section" id="section-polls">
             <h2 class="section-heading">🗳️ Pink Ballot Studio</h2>
-            <p class="section-description">Create private Honors Society ballots, schedule voting windows, and manage live polls. Admins and moderators share full access.</p>
-            <div class="panel"><div class="panel-head">🎀 DESIGN A PINK BALLOT</div><div class="panel-body">
-              <p id="pinkStudioStatus" class="mini" role="status" aria-live="polite">Preparing your live ballot desk...</p>
-              <form id="pinkLiveForm">
-                <input type="hidden" id="pinkLiveId">
-                <label class="field"><span>Poll question</span><input id="pinkLiveQuestion" required maxlength="180" placeholder="What should our next Bestie social be?"></label>
-                <label class="field"><span>Description (optional)</span><textarea id="pinkLiveDescription" maxlength="2000" placeholder="Give your VIP Besties the inside scoop..."></textarea></label>
-                <label class="field"><span>Choices (one per line, 2–12 choices)</span><textarea id="pinkLiveOptions" required maxlength="3600" style="min-height:135px" placeholder="☕ Coffeehouse Chat&#10;🎨 Craft Night&#10;📚 Reading Party"></textarea></label>
-                <div class="form-grid">
-                  <label class="field"><span>Opens at (optional, local time)</span><input id="pinkLiveOpens" type="datetime-local"></label>
-                  <label class="field"><span>Closes at (optional, local time)</span><input id="pinkLiveCloses" type="datetime-local"></label>
+            <p class="section-description">Create private Honors Society ballots, schedule voting windows, and manage
+              live polls. Admins and moderators share full access.</p>
+            <div class="panel">
+              <div class="panel-head">🎀 DESIGN A PINK BALLOT</div>
+              <div class="panel-body">
+                <p id="pinkStudioStatus" class="mini" role="status" aria-live="polite">Preparing your live ballot
+                  desk...</p>
+                <form id="pinkLiveForm">
+                  <input type="hidden" id="pinkLiveId">
+                  <label class="field"><span>Poll question</span><input id="pinkLiveQuestion" required maxlength="180"
+                      placeholder="What should our next Bestie social be?"></label>
+                  <label class="field"><span>Description (optional)</span><textarea id="pinkLiveDescription"
+                      maxlength="2000" placeholder="Give your VIP Besties the inside scoop..."></textarea></label>
+                  <label class="field"><span>Choices (one per line, 2–12 choices)</span><textarea id="pinkLiveOptions"
+                      required maxlength="3600" style="min-height:135px"
+                      placeholder="☕ Coffeehouse Chat&#10;🎨 Craft Night&#10;📚 Reading Party"></textarea></label>
+                  <div class="form-grid">
+                    <label class="field"><span>Opens at (optional, local time)</span><input id="pinkLiveOpens"
+                        type="datetime-local"></label>
+                    <label class="field"><span>Closes at (optional, local time)</span><input id="pinkLiveCloses"
+                        type="datetime-local"></label>
+                  </div>
+                  <label class="field"><span>Visibility</span><select id="pinkLiveStatus">
+                      <option value="draft">Draft · staff only</option>
+                      <option value="published">Published · opens on schedule</option>
+                      <option value="closed">Closed · results only</option>
+                      <option value="archived">Archived · staff only</option>
+                    </select></label>
+                  <p class="mini">For ballot integrity, choices can only be edited while a poll is a draft. Published
+                    polls can be closed or archived. Each member gets one vote.</p>
+                  <div class="actions"><button class="btn secondary" id="pinkLiveSave" type="submit">💗 Save Pink
+                      Ballot</button><button class="btn light" id="pinkLiveClear" type="button">Clear Editor</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">📋 LIVE PINK BALLOT REGISTRY</div>
+              <div class="panel-body"><button class="btn light" id="pinkLiveRefresh" type="button">🔄 Refresh
+                  Ballots</button>
+                <div id="pinkLiveList" aria-live="polite">
+                  <p class="empty">Loading ballots...</p>
                 </div>
-                <label class="field"><span>Visibility</span><select id="pinkLiveStatus"><option value="draft">Draft · staff only</option><option value="published">Published · opens on schedule</option><option value="closed">Closed · results only</option><option value="archived">Archived · staff only</option></select></label>
-                <p class="mini">For ballot integrity, choices can only be edited while a poll is a draft. Published polls can be closed or archived. Each member gets one vote.</p>
-                <div class="actions"><button class="btn secondary" id="pinkLiveSave" type="submit">💗 Save Pink Ballot</button><button class="btn light" id="pinkLiveClear" type="button">Clear Editor</button></div>
-              </form>
-            </div></div>
-            <div class="panel"><div class="panel-head">📋 LIVE PINK BALLOT REGISTRY</div><div class="panel-body"><button class="btn light" id="pinkLiveRefresh" type="button">🔄 Refresh Ballots</button><div id="pinkLiveList" aria-live="polite"><p class="empty">Loading ballots...</p></div></div></div>
+              </div>
+            </div>
           </section>
 
           <!-- PHASE 7.5B: LIVE BESTIE ACCESS STUDIO -->
           <section class="section" id="section-access">
             <h2 class="section-heading">💌 Bestie Access Studio</h2>
-            <p class="section-description">Create live VIP-first experiences, choose VIP-only or campus-wide admission, and manage registration rosters and waitlists in Supabase.</p>
-            <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+            <p class="section-description">Create live VIP-first experiences, choose VIP-only or campus-wide admission,
+              and manage capacity-limited registration rosters in Supabase.</p>
+            <div class="stats" style="grid-template-columns:repeat(2,minmax(0,1fr))">
               <div class="stat"><strong id="accessEventCount">—</strong><span>EVENTS</span></div>
               <div class="stat"><strong id="accessRegistrationCount">—</strong><span>CONFIRMED SPOTS</span></div>
-              <div class="stat"><strong id="accessWaitlistCount">—</strong><span>WAITING / OFFERED</span></div>
             </div>
-            <div class="panel"><div class="panel-head">🎀 CREATE OR EDIT A LIVE EVENT</div><div class="panel-body">
-              <p id="accessStatus" class="mini" role="status" aria-live="polite">Waiting for staff verification...</p>
-              <form id="accessForm">
-                <input type="hidden" id="accessEventId">
-                <label class="field"><span>Event title</span><input id="accessTitle" required minlength="3" maxlength="160" placeholder="☕ Velvet Latte Reading Social"></label>
-                <label class="field"><span>Description</span><textarea id="accessDescription" maxlength="5000" placeholder="Give your Besties all the details..."></textarea></label>
-                <label class="field"><span>Location or online meeting details (optional)</span><textarea id="accessLocation" maxlength="2000" placeholder="Where will we meet?"></textarea></label>
-                <div class="form-grid">
-                  <label class="field"><span>Honors Society season</span><select id="accessSeason" required><option value="">Loading seasons...</option></select></label>
-                  <label class="field"><span>Registration audience</span><select id="accessAudience"><option value="vip_only">💎 VIP Only</option><option value="campus_wide">🎓 VIP First → All Approved Besties</option></select></label>
-                  <label class="field"><span>Event begins (local time)</span><input id="accessStarts" type="datetime-local" required></label>
-                  <label class="field"><span>Event ends (local time)</span><input id="accessEnds" type="datetime-local" required></label>
-                  <label class="field"><span>VIP registration opens (local time)</span><input id="accessVipOpens" type="datetime-local" required></label>
-                  <label class="field" id="accessGeneralField" hidden><span>General registration opens (local time)</span><input id="accessGeneralOpens" type="datetime-local"></label>
-                  <label class="field"><span>Registration closes (local time)</span><input id="accessCloses" type="datetime-local" required></label>
-                  <label class="field"><span>Cancellation cutoff (optional, local time)</span><input id="accessCancelCloses" type="datetime-local"></label>
-                  <label class="field"><span>Capacity</span><input id="accessCapacity" type="number" min="1" max="10000" value="20" required></label>
+            <div class="panel">
+              <div class="panel-head">🎀 CREATE OR EDIT A LIVE EVENT</div>
+              <div class="panel-body">
+                <p id="accessStatus" class="mini" role="status" aria-live="polite">Waiting for staff verification...</p>
+                <form id="accessForm">
+                  <input type="hidden" id="accessEventId">
+                  <label class="field"><span>Event title</span><input id="accessTitle" required minlength="3"
+                      maxlength="160" placeholder="☕ Velvet Latte Reading Social"></label>
+                  <label class="field"><span>Description</span><textarea id="accessDescription" maxlength="5000"
+                      placeholder="Give your Besties all the details..."></textarea></label>
+                  <label class="field"><span>Location or online meeting details (optional)</span><textarea
+                      id="accessLocation" maxlength="2000" placeholder="Where will we meet?"></textarea></label>
+                  <div class="form-grid">
+                    <label class="field"><span>Honors Society season</span><select id="accessSeason" required>
+                        <option value="">Loading seasons...</option>
+                      </select></label>
+                    <label class="field"><span>Registration audience</span><select id="accessAudience">
+                        <option value="vip_only">💎 VIP Only</option>
+                        <option value="campus_wide">🎓 VIP First → All Approved Besties</option>
+                      </select></label>
+                    <label class="field"><span>Event begins (local time)</span><input id="accessStarts"
+                        type="datetime-local" required></label>
+                    <label class="field"><span>Event ends (local time)</span><input id="accessEnds"
+                        type="datetime-local" required></label>
+                    <label class="field"><span>VIP registration opens (local time)</span><input id="accessVipOpens"
+                        type="datetime-local" required></label>
+                    <label class="field" id="accessGeneralField" hidden><span>General registration opens (local
+                        time)</span><input id="accessGeneralOpens" type="datetime-local"></label>
+                    <label class="field"><span>Registration closes (local time)</span><input id="accessCloses"
+                        type="datetime-local" required></label>
+                    <label class="field"><span>Cancellation cutoff (optional, local time)</span><input
+                        id="accessCancelCloses" type="datetime-local"></label>
+                    <label class="field"><span>Capacity</span><input id="accessCapacity" type="number" min="1"
+                        max="10000" value="20" required></label>
+                  </div>
+
+                  <label class="field"><span>Save as</span><select id="accessSaveStatus">
+                      <option value="draft">🎀 Draft (staff only)</option>
+                      <option value="published">💌 Published (follows registration schedule)</option>
+                    </select></label>
+                  <p class="mini">Published events are real. VIP registration opens at the configured time. Campus-wide
+                    events open to all approved Besties at the general opening time. Events with registration history
+                    cannot be edited under the current database rules.</p>
+                  <div class="actions"><button class="btn secondary" id="accessSave" type="submit">💗 Save to
+                      Supabase</button><button class="btn light" id="accessClear" type="button">Clear
+                      Editor</button><button class="btn light" id="accessRefresh" type="button">↻ Refresh
+                      Events</button></div>
+                </form>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">📋 LIVE EVENT REGISTRY & ROSTERS</div>
+              <div class="panel-body">
+                <div id="accessEventList" aria-live="polite">
+                  <p class="empty">Loading events...</p>
                 </div>
-                <label class="field" style="display:flex;align-items:center;gap:10px"><input id="accessWaitlistEnabled" type="checkbox" checked style="width:auto"><span style="margin:0">Enable the waitlist when full</span></label>
-                <label class="field"><span>Save as</span><select id="accessSaveStatus"><option value="draft">🎀 Draft (staff only)</option><option value="published">💌 Published (follows registration schedule)</option></select></label>
-                <p class="mini">Published events are real. VIP registration opens at the configured time. Campus-wide events open to all approved Besties at the general opening time. Events with registration history cannot be edited under the current database rules.</p>
-                <div class="actions"><button class="btn secondary" id="accessSave" type="submit">💗 Save to Supabase</button><button class="btn light" id="accessClear" type="button">Clear Editor</button><button class="btn light" id="accessRefresh" type="button">↻ Refresh Events</button></div>
-              </form>
-            </div></div>
-            <div class="panel"><div class="panel-head">📋 LIVE EVENT REGISTRY & ROSTERS</div><div class="panel-body"><div id="accessEventList" aria-live="polite"><p class="empty">Loading events...</p></div></div></div>
+              </div>
+            </div>
           </section>
 
           <!-- LIVE MONTHLY CROWN LINKS -->
           <section class="section" id="section-crown">
             <h2 class="section-heading">👑 Monthly Crown Management</h2>
-            <p class="section-description">Your live Monthly Crown and Campus Housing tools. Season records, submissions, and teams are stored in Supabase.</p>
+            <p class="section-description">Your live Monthly Crown and Campus Housing tools. Season records,
+              submissions, and teams are stored in Supabase.</p>
             <div class="grid">
               <div class="panel">
                 <div class="panel-head">🏡 CAMPUS HOUSING</div>
@@ -972,14 +1137,19 @@
           <!-- LIVE SEASONAL DORM CUSTOMIZATION -->
           <section class="section" id="section-dorm-design">
             <h2 class="section-heading">🎨 Dorm Design Studio</h2>
-            <p class="section-description">Give every seasonal dorm its own personality! Admins can save these settings directly to Supabase. Moderators can view the current designs.</p>
+            <p class="section-description">Give every seasonal dorm its own personality! Admins can save these settings
+              directly to Supabase. Moderators can view the current designs.</p>
             <div class="panel">
               <div class="panel-head">💌 CHOOSE YOUR SEASON & DORM</div>
               <div class="panel-body">
                 <p id="dormDesignStatus" role="status" aria-live="polite" class="mini">Loading seasonal dorms...</p>
                 <div class="form-grid">
-                  <label class="field"><span>Monthly Crown Season</span><select id="designSeason"><option value="">Loading seasons...</option></select></label>
-                  <label class="field"><span>Team / Dorm</span><select id="designTeam"><option value="">Choose a season first</option></select></label>
+                  <label class="field"><span>Monthly Crown Season</span><select id="designSeason">
+                      <option value="">Loading seasons...</option>
+                    </select></label>
+                  <label class="field"><span>Team / Dorm</span><select id="designTeam">
+                      <option value="">Choose a season first</option>
+                    </select></label>
                 </div>
               </div>
             </div>
@@ -987,19 +1157,27 @@
               <div class="panel-head">✨ THE DORM MAKEOVER</div>
               <div class="panel-body">
                 <form id="dormDesignForm">
-                  <label class="field"><span>Dorm Theme Name</span><input id="designThemeName" maxlength="100" required placeholder="Mocha Muse Manor"></label>
-                  <label class="field"><span>Welcome Description</span><textarea id="designDescription" maxlength="1500" placeholder="Welcome home, Besties!"></textarea></label>
+                  <label class="field"><span>Dorm Theme Name</span><input id="designThemeName" maxlength="100" required
+                      placeholder="Mocha Muse Manor"></label>
+                  <label class="field"><span>Welcome Description</span><textarea id="designDescription" maxlength="1500"
+                      placeholder="Welcome home, Besties!"></textarea></label>
                   <div class="form-grid">
-                    <label class="field"><span>Primary Color</span><input id="designPrimary" type="color" value="#e8b4c8"></label>
-                    <label class="field"><span>Secondary Color</span><input id="designSecondary" type="color" value="#fff3e6"></label>
-                    <label class="field"><span>Accent Color</span><input id="designAccent" type="color" value="#c76b91"></label>
-                    <label class="field"><span>Banner Image URL (optional)</span><input id="designBanner" type="url" maxlength="2000" placeholder="https://example.com/dorm-banner.jpg"></label>
+                    <label class="field"><span>Primary Color</span><input id="designPrimary" type="color"
+                        value="#e8b4c8"></label>
+                    <label class="field"><span>Secondary Color</span><input id="designSecondary" type="color"
+                        value="#fff3e6"></label>
+                    <label class="field"><span>Accent Color</span><input id="designAccent" type="color"
+                        value="#c76b91"></label>
+                    <label class="field"><span>Banner Image URL (optional)</span><input id="designBanner" type="url"
+                        maxlength="2000" placeholder="https://example.com/dorm-banner.jpg"></label>
                   </div>
-                  <div id="designPreview" style="padding:25px;border-radius:18px;border:3px solid #fff;margin:22px 0;box-shadow:0 5px 15px #0001">
+                  <div id="designPreview"
+                    style="padding:25px;border-radius:18px;border:3px solid #fff;margin:22px 0;box-shadow:0 5px 15px #0001">
                     <div class="kicker" style="font-size:11px">BESTIE UNIVERSITY · RESIDENTIAL LIFE</div>
                     <h3 id="designPreviewName" style="font-size:28px;margin:14px 0 7px">Your Dorm</h3>
                     <p id="designPreviewDescription" style="font-weight:800;line-height:1.6"></p>
-                    <img id="designPreviewBanner" alt="Dorm banner preview" style="width:100%;max-height:240px;object-fit:cover;border-radius:13px;margin-top:12px" hidden>
+                    <img id="designPreviewBanner" alt="Dorm banner preview"
+                      style="width:100%;max-height:240px;object-fit:cover;border-radius:13px;margin-top:12px" hidden>
                   </div>
                   <div class="actions">
                     <button id="designSave" class="btn secondary" type="submit">💗 Save Dorm Makeover</button>
@@ -1008,7 +1186,9 @@
                   </div>
                   <p id="designSaveMessage" class="mini" role="status" aria-live="polite"></p>
                 </form>
-                <p class="mini">The existing dorm page already displays the saved primary color and description. Theme names, secondary/accent colors and banners are saved now; displaying all of them on the resident page is the next visual integration.</p>
+                <p class="mini">The existing dorm page already displays the saved primary color and description. Theme
+                  names, secondary/accent colors and banners are saved now; displaying all of them on the resident page
+                  is the next visual integration.</p>
               </div>
             </div>
           </section>
@@ -1017,14 +1197,19 @@
           <!-- LIVE DORM ASSIGNMENTS & TRANSFERS -->
           <section class="section" id="section-dorm-assignments">
             <h2 class="section-heading">🏡 Dorm Assignments & Team Transfers</h2>
-            <p class="section-description">Manage approved Besties' Monthly Crown enrollment, assign their seasonal team, and transfer residents. All changes save to your existing Supabase records. Administrators can make changes; moderators can view rosters.</p>
+            <p class="section-description">Manage approved Besties' Monthly Crown enrollment, assign their seasonal
+              team, and transfer residents. All changes save to your existing Supabase records. Administrators can make
+              changes; moderators can view rosters.</p>
             <div class="panel">
               <div class="panel-head">👑 CHOOSE A SEASON</div>
               <div class="panel-body">
                 <label class="field"><span>Monthly Crown Season</span>
-                  <select id="assignmentSeason"><option value="">Loading seasons...</option></select>
+                  <select id="assignmentSeason">
+                    <option value="">Loading seasons...</option>
+                  </select>
                 </label>
-                <p class="mini" id="assignmentStatus" role="status" aria-live="polite">Preparing the residence desk...</p>
+                <p class="mini" id="assignmentStatus" role="status" aria-live="polite">Preparing the residence desk...
+                </p>
               </div>
             </div>
             <div class="panel" id="assignmentEditor" hidden>
@@ -1035,19 +1220,27 @@
                     <input id="assignmentSearch" type="search" placeholder="Search display names" autocomplete="off">
                   </label>
                   <label class="field"><span>Bestie</span>
-                    <select id="assignmentMember" required><option value="">Choose a member</option></select>
+                    <select id="assignmentMember" required>
+                      <option value="">Choose a member</option>
+                    </select>
                   </label>
-                  <p id="assignmentCurrent" class="notice" role="status">Choose a Bestie to see their current enrollment.</p>
+                  <p id="assignmentCurrent" class="notice" role="status">Choose a Bestie to see their current
+                    enrollment.</p>
                   <label class="field"><span>Assign to Team / Dorm</span>
-                    <select id="assignmentTeam" required><option value="">Choose a team</option></select>
+                    <select id="assignmentTeam" required>
+                      <option value="">Choose a team</option>
+                    </select>
                   </label>
                   <div class="actions">
-                    <button class="btn secondary" type="submit" id="assignmentSave">💗 Approve & Assign / Transfer</button>
+                    <button class="btn secondary" type="submit" id="assignmentSave">💗 Approve & Assign /
+                      Transfer</button>
                     <button class="btn light" type="button" id="assignmentRefresh">🔄 Refresh Residents</button>
                   </div>
                   <p class="mini" id="assignmentSaveMessage" role="status" aria-live="polite"></p>
                 </form>
-                <p class="mini">Only campus-approved members can be assigned. Existing Monthly Crown submissions follow a resident to their new team, so eligible pages count for the new dorm after a transfer. Dorm access updates with the enrollment.</p>
+                <p class="mini">Only campus-approved members can be assigned. Existing Monthly Crown submissions follow
+                  a resident to their new team, so eligible pages count for the new dorm after a transfer. Dorm access
+                  updates with the enrollment.</p>
               </div>
             </div>
             <div class="panel" id="assignmentRosterPanel" hidden>
@@ -1065,7 +1258,7 @@
               📣 Crown Commons Moderation
             </h2>
 
-            
+
             <p class="section-description">
               Your live Dean's Office for reviewing member reports,
               moderating Crown Commons, and publishing campus announcements.
@@ -1095,18 +1288,18 @@
 
                 <div class="item" id="announcementComposerPanel">
                   <h4>📣 LIVE CAMPUS ANNOUNCEMENTS</h4>
-                  
-                <p class="mini">
-                  Administrators can publish announcements to Campus Buzz
-                  and every approved Bestie's Campus Mail inbox.
-                  Publishing is immediate.
-                </p>
 
-                  
-                <p id="announcementAccess" class="mini" role="status">
-                  💗 Campus Buzz and Campus Mail publishing are connected.
-                  Administrator access required.
-                </p>
+                  <p class="mini">
+                    Administrators can publish announcements to Campus Buzz
+                    and every approved Bestie's Campus Mail inbox.
+                    Publishing is immediate.
+                  </p>
+
+
+                  <p id="announcementAccess" class="mini" role="status">
+                    💗 Campus Buzz and Campus Mail publishing are connected.
+                    Administrator access required.
+                  </p>
 
                   <form id="announcementForm" hidden>
                     <label class="field" for="announcementTitle">
@@ -1115,14 +1308,16 @@
                     </label>
                     <label class="field" for="announcementMessage">
                       <span>Announcement Message</span>
-                      <textarea id="announcementMessage" maxlength="2000" required placeholder="Tell the Besties the news..."></textarea>
+                      <textarea id="announcementMessage" maxlength="2000" required
+                        placeholder="Tell the Besties the news..."></textarea>
                     </label>
-                    <button class="btn secondary" id="publishAnnouncement" type="submit">💌 Publish to Approved Besties</button>
+                    <button class="btn secondary" id="publishAnnouncement" type="submit">💌 Publish to Approved
+                      Besties</button>
                     <p id="announcementResult" role="status" aria-live="polite"></p>
                   </form>
                 </div>
 
-                
+
                 <!-- LIVE COMMONS REPORTS -->
                 <div class="item" id="commonsReportsPanel">
                   <h4>🚩 DEAN'S OFFICE — MEMBER REPORTS</h4>
@@ -1133,18 +1328,13 @@
                     campus staff can manage reports.
                   </p>
 
-                  <div id="commonsReportsStatus"
-                       role="status"
-                       aria-live="polite">
+                  <div id="commonsReportsStatus" role="status" aria-live="polite">
                     💗 Preparing the moderation desk...
                   </div>
 
                   <div id="commonsReportsList"></div>
 
-                  <button
-                    class="btn secondary"
-                    id="refreshCommonsReports"
-                    type="button">
+                  <button class="btn secondary" id="refreshCommonsReports" type="button">
                     🔄 Refresh Reports
                   </button>
                 </div>
@@ -1167,12 +1357,7 @@
       </div>
     </main>
 
-    <div
-      class="toast hidden"
-      id="toast"
-      role="status"
-      aria-live="polite"
-    ></div>
+    <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 
     <footer>
       BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG
@@ -1327,7 +1512,7 @@
         });
       }
 
-      function renderDemoOverview() {        
+      function renderDemoOverview() {
         // Live Campus Overview handles activity and VIP statistics.
         // Demo records must not overwrite the live counters.
 
@@ -1705,7 +1890,7 @@
         admin = isAdmin === true;
         $("designSave").disabled = !admin;
         $("designSave").textContent = admin ? "💗 Save Dorm Makeover" : "🔒 Admin Only";
-        ["designThemeName","designDescription","designPrimary","designSecondary","designAccent","designBanner"]
+        ["designThemeName", "designDescription", "designPrimary", "designSecondary", "designAccent", "designBanner"]
           .forEach(id => { $(id).disabled = !admin; });
         $("designReset").disabled = !admin;
         const { data: seasons, error } = await client.from("crown_seasons")
@@ -1720,7 +1905,7 @@
 
       $("designSeason").addEventListener("change", selectSeason);
       $("designTeam").addEventListener("change", selectTeam);
-      ["designThemeName","designDescription","designPrimary","designSecondary","designAccent","designBanner"]
+      ["designThemeName", "designDescription", "designPrimary", "designSecondary", "designAccent", "designBanner"]
         .forEach(id => $(id).addEventListener("input", preview));
       $("designReset").addEventListener("click", fill);
       $("dormDesignForm").addEventListener("submit", async event => {
@@ -1777,10 +1962,10 @@
         const select = $("assignmentMember");
         select.replaceChildren(new Option("Choose a member", ""));
         members.filter(member => label(member).toLowerCase().includes(query))
-          .sort((a,b) => label(a).localeCompare(label(b)))
+          .sort((a, b) => label(a).localeCompare(label(b)))
           .forEach(member => select.add(new Option(label(member), member.id)));
         if (members.some(member => member.id === selected) &&
-            [...select.options].some(option => option.value === selected)) select.value = selected;
+          [...select.options].some(option => option.value === selected)) select.value = selected;
         showMember();
       }
 
@@ -1803,7 +1988,7 @@
         const pending = enrollments.filter(entry => entry.status === "pending");
         for (const team of teams) {
           const entries = active.filter(entry => entry.team_id === team.id)
-            .sort((a,b) => (nameById.get(a.user_id) || "").localeCompare(nameById.get(b.user_id) || ""));
+            .sort((a, b) => (nameById.get(a.user_id) || "").localeCompare(nameById.get(b.user_id) || ""));
           const panel = document.createElement("div");
           panel.className = "item";
           const heading = document.createElement("h4");
@@ -1842,9 +2027,9 @@
         if (!seasonId) { status("Select a season to manage its dorms."); return; }
         status("Loading live teams, members and enrollments...");
         const [teamResult, memberResult, enrollmentResult] = await Promise.all([
-          client.from("crown_teams").select("id,name,emoji").eq("season_id",seasonId).order("name"),
-          client.from("profiles").select("id,display_name,membership_status").eq("membership_status","approved").order("display_name").limit(1000),
-          client.from("crown_enrollments").select("id,user_id,season_id,team_id,status").eq("season_id",seasonId).limit(2000)
+          client.from("crown_teams").select("id,name,emoji").eq("season_id", seasonId).order("name"),
+          client.from("profiles").select("id,display_name,membership_status").eq("membership_status", "approved").order("display_name").limit(1000),
+          client.from("crown_enrollments").select("id,user_id,season_id,team_id,status").eq("season_id", seasonId).limit(2000)
         ]);
         if (token !== requestToken) return;
         const error = teamResult.error || memberResult.error || enrollmentResult.error;
@@ -1871,20 +2056,20 @@
         $("assignmentSave").disabled = !isAdmin;
         $("assignmentSave").textContent = isAdmin ? "💗 Approve & Assign / Transfer" : "🔒 Admin Only";
         $("assignmentTeam").disabled = !isAdmin;
-        const seasons = await client.from("crown_seasons").select("id,name,starts_on").order("starts_on",{ascending:false});
+        const seasons = await client.from("crown_seasons").select("id,name,starts_on").order("starts_on", { ascending: false });
         if (seasons.error) { status("Unable to load seasons: " + errorText(seasons.error)); return; }
         $("assignmentSeason").replaceChildren(new Option("Choose a season", ""));
-        (seasons.data || []).forEach(season => $("assignmentSeason").add(new Option(season.name,season.id)));
+        (seasons.data || []).forEach(season => $("assignmentSeason").add(new Option(season.name, season.id)));
         const november = (seasons.data || []).find(season => season.name === "November 2026");
         if (november) { $("assignmentSeason").value = november.id; await loadSeason(); }
         else status("Choose a season to begin.");
       }
 
-      $("assignmentSeason").addEventListener("change",loadSeason);
-      $("assignmentMember").addEventListener("change",showMember);
-      $("assignmentSearch").addEventListener("input",refreshMemberOptions);
-      $("assignmentRefresh").addEventListener("click",loadSeason);
-      $("assignmentForm").addEventListener("submit",async event => {
+      $("assignmentSeason").addEventListener("change", loadSeason);
+      $("assignmentMember").addEventListener("change", showMember);
+      $("assignmentSearch").addEventListener("input", refreshMemberOptions);
+      $("assignmentRefresh").addEventListener("click", loadSeason);
+      $("assignmentForm").addEventListener("submit", async event => {
         event.preventDefault();
         if (!isAdmin) return;
         const seasonId = $("assignmentSeason").value;
@@ -1900,13 +2085,13 @@
           $("assignmentSaveMessage").textContent = "This Bestie is already approved for that dorm."; return;
         }
         if (prior?.status === "approved" && prior.team_id !== teamId &&
-            !confirm(`Transfer ${label(members.find(member => member.id === userId) || {})} from ${oldTeam ? teamLabel(oldTeam) : "their old team"} to ${nextTeam ? teamLabel(nextTeam) : "the selected team"}? Their eligible Monthly Crown pages will move to the new team.`)) return;
+          !confirm(`Transfer ${label(members.find(member => member.id === userId) || {})} from ${oldTeam ? teamLabel(oldTeam) : "their old team"} to ${nextTeam ? teamLabel(nextTeam) : "the selected team"}? Their eligible Monthly Crown pages will move to the new team.`)) return;
         const button = $("assignmentSave");
         button.disabled = true;
         $("assignmentSaveMessage").textContent = "Saving assignment to Supabase...";
         try {
-          const { error } = await client.rpc("admin_assign_crown_dorm",{
-            p_season_id:seasonId,p_user_id:userId,p_team_id:teamId
+          const { error } = await client.rpc("admin_assign_crown_dorm", {
+            p_season_id: seasonId, p_user_id: userId, p_team_id: teamId
           });
           if (error) { $("assignmentSaveMessage").textContent = "Save failed: " + errorText(error); return; }
           await loadSeason();
@@ -1917,7 +2102,7 @@
           $("assignmentSaveMessage").textContent = "Save failed: " + errorText(error);
         } finally { button.disabled = !isAdmin; }
       });
-      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
+      document.addEventListener("bb:campus-hq-ready", initialize, { once: true });
     })();
   </script>
 
@@ -1930,7 +2115,7 @@
       const status = text => { $("honorsStatus").textContent = text; };
       const seasonStatus = text => { $("honorsSeasonStatus").textContent = text; };
       const err = e => e?.message || "Unknown database error";
-      const nameFor = id => approved.find(p => p.id === id)?.display_name || `Member ${String(id).slice(0,8)}…`;
+      const nameFor = id => approved.find(p => p.id === id)?.display_name || `Member ${String(id).slice(0, 8)}…`;
       const make = (tag, text, cls) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (cls) n.className = cls; return n; };
       const dateText = value => value ? new Date(value).toLocaleDateString() : "—";
       const chosen = () => seasons.find(s => s.id === selectedId);
@@ -1938,7 +2123,7 @@
       const accepting = () => chosen()?.status === "active" && selectedId === activeId && inWindow(chosen());
       function setBusy(value) {
         busy = value;
-        ["honorsSend","honorsRefresh","honorsSeasonCreate","honorsSeasonActivate","honorsSeasonClose"].forEach(id => { $(id).disabled = value; });
+        ["honorsSend", "honorsRefresh", "honorsSeasonCreate", "honorsSeasonActivate", "honorsSeasonClose"].forEach(id => { $(id).disabled = value; });
         if (!value) renderSeason();
       }
       function options() {
@@ -1946,7 +2131,7 @@
         const select = $("honorsInvitee"), previous = select.value;
         select.replaceChildren(new Option("Choose an approved Bestie", ""));
         approved.filter(p => (p.display_name || "").toLowerCase().includes(query))
-          .sort((a,b) => (a.display_name || "").localeCompare(b.display_name || ""))
+          .sort((a, b) => (a.display_name || "").localeCompare(b.display_name || ""))
           .forEach(p => {
             const active = memberships.some(m => m.user_id === p.id && m.status === "active");
             const pending = invitations.some(i => i.invitee_id === p.id && i.status === "pending");
@@ -1983,7 +2168,7 @@
         invitations.forEach(inv => {
           const n = card(`💌 ${nameFor(inv.invitee_id)}`, `Sent ${dateText(inv.created_at)}${inv.invitation_message ? " · Message: " + inv.invitation_message : ""}`, inv.status);
           if (inv.status === "pending" && accepting()) n.append(actionButton("Revoke Invitation", async () => {
-            if (confirm(`Revoke the invitation for ${nameFor(inv.invitee_id)}?`)) await mutate("honors_revoke_invitation", {p_invitation_id:inv.id}, "Invitation revoked.");
+            if (confirm(`Revoke the invitation for ${nameFor(inv.invitee_id)}?`)) await mutate("honors_revoke_invitation", { p_invitation_id: inv.id }, "Invitation revoked.");
           }));
           invites.append(n);
         });
@@ -1992,7 +2177,7 @@
         memberships.forEach(m => {
           const n = card(`💎 ${nameFor(m.user_id)}`, `Activated ${dateText(m.activated_at)}${m.revoked_at ? " · Revoked " + dateText(m.revoked_at) : ""}`, m.status);
           if (m.status === "active" && accepting()) n.append(actionButton("Revoke VIP Membership", async () => {
-            if (confirm(`Revoke ${nameFor(m.user_id)}'s membership for this season?`)) await mutate("honors_revoke_membership", {p_user_id:m.user_id}, "Season membership revoked.");
+            if (confirm(`Revoke ${nameFor(m.user_id)}'s membership for this season?`)) await mutate("honors_revoke_membership", { p_user_id: m.user_id }, "Season membership revoked.");
           }));
           roster.append(n);
         });
@@ -2001,14 +2186,14 @@
         $("statVIP").textContent = selectedId === activeId && inWindow(chosen()) ? active.length : $("statVIP").textContent;
       }
       async function loadSeasons(preserve = true) {
-        const {data,error} = await client.from("honors_seasons").select("id,name,starts_on,ends_on,status,created_at").order("starts_on",{ascending:false});
+        const { data, error } = await client.from("honors_seasons").select("id,name,starts_on,ends_on,status,created_at").order("starts_on", { ascending: false });
         if (error) throw error;
         seasons = data || []; activeId = seasons.find(s => s.status === "active")?.id || null;
         const old = preserve ? selectedId : "";
         selectedId = seasons.some(s => s.id === old) ? old : (activeId || seasons[0]?.id || "");
         const select = $("honorsSeasonSelect"); select.replaceChildren();
         if (!seasons.length) select.add(new Option("No seasons created", ""));
-        seasons.forEach(s => select.add(new Option(`${s.name} · ${s.status}`,s.id)));
+        seasons.forEach(s => select.add(new Option(`${s.name} · ${s.status}`, s.id)));
         select.value = selectedId; renderSeason();
         seasonStatus(seasons.length ? `${seasons.length} season(s) loaded. Select any season to browse its records.` : "Create your first draft season.");
       }
@@ -2017,8 +2202,8 @@
         setBusy(true); status("Loading selected season's invitations and VIP roster...");
         try {
           await loadSeasons();
-          const base = [client.from("profiles").select("id,display_name").eq("membership_status","approved").order("display_name")];
-          if (selectedId) base.push(client.from("honors_invitations").select("id,season_id,invitee_id,status,invitation_message,created_at").eq("season_id",selectedId).order("created_at",{ascending:false}), client.from("honors_memberships").select("id,season_id,user_id,status,activated_at,revoked_at").eq("season_id",selectedId).order("activated_at",{ascending:false}));
+          const base = [client.from("profiles").select("id,display_name").eq("membership_status", "approved").order("display_name")];
+          if (selectedId) base.push(client.from("honors_invitations").select("id,season_id,invitee_id,status,invitation_message,created_at").eq("season_id", selectedId).order("created_at", { ascending: false }), client.from("honors_memberships").select("id,season_id,user_id,status,activated_at,revoked_at").eq("season_id", selectedId).order("activated_at", { ascending: false }));
           const result = await Promise.all(base);
           const problem = result.find(r => r.error)?.error; if (problem) throw problem;
           approved = result[0].data || []; invitations = result[1]?.data || []; memberships = result[2]?.data || [];
@@ -2028,14 +2213,14 @@
       }
       async function mutate(rpc, params, success) {
         if (busy) return; setBusy(true); status("Saving to Supabase...");
-        try { const {error} = await client.rpc(rpc,params); if (error) throw error; setBusy(false); await load(); status("💗 " + success); }
+        try { const { error } = await client.rpc(rpc, params); if (error) throw error; setBusy(false); await load(); status("💗 " + success); }
         catch (e) { status("Could not save: " + err(e)); }
         finally { setBusy(false); }
       }
       async function seasonAction(rpc, params, success) {
         if (busy) return; setBusy(true); seasonStatus("Saving season...");
-        try { const {error} = await client.rpc(rpc,params); if (error) throw error; setBusy(false); await load(); seasonStatus("💗 " + success); }
-        catch(e) { seasonStatus("Season change failed: " + err(e)); }
+        try { const { error } = await client.rpc(rpc, params); if (error) throw error; setBusy(false); await load(); seasonStatus("💗 " + success); }
+        catch (e) { seasonStatus("Season change failed: " + err(e)); }
         finally { setBusy(false); }
       }
       async function initialize() {
@@ -2051,29 +2236,29 @@
         const name = $("honorsSeasonName").value.trim(), start = $("honorsSeasonStart").value;
         if (!/^\d{4}-\d{2}-01$/.test(start)) { seasonStatus("Season start must be the first day of a month."); return; }
         if (!confirm(`Create ${name} as a draft two-month season?`)) return;
-        await seasonAction("honors_create_season", {p_name:name,p_starts_on:start}, "Draft season created.");
+        await seasonAction("honors_create_season", { p_name: name, p_starts_on: start }, "Draft season created.");
         $("honorsSeasonForm").reset();
       });
       $("honorsSeasonActivate").addEventListener("click", async () => {
         if (!chosen() || chosen().status !== "draft") return;
         if (!confirm(`Activate ${chosen().name}? The previously active season will close. Existing memberships will NOT transfer.`)) return;
-        await seasonAction("honors_activate_season", {p_season_id:selectedId}, "Season activated.");
+        await seasonAction("honors_activate_season", { p_season_id: selectedId }, "Season activated.");
       });
       $("honorsSeasonClose").addEventListener("click", async () => {
         if (!chosen() || chosen().status !== "active") return;
         if (!confirm(`Close ${chosen().name} now? VIP access will end immediately.`)) return;
-        await seasonAction("honors_close_season", {p_season_id:selectedId}, "Season closed.");
+        await seasonAction("honors_close_season", { p_season_id: selectedId }, "Season closed.");
       });
-      $("honorsSearch").addEventListener("input",options);
-      $("honorsRefresh").addEventListener("click",load);
+      $("honorsSearch").addEventListener("input", options);
+      $("honorsRefresh").addEventListener("click", load);
       $("honorsInviteForm").addEventListener("submit", async e => {
         e.preventDefault(); if (!accepting()) { status("Select the active, in-date season to send invitations."); return; }
         const id = $("honorsInvitee").value; if (!id || busy) return;
         if (!confirm(`Invite ${nameFor(id)} to ${chosen().name}?`)) return;
-        await mutate("honors_send_invitation", {p_invitee_id:id,p_message:$("honorsMessage").value.trim() || null}, `Invitation sent to ${nameFor(id)}.`);
+        await mutate("honors_send_invitation", { p_invitee_id: id, p_message: $("honorsMessage").value.trim() || null }, `Invitation sent to ${nameFor(id)}.`);
         $("honorsMessage").value = "";
       });
-      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
+      document.addEventListener("bb:campus-hq-ready", initialize, { once: true });
     })();
   </script>
 
@@ -2102,7 +2287,7 @@
         const d = new Date(iso);
         if (Number.isNaN(d.getTime())) return "";
         const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-        return local.toISOString().slice(0,16);
+        return local.toISOString().slice(0, 16);
       }
       function fmt(iso) { return iso ? new Date(iso).toLocaleString() : "Not set"; }
       function node(tag, content, className) {
@@ -2111,9 +2296,9 @@
         if (className) n.className = className;
         return n;
       }
-      function action(text, fn, style="light") {
-        const b = node("button",text,"btn "+style);
-        b.type="button"; b.addEventListener("click",fn); return b;
+      function action(text, fn, style = "light") {
+        const b = node("button", text, "btn " + style);
+        b.type = "button"; b.addEventListener("click", fn); return b;
       }
       function edit(post) {
         $("exclusivePostId").value = post.id;
@@ -2128,12 +2313,12 @@
         $("exclusiveRemoveImage").hidden = !post.image_path;
         removeImage = false;
         $("exclusiveSave").textContent = "💗 Update Insider Post";
-        $("exclusiveStudioForm").scrollIntoView({behavior:"smooth",block:"center"});
+        $("exclusiveStudioForm").scrollIntoView({ behavior: "smooth", block: "center" });
       }
       async function load() {
         if (!client || busy) return;
         msg("Loading VIP posts...");
-        const {data,error} = await client.from(table).select("id,title,body,post_type,image_path,status,is_featured,scheduled_at,published_at,created_at,updated_at").order("created_at",{ascending:false});
+        const { data, error } = await client.from(table).select("id,title,body,post_type,image_path,status,is_featured,scheduled_at,published_at,created_at,updated_at").order("created_at", { ascending: false });
         if (error) { msg("Unable to load posts: " + err(error)); return; }
         posts = data || [];
         render();
@@ -2141,37 +2326,37 @@
       }
       function render() {
         const list = $("exclusivePostList"); list.replaceChildren();
-        if (!posts.length) { list.append(node("p","No Insider Room posts yet. Create your first one!","empty")); return; }
+        if (!posts.length) { list.append(node("p", "No Insider Room posts yet. Create your first one!", "empty")); return; }
         for (const post of posts) {
-          const item = node("article",undefined,"item");
-          item.append(node("h4",(post.is_featured ? "💎 " : "") + post.title));
-          const tag = node("span",post.post_type.replaceAll("_"," ") + " · " + post.status + (post.status === "published" && post.scheduled_at && new Date(post.scheduled_at)>new Date() ? " · awaiting reveal" : ""),"tag " + (post.status === "published" ? "green" : "gray"));
-          item.append(tag,node("p",post.body.length>250 ? post.body.slice(0,250)+"…" : post.body),node("p","Created: " + fmt(post.created_at) + " · Reveal: " + fmt(post.scheduled_at),"mini"));
-          if (post.image_path) item.append(node("p","🖼️ Private image attached","mini"));
-          const buttons = node("div",undefined,"actions");
-          buttons.append(action("✏️ Edit",()=>edit(post)));
-          if (post.status !== "published") buttons.append(action("💗 Publish",()=>quickStatus(post,"published"),"secondary"));
-          if (post.status !== "draft") buttons.append(action("📋 Draft",()=>quickStatus(post,"draft")));
-          if (post.status !== "archived") buttons.append(action("📦 Archive",()=>quickStatus(post,"archived")));
-          buttons.append(action("🗑️ Delete",()=>deletePost(post),"danger"));
+          const item = node("article", undefined, "item");
+          item.append(node("h4", (post.is_featured ? "💎 " : "") + post.title));
+          const tag = node("span", post.post_type.replaceAll("_", " ") + " · " + post.status + (post.status === "published" && post.scheduled_at && new Date(post.scheduled_at) > new Date() ? " · awaiting reveal" : ""), "tag " + (post.status === "published" ? "green" : "gray"));
+          item.append(tag, node("p", post.body.length > 250 ? post.body.slice(0, 250) + "…" : post.body), node("p", "Created: " + fmt(post.created_at) + " · Reveal: " + fmt(post.scheduled_at), "mini"));
+          if (post.image_path) item.append(node("p", "🖼️ Private image attached", "mini"));
+          const buttons = node("div", undefined, "actions");
+          buttons.append(action("✏️ Edit", () => edit(post)));
+          if (post.status !== "published") buttons.append(action("💗 Publish", () => quickStatus(post, "published"), "secondary"));
+          if (post.status !== "draft") buttons.append(action("📋 Draft", () => quickStatus(post, "draft")));
+          if (post.status !== "archived") buttons.append(action("📦 Archive", () => quickStatus(post, "archived")));
+          buttons.append(action("🗑️ Delete", () => deletePost(post), "danger"));
           item.append(buttons); list.append(item);
         }
       }
-      async function quickStatus(post,status) {
+      async function quickStatus(post, status) {
         if (busy) return;
         if (!confirm(`Change “${post.title}” to ${status}?`)) return;
         busyState(true);
-        const {error} = await client.from(table).update({status}).eq("id",post.id);
+        const { error } = await client.from(table).update({ status }).eq("id", post.id);
         busyState(false);
-        if (error) {msg("Could not update: "+err(error));return;}
+        if (error) { msg("Could not update: " + err(error)); return; }
         msg("Post updated."); await load();
       }
       async function deletePost(post) {
         if (busy || !confirm(`Permanently delete “${post.title}”? This cannot be undone.`)) return;
         busyState(true);
-        const {error} = await client.from(table).delete().eq("id",post.id);
+        const { error } = await client.from(table).delete().eq("id", post.id);
         busyState(false);
-        if (error) {msg("Could not delete: "+err(error));return;}
+        if (error) { msg("Could not delete: " + err(error)); return; }
         if ($("exclusivePostId").value === post.id) reset();
         // Image objects are deliberately retained to avoid deleting an image
         // referenced by another post. Cleanup can be added separately.
@@ -2181,34 +2366,34 @@
         event.preventDefault();
         if (busy || !client) return;
         const id = $("exclusivePostId").value;
-        const previous = posts.find(p=>p.id===id);
+        const previous = posts.find(p => p.id === id);
         const file = $("exclusiveImage").files[0];
-        if (file && (!validTypes.includes(file.type) || file.size > 10*1024*1024 || file.size === 0)) {msg("Choose a JPG, PNG, WebP, or GIF under 10 MB.");return;}
+        if (file && (!validTypes.includes(file.type) || file.size > 10 * 1024 * 1024 || file.size === 0)) { msg("Choose a JPG, PNG, WebP, or GIF under 10 MB."); return; }
         const title = $("exclusiveTitle").value.trim(), body = $("exclusiveBody").value.trim();
-        if (!title || !body) {msg("Add a title and message first.");return;}
+        if (!title || !body) { msg("Add a title and message first."); return; }
         const dateInput = $("exclusiveSchedule").value;
         const schedule = dateInput ? new Date(dateInput) : null;
-        if (schedule && Number.isNaN(schedule.getTime())) {msg("Enter a valid scheduled date.");return;}
+        if (schedule && Number.isNaN(schedule.getTime())) { msg("Enter a valid scheduled date."); return; }
         const payload = {
-          title,body,post_type:$("exclusiveType").value,
-          status:$("exclusiveStatus").value,
-          is_featured:$("exclusiveFeatured").checked,
-          scheduled_at:schedule ? schedule.toISOString() : null,
-          image_path:removeImage ? null : previous?.image_path || null
+          title, body, post_type: $("exclusiveType").value,
+          status: $("exclusiveStatus").value,
+          is_featured: $("exclusiveFeatured").checked,
+          scheduled_at: schedule ? schedule.toISOString() : null,
+          image_path: removeImage ? null : previous?.image_path || null
         };
         busyState(true);
         let uploadedPath = null;
         try {
           if (file) {
-            const ext = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif"}[file.type];
+            const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[file.type];
             uploadedPath = `${userId}/${crypto.randomUUID()}.${ext}`;
             msg("Uploading your private VIP graphic...");
-            const uploaded = await client.storage.from(bucket).upload(uploadedPath,file,{contentType:file.type,upsert:false});
+            const uploaded = await client.storage.from(bucket).upload(uploadedPath, file, { contentType: file.type, upsert: false });
             if (uploaded.error) throw uploaded.error;
             payload.image_path = uploadedPath;
           }
           msg("Saving Insider Room post...");
-          const result = id ? await client.from(table).update(payload).eq("id",id).select("id").single() : await client.from(table).insert(payload).select("id").single();
+          const result = id ? await client.from(table).update(payload).eq("id", id).select("id").single() : await client.from(table).insert(payload).select("id").single();
           if (result.error) throw result.error;
           reset();
           busyState(false);
@@ -2222,307 +2407,302 @@
       }
       async function initialize() {
         client = window.BB_CAMPUS_CLIENT;
-        if (!client) {msg("Campus HQ Supabase connection unavailable. Refresh.");return;}
-        const [staff,session] = await Promise.all([client.rpc("is_campus_staff"),client.auth.getUser()]);
-        if (staff.error || staff.data !== true || !session.data?.user) {msg("Verified campus staff access required.");$("exclusiveSave").disabled=true;return;}
+        if (!client) { msg("Campus HQ Supabase connection unavailable. Refresh."); return; }
+        const [staff, session] = await Promise.all([client.rpc("is_campus_staff"), client.auth.getUser()]);
+        if (staff.error || staff.data !== true || !session.data?.user) { msg("Verified campus staff access required."); $("exclusiveSave").disabled = true; return; }
         userId = session.data.user.id;
         await load();
       }
-      $("exclusiveStudioForm").addEventListener("submit",save);
-      $("exclusiveClear").addEventListener("click",reset);
-      $("exclusiveRefresh").addEventListener("click",load);
-      $("exclusiveRemoveImage").addEventListener("click",()=>{removeImage=true;$("exclusiveImage").value="";$("exclusiveImageInfo").textContent="Existing image will be detached when you save.";});
-      $("exclusiveImage").addEventListener("change",()=>{const f=$("exclusiveImage").files[0];if(f) {removeImage=false;$("exclusiveImageInfo").textContent=`New image: ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`;}});
-      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
+      $("exclusiveStudioForm").addEventListener("submit", save);
+      $("exclusiveClear").addEventListener("click", reset);
+      $("exclusiveRefresh").addEventListener("click", load);
+      $("exclusiveRemoveImage").addEventListener("click", () => { removeImage = true; $("exclusiveImage").value = ""; $("exclusiveImageInfo").textContent = "Existing image will be detached when you save."; });
+      $("exclusiveImage").addEventListener("change", () => { const f = $("exclusiveImage").files[0]; if (f) { removeImage = false; $("exclusiveImageInfo").textContent = `New image: ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`; } });
+      document.addEventListener("bb:campus-hq-ready", initialize, { once: true });
     })();
   </script>
 
 
   <!-- PHASE 7.3B: PINK BALLOT SUPABASE STAFF STUDIO -->
   <script>
-  (() => {
-    "use strict";
-    const $ = id => document.getElementById(id);
-    const dbTable = "honors_polls", optionTable = "honors_poll_options";
-    let client = null, polls = [], busy = false;
-    const say = message => { $("pinkStudioStatus").textContent = message; };
-    const errorMessage = e => e?.message || String(e);
-    const element = (tag, content, cls) => {
-      const e = document.createElement(tag);
-      if (content !== undefined) e.textContent = content;
-      if (cls) e.className = cls;
-      return e;
-    };
-    const button = (label, handler, cls="light") => {
-      const b = element("button",label,"btn "+cls); b.type="button";
-      b.addEventListener("click",handler); return b;
-    };
-    const lock = flag => {
-      busy = flag;
-      ["pinkLiveSave","pinkLiveClear","pinkLiveRefresh"].forEach(id=>$(id).disabled=flag);
-    };
-    const dateText = v => v ? new Date(v).toLocaleString() : "Not set";
-    const toLocal = v => {
-      if (!v) return "";
-      const d = new Date(v);
-      return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
-    };
-    const toUtc = id => $(id).value ? new Date($(id).value).toISOString() : null;
-    const reset = () => {$("pinkLiveForm").reset();$("pinkLiveId").value="";$("pinkLiveOptions").disabled=false;$("pinkLiveQuestion").disabled=false;};
-    function edit(p) {
-      $("pinkLiveId").value=p.id;
-      $("pinkLiveQuestion").value=p.question;
-      $("pinkLiveDescription").value=p.description || "";
-      $("pinkLiveOptions").value=(p.options||[]).map(o=>o.option_text).join("\n");
-      $("pinkLiveOpens").value=toLocal(p.opens_at);
-      $("pinkLiveCloses").value=toLocal(p.closes_at);
-      $("pinkLiveStatus").value=p.status;
-      const frozen = p.status!=="draft";
-      $("pinkLiveOptions").disabled=frozen;
-      $("pinkLiveQuestion").disabled=frozen;
-      say(frozen ? "Published ballot: question and choices are locked. You can update description, schedule or status." : "Editing draft. Save to apply your changes.");
-      $("pinkLiveForm").scrollIntoView({behavior:"smooth",block:"center"});
-    }
-    function render() {
-      const list=$("pinkLiveList"); list.replaceChildren();
-      if (!polls.length) {list.append(element("p","No Pink Ballots yet, Bestie! Create your first draft.","empty"));return;}
-      for (const p of polls) {
-        const box=element("article",undefined,"item");
-        box.append(element("h4","🗳️ "+p.question));
-        box.append(element("span",p.status.toUpperCase(),"tag "+(p.status==="published"?"green":"gray")));
-        if (p.description) box.append(element("p",p.description));
-        box.append(element("p",(p.options||[]).map(o=>o.option_text).join("  ·  "),"mini"));
-        box.append(element("p","Opens: "+dateText(p.opens_at)+" · Closes: "+dateText(p.closes_at),"mini"));
-        const actions=element("div",undefined,"actions");
-        actions.append(button("✏️ Edit",()=>edit(p)));
-        if (p.status==="draft") actions.append(button("💗 Publish",()=>setStatus(p,"published"),"secondary"));
-        if (p.status==="published") actions.append(button("🔒 Close Voting",()=>setStatus(p,"closed")));
-        if (p.status!=="archived") actions.append(button("📦 Archive",()=>setStatus(p,"archived")));
-        if (p.status==="draft") actions.append(button("🗑️ Delete Draft",()=>deleteDraft(p),"danger"));
-        box.append(actions); list.append(box);
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      const dbTable = "honors_polls", optionTable = "honors_poll_options";
+      let client = null, polls = [], busy = false;
+      const say = message => { $("pinkStudioStatus").textContent = message; };
+      const errorMessage = e => e?.message || String(e);
+      const element = (tag, content, cls) => {
+        const e = document.createElement(tag);
+        if (content !== undefined) e.textContent = content;
+        if (cls) e.className = cls;
+        return e;
+      };
+      const button = (label, handler, cls = "light") => {
+        const b = element("button", label, "btn " + cls); b.type = "button";
+        b.addEventListener("click", handler); return b;
+      };
+      const lock = flag => {
+        busy = flag;
+        ["pinkLiveSave", "pinkLiveClear", "pinkLiveRefresh"].forEach(id => $(id).disabled = flag);
+      };
+      const dateText = v => v ? new Date(v).toLocaleString() : "Not set";
+      const toLocal = v => {
+        if (!v) return "";
+        const d = new Date(v);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      };
+      const toUtc = id => $(id).value ? new Date($(id).value).toISOString() : null;
+      const reset = () => { $("pinkLiveForm").reset(); $("pinkLiveId").value = ""; $("pinkLiveOptions").disabled = false; $("pinkLiveQuestion").disabled = false; };
+      function edit(p) {
+        $("pinkLiveId").value = p.id;
+        $("pinkLiveQuestion").value = p.question;
+        $("pinkLiveDescription").value = p.description || "";
+        $("pinkLiveOptions").value = (p.options || []).map(o => o.option_text).join("\n");
+        $("pinkLiveOpens").value = toLocal(p.opens_at);
+        $("pinkLiveCloses").value = toLocal(p.closes_at);
+        $("pinkLiveStatus").value = p.status;
+        const frozen = p.status !== "draft";
+        $("pinkLiveOptions").disabled = frozen;
+        $("pinkLiveQuestion").disabled = frozen;
+        say(frozen ? "Published ballot: question and choices are locked. You can update description, schedule or status." : "Editing draft. Save to apply your changes.");
+        $("pinkLiveForm").scrollIntoView({ behavior: "smooth", block: "center" });
       }
-    }
-    async function load() {
-      if (!client || busy) return;
-      say("Loading live Pink Ballots...");
-      const {data,error}=await client.from(dbTable).select("id,question,description,status,opens_at,closes_at,created_at,honors_poll_options(id,option_text,sort_order)").order("created_at",{ascending:false});
-      if (error) {say("Unable to load ballots: "+errorMessage(error));return;}
-      polls=(data||[]).map(p=>({...p,options:(p.honors_poll_options||[]).sort((a,b)=>a.sort_order-b.sort_order)}));
-      render();say(polls.length+" live Pink Ballot(s) loaded from Supabase.");
-    }
-    async function setStatus(p,status) {
-      if (busy || !confirm(`Change “${p.question}” to ${status}?`)) return;
-      if (status==="published" && (p.options||[]).length<2) {say("A poll needs at least two choices.");return;}
-      lock(true);
-      const {error}=await client.from(dbTable).update({status}).eq("id",p.id);
-      lock(false);
-      if (error) {say("Could not update ballot: "+errorMessage(error));return;}
-      if ($("pinkLiveId").value===p.id) reset();
-      await load();say("💗 Ballot status updated!");
-    }
-    async function deleteDraft(p) {
-      if (busy || !confirm(`Permanently delete draft “${p.question}”?`)) return;
-      lock(true);
-      const {error}=await client.from(dbTable).delete().eq("id",p.id).eq("status","draft");
-      lock(false);
-      if (error) {say("Could not delete draft: "+errorMessage(error));return;}
-      if ($("pinkLiveId").value===p.id) reset();
-      await load();say("Draft deleted.");
-    }
-    async function save(e) {
-      e.preventDefault();if (busy || !client) return;
-      const id=$("pinkLiveId").value;
-      const existing=polls.find(p=>p.id===id);
-      const question=$("pinkLiveQuestion").value.trim();
-      const description=$("pinkLiveDescription").value.trim()||null;
-      const choices=$("pinkLiveOptions").value.split("\n").map(s=>s.trim()).filter(Boolean);
-      if (!existing || existing.status==="draft") {
-        if (!question || question.length>180 || choices.length<2 || choices.length>12 || choices.some(x=>x.length>300)) {say("Enter a question and 2–12 choices, each no longer than 300 characters.");return;}
-        if (new Set(choices.map(x=>x.toLowerCase())).size!==choices.length) {say("Each choice must be unique.");return;}
+      function render() {
+        const list = $("pinkLiveList"); list.replaceChildren();
+        if (!polls.length) { list.append(element("p", "No Pink Ballots yet, Bestie! Create your first draft.", "empty")); return; }
+        for (const p of polls) {
+          const box = element("article", undefined, "item");
+          box.append(element("h4", "🗳️ " + p.question));
+          box.append(element("span", p.status.toUpperCase(), "tag " + (p.status === "published" ? "green" : "gray")));
+          if (p.description) box.append(element("p", p.description));
+          box.append(element("p", (p.options || []).map(o => o.option_text).join("  ·  "), "mini"));
+          box.append(element("p", "Opens: " + dateText(p.opens_at) + " · Closes: " + dateText(p.closes_at), "mini"));
+          const actions = element("div", undefined, "actions");
+          actions.append(button("✏️ Edit", () => edit(p)));
+          if (p.status === "draft") actions.append(button("💗 Publish", () => setStatus(p, "published"), "secondary"));
+          if (p.status === "published") actions.append(button("🔒 Close Voting", () => setStatus(p, "closed")));
+          if (p.status !== "archived") actions.append(button("📦 Archive", () => setStatus(p, "archived")));
+          if (p.status === "draft") actions.append(button("🗑️ Delete Draft", () => deleteDraft(p), "danger"));
+          box.append(actions); list.append(box);
+        }
       }
-      const opens=toUtc("pinkLiveOpens"),closes=toUtc("pinkLiveCloses");
-      if (opens && closes && new Date(closes)<=new Date(opens)) {say("Closing time must be after opening time.");return;}
-      const status=$("pinkLiveStatus").value;
-      if (existing && existing.status!=="draft" && status==="draft") {say("A published/closed ballot cannot return to draft.");return;}
-      lock(true);
-      try {
-        let pollId=id;
-        if (existing && existing.status!=="draft") {
-          const {error}=await client.from(dbTable).update({description,opens_at:opens,closes_at:closes,status}).eq("id",id);
-          if (error) throw error;
-        } else if (existing) {
-          // Keep the poll in draft until all choices are successfully saved.
-          const {error}=await client.from(dbTable).update({question,description,opens_at:opens,closes_at:closes,status:"draft"}).eq("id",id);
-          if (error) throw error;
-          const old=existing.options||[];
-          // Upsert existing choices in place to avoid a destructive delete-first update.
-          for (let i=0;i<choices.length;i++) {
-            if (old[i]) {
-              const {error:e}=await client.from(optionTable).update({option_text:choices[i]}).eq("id",old[i].id);
+      async function load() {
+        if (!client || busy) return;
+        say("Loading live Pink Ballots...");
+        const { data, error } = await client.from(dbTable).select("id,question,description,status,opens_at,closes_at,created_at,honors_poll_options(id,option_text,sort_order)").order("created_at", { ascending: false });
+        if (error) { say("Unable to load ballots: " + errorMessage(error)); return; }
+        polls = (data || []).map(p => ({ ...p, options: (p.honors_poll_options || []).sort((a, b) => a.sort_order - b.sort_order) }));
+        render(); say(polls.length + " live Pink Ballot(s) loaded from Supabase.");
+      }
+      async function setStatus(p, status) {
+        if (busy || !confirm(`Change “${p.question}” to ${status}?`)) return;
+        if (status === "published" && (p.options || []).length < 2) { say("A poll needs at least two choices."); return; }
+        lock(true);
+        const { error } = await client.from(dbTable).update({ status }).eq("id", p.id);
+        lock(false);
+        if (error) { say("Could not update ballot: " + errorMessage(error)); return; }
+        if ($("pinkLiveId").value === p.id) reset();
+        await load(); say("💗 Ballot status updated!");
+      }
+      async function deleteDraft(p) {
+        if (busy || !confirm(`Permanently delete draft “${p.question}”?`)) return;
+        lock(true);
+        const { error } = await client.from(dbTable).delete().eq("id", p.id).eq("status", "draft");
+        lock(false);
+        if (error) { say("Could not delete draft: " + errorMessage(error)); return; }
+        if ($("pinkLiveId").value === p.id) reset();
+        await load(); say("Draft deleted.");
+      }
+      async function save(e) {
+        e.preventDefault(); if (busy || !client) return;
+        const id = $("pinkLiveId").value;
+        const existing = polls.find(p => p.id === id);
+        const question = $("pinkLiveQuestion").value.trim();
+        const description = $("pinkLiveDescription").value.trim() || null;
+        const choices = $("pinkLiveOptions").value.split("\n").map(s => s.trim()).filter(Boolean);
+        if (!existing || existing.status === "draft") {
+          if (!question || question.length > 180 || choices.length < 2 || choices.length > 12 || choices.some(x => x.length > 300)) { say("Enter a question and 2–12 choices, each no longer than 300 characters."); return; }
+          if (new Set(choices.map(x => x.toLowerCase())).size !== choices.length) { say("Each choice must be unique."); return; }
+        }
+        const opens = toUtc("pinkLiveOpens"), closes = toUtc("pinkLiveCloses");
+        if (opens && closes && new Date(closes) <= new Date(opens)) { say("Closing time must be after opening time."); return; }
+        const status = $("pinkLiveStatus").value;
+        if (existing && existing.status !== "draft" && status === "draft") { say("A published/closed ballot cannot return to draft."); return; }
+        lock(true);
+        try {
+          let pollId = id;
+          if (existing && existing.status !== "draft") {
+            const { error } = await client.from(dbTable).update({ description, opens_at: opens, closes_at: closes, status }).eq("id", id);
+            if (error) throw error;
+          } else if (existing) {
+            // Keep the poll in draft until all choices are successfully saved.
+            const { error } = await client.from(dbTable).update({ question, description, opens_at: opens, closes_at: closes, status: "draft" }).eq("id", id);
+            if (error) throw error;
+            const old = existing.options || [];
+            // Upsert existing choices in place to avoid a destructive delete-first update.
+            for (let i = 0; i < choices.length; i++) {
+              if (old[i]) {
+                const { error: e } = await client.from(optionTable).update({ option_text: choices[i] }).eq("id", old[i].id);
+                if (e) throw e;
+              } else {
+                const { error: e } = await client.from(optionTable).insert({ poll_id: id, option_text: choices[i], sort_order: i });
+                if (e) throw e;
+              }
+            }
+            for (const oldOption of old.slice(choices.length)) {
+              const { error: e } = await client.from(optionTable).delete().eq("id", oldOption.id);
               if (e) throw e;
-            } else {
-              const {error:e}=await client.from(optionTable).insert({poll_id:id,option_text:choices[i],sort_order:i});
+            }
+            if (status !== "draft") {
+              const { error: e } = await client.from(dbTable).update({ status }).eq("id", id);
+              if (e) throw e;
+            }
+          } else {
+            const { data, error } = await client.from(dbTable).insert({ question, description, opens_at: opens, closes_at: closes, status: "draft" }).select("id").single();
+            if (error) throw error;
+            pollId = data.id;
+            const { error: choiceError } = await client.from(optionTable).insert(choices.map((option_text, i) => ({ poll_id: pollId, option_text, sort_order: i })));
+            if (choiceError) throw choiceError;
+            if (status !== "draft") {
+              const { error: e } = await client.from(dbTable).update({ status }).eq("id", pollId);
               if (e) throw e;
             }
           }
-          for (const oldOption of old.slice(choices.length)) {
-            const {error:e}=await client.from(optionTable).delete().eq("id",oldOption.id);
-            if (e) throw e;
-          }
-          if (status!=="draft") {
-            const {error:e}=await client.from(dbTable).update({status}).eq("id",id);
-            if (e) throw e;
-          }
-        } else {
-          const {data,error}=await client.from(dbTable).insert({question,description,opens_at:opens,closes_at:closes,status:"draft"}).select("id").single();
-          if (error) throw error;
-          pollId=data.id;
-          const {error:choiceError}=await client.from(optionTable).insert(choices.map((option_text,i)=>({poll_id:pollId,option_text,sort_order:i})));
-          if (choiceError) throw choiceError;
-          if (status!=="draft") {
-            const {error:e}=await client.from(dbTable).update({status}).eq("id",pollId);
-            if (e) throw e;
-          }
-        }
-        reset();lock(false);await load();say("💗 Pink Ballot saved to Supabase!"+(status==="published"?" VIP visibility follows its opening time.":""));
-      } catch(err) {say("Could not save ballot: "+errorMessage(err)+". If this was a new ballot, check the draft registry before retrying.");}
-      finally {lock(false);}
-    }
-    async function init() {
-      client=window.BB_CAMPUS_CLIENT;
-      if (!client) {say("Campus HQ Supabase connection unavailable.");return;}
-      const {data,error}=await client.rpc("is_campus_staff");
-      if (error || data!==true) {say("Campus staff verification required.");$("pinkLiveSave").disabled=true;return;}
-      await load();
-    }
-    $("pinkLiveForm").addEventListener("submit",save);
-    $("pinkLiveClear").addEventListener("click",()=>{reset();say("Editor cleared.");});
-    $("pinkLiveRefresh").addEventListener("click",load);
-    document.addEventListener("bb:campus-hq-ready",init,{once:true});
-  })();
+          reset(); lock(false); await load(); say("💗 Pink Ballot saved to Supabase!" + (status === "published" ? " VIP visibility follows its opening time." : ""));
+        } catch (err) { say("Could not save ballot: " + errorMessage(err) + ". If this was a new ballot, check the draft registry before retrying."); }
+        finally { lock(false); }
+      }
+      async function init() {
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) { say("Campus HQ Supabase connection unavailable."); return; }
+        const { data, error } = await client.rpc("is_campus_staff");
+        if (error || data !== true) { say("Campus staff verification required."); $("pinkLiveSave").disabled = true; return; }
+        await load();
+      }
+      $("pinkLiveForm").addEventListener("submit", save);
+      $("pinkLiveClear").addEventListener("click", () => { reset(); say("Editor cleared."); });
+      $("pinkLiveRefresh").addEventListener("click", load);
+      document.addEventListener("bb:campus-hq-ready", init, { once: true });
+    })();
   </script>
 
   <script>
-  /* Phase 7.5B — live Bestie Access event management */
-  (() => {
-    'use strict';
-    const $ = id => document.getElementById(id);
-    const make = (tag, text, cls) => { const n=document.createElement(tag); if(text!==undefined)n.textContent=text; if(cls)n.className=cls; return n; };
-    const errorText = e => e?.message || String(e);
-    const dateLabel = x => x ? new Date(x).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : 'Not set';
-    const localValue = x => { if(!x)return ''; const d=new Date(x); const z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; };
-    const iso = id => $(id).value ? new Date($(id).value).toISOString() : null;
-    const fields = ['accessEventId','accessSeason','accessTitle','accessDescription','accessLocation','accessStarts','accessEnds','accessCapacity','accessAudience','accessVipOpens','accessGeneralOpens','accessCloses','accessCancelCloses','accessWaitlistEnabled','accessSaveStatus'];
-    let client,events=[],seasons=[],busy=false;
-    const say = message => { $('accessStatus').textContent=message; };
-    function audience(){ const general=$('accessAudience').value==='campus_wide'; $('accessGeneralField').hidden=!general; $('accessGeneralOpens').required=general; }
-    function reset(){ $('accessForm').reset(); $('accessEventId').value=''; $('accessCapacity').value=20; $('accessSaveStatus').value='draft'; const active=seasons.find(x=>x.status==='active'); $('accessSeason').value=active?.id||seasons[0]?.id||''; audience(); $('accessSave').textContent='💗 Save to Supabase'; }
-    function lock(value){busy=value; $('accessSave').disabled=value; $('accessRefresh').disabled=value;}
-    function edit(e){
-      $('accessEventId').value=e.id; $('accessSeason').value=e.honors_season_id; $('accessTitle').value=e.title;
-      $('accessDescription').value=e.description||''; $('accessLocation').value=e.location_details||'';
-      $('accessStarts').value=localValue(e.starts_at); $('accessEnds').value=localValue(e.ends_at);
-      $('accessCapacity').value=e.capacity; $('accessAudience').value=e.audience;
-      $('accessVipOpens').value=localValue(e.vip_opens_at); $('accessGeneralOpens').value=localValue(e.general_opens_at);
-      $('accessCloses').value=localValue(e.registration_closes_at); $('accessCancelCloses').value=localValue(e.cancellation_closes_at);
-      $('accessWaitlistEnabled').checked=e.waitlist_enabled; $('accessSaveStatus').value=e.status;
-      audience(); $('accessSave').textContent='💗 Save Changes'; $('accessForm').scrollIntoView({behavior:'smooth',block:'start'});
-    }
-    async function save(ev){
-      ev.preventDefault(); if(busy)return;
-      const audienceValue=$('accessAudience').value;
-      const starts=iso('accessStarts'), ends=iso('accessEnds'), vip=iso('accessVipOpens'), general=audienceValue==='campus_wide'?iso('accessGeneralOpens'):null, closes=iso('accessCloses'), cancel=iso('accessCancelCloses');
-      if(!starts||!ends||!vip||!closes||(audienceValue==='campus_wide'&&!general)){say('Please complete all required dates.');return;}
-      if(!(ends>starts && vip<closes && closes<=starts && (!general||(general>=vip&&general<closes)) && (!cancel||cancel<=starts))){say('⚠️ Check your dates: event end after start; VIP opens before registration closes; general opens after VIP; registration closes before the event starts.');return;}
-      const capacity=Number($('accessCapacity').value);
-      if(!Number.isInteger(capacity)||capacity<1||capacity>10000){say('Enter a capacity between 1 and 10,000.');return;}
-      const args={p_event_id:$('accessEventId').value||null,p_season_id:$('accessSeason').value,p_title:$('accessTitle').value.trim(),p_description:$('accessDescription').value.trim(),p_location_details:$('accessLocation').value.trim()||null,p_starts_at:starts,p_ends_at:ends,p_capacity:capacity,p_audience:audienceValue,p_vip_opens_at:vip,p_general_opens_at:general,p_registration_closes_at:closes,p_cancellation_closes_at:cancel,p_waitlist_enabled:$('accessWaitlistEnabled').checked,p_status:$('accessSaveStatus').value};
-      if(!args.p_season_id){say('Choose an Honors Society season.');return;}
-      lock(true);say('💌 Saving your live event...');
-      try{const {error}=await client.rpc('honors_access_save_event',args);if(error)throw error;reset();say('💗 Event saved to Supabase!');await load();}
-      catch(e){say('⚠️ Could not save event: '+errorText(e));}
-      finally{lock(false);}
-    }
-    async function changeStatus(e,next){
-      const wording=next==='cancelled'?'Cancel this event? This will close waitlist entries.':`Change this event to ${next}?`;
-      if(!window.confirm(wording))return;
-      say('Updating event status...');
-      const {error}=await client.rpc('honors_access_set_status',{p_event_id:e.id,p_status:next});
-      if(error){say('⚠️ '+errorText(error));return;}
-      say('💗 Event status updated.');await load();
-    }
-    function action(parent,label,callback,cls='light'){
-      const b=make('button',label,'btn '+cls);b.type='button';b.addEventListener('click',callback);parent.append(b);
-    }
-    async function load(){
-      if(!client)return;
-      say('💌 Loading live Bestie Access events...');
-      const [eventResult,regResult,waitResult]=await Promise.all([
-        client.from('honors_access_events').select('*').order('starts_at',{ascending:false}).limit(500),
-        client.from('honors_access_registrations').select('id,event_id,user_id,status,registered_at').limit(5000),
-        client.from('honors_access_waitlist').select('id,event_id,user_id,status,joined_at,offer_expires_at').limit(5000)
-      ]);
-      const err=eventResult.error||regResult.error||waitResult.error;
-      if(err){say('⚠️ Could not load Bestie Access: '+errorText(err));return;}
-      events=eventResult.data||[];
-      const registrations=regResult.data||[],waitlist=waitResult.data||[];
-      $('accessEventCount').textContent=events.length;
-      $('accessRegistrationCount').textContent=registrations.filter(r=>r.status==='confirmed').length;
-      $('accessWaitlistCount').textContent=waitlist.filter(w=>['waiting','offered'].includes(w.status)).length;
-      const root=$('accessEventList');root.replaceChildren();
-      if(!events.length){root.append(make('p','🎀 No live events yet! Create your first event above.','empty'));say('💗 Ready for your first event!');return;}
-      const userIds=[...new Set([...registrations.map(r=>r.user_id),...waitlist.map(w=>w.user_id)])];
-      let profiles=[];
-      for(let i=0;i<userIds.length;i+=100){const {data,error}=await client.from('profiles').select('id,display_name').in('id',userIds.slice(i,i+100));if(!error)profiles.push(...(data||[]));}
-      const names=new Map(profiles.map(p=>[p.id,p.display_name||'Bestie']));
-      for(const e of events){
-        const confirmed=registrations.filter(r=>r.event_id===e.id&&r.status==='confirmed');
-        const waiting=waitlist.filter(w=>w.event_id===e.id&&w.status==='waiting').sort((a,b)=>new Date(a.joined_at)-new Date(b.joined_at)||a.id.localeCompare(b.id));
-        const offered=waitlist.filter(w=>w.event_id===e.id&&w.status==='offered');
-        const card=make('article',undefined,'item');
-        card.append(make('h4','💌 '+e.title));
-        card.append(make('span',e.status.toUpperCase(),'tag '+(e.status==='published'?'green':'gray')));
-        card.append(make('p',`${e.audience==='vip_only'?'💎 VIP only':'🎓 VIP first → campus-wide'} · ${seasons.find(x=>x.id===e.honors_season_id)?.name||'Season'} · ${e.capacity} spots`,'mini'));
-        card.append(make('p',`📅 ${dateLabel(e.starts_at)} – ${dateLabel(e.ends_at)}`,'mini'));
-        card.append(make('p',`💎 VIP opens ${dateLabel(e.vip_opens_at)}${e.general_opens_at?' · 🎓 General opens '+dateLabel(e.general_opens_at):''} · Registration closes ${dateLabel(e.registration_closes_at)}`,'mini'));
-        card.append(make('p',`🎟️ ${confirmed.length} confirmed · ${offered.length} offers · ${waiting.length} waiting · ${Math.max(0,e.capacity-confirmed.length-offered.length)} unreserved spots`,'mini'));
-        if(e.description)card.append(make('p',e.description));
-        const actions=make('div',undefined,'actions');
-        if(['draft','published'].includes(e.status))action(actions,'✏️ Edit',()=>edit(e));
-        if(e.status==='draft')action(actions,'💗 Publish',()=>changeStatus(e,'published'),'secondary');
-        if(['draft','published'].includes(e.status))action(actions,'🚫 Cancel Event',()=>changeStatus(e,'cancelled'),'danger');
-        if(e.status==='published')action(actions,'✓ Mark Completed',()=>changeStatus(e,'completed'));
-        if(e.status==='completed')action(actions,'📦 Archive',()=>changeStatus(e,'archived'));
-        card.append(actions);
-        const details=make('details');details.style.marginTop='14px';
-        const summary=make('summary',`👥 View roster (${confirmed.length} confirmed, ${offered.length} offers, ${waiting.length} waiting)`);summary.style.cursor='pointer';summary.style.fontWeight='900';details.append(summary);
-        const roster=make('div',undefined,'item');
-        const addGroup=(title,rows,formatter)=>{roster.append(make('h4',title));if(!rows.length)roster.append(make('p','No entries.','mini'));else rows.forEach((r,i)=>roster.append(make('p',formatter(r,i),'mini')));};
-        addGroup('💗 Confirmed',confirmed,r=>`${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · ${dateLabel(r.registered_at)}`);
-        addGroup('💌 Active Offers',offered,r=>`${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · expires ${dateLabel(r.offer_expires_at)}`);
-        addGroup('⏳ Waiting',waiting,(r,i)=>`#${i+1} ${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · joined ${dateLabel(r.joined_at)}`);
-        details.append(roster);card.append(details);root.append(card);
+    /* Phase 7.5B — live Bestie Access event management */
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const make = (tag, text, cls) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (cls) n.className = cls; return n; };
+      const errorText = e => e?.message || String(e);
+      const dateLabel = x => x ? new Date(x).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'Not set';
+      const localValue = x => { if (!x) return ''; const d = new Date(x); const z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; };
+      const iso = id => $(id).value ? new Date($(id).value).toISOString() : null;
+      const fields = ['accessEventId', 'accessSeason', 'accessTitle', 'accessDescription', 'accessLocation', 'accessStarts', 'accessEnds', 'accessCapacity', 'accessAudience', 'accessVipOpens', 'accessGeneralOpens', 'accessCloses', 'accessCancelCloses', 'accessSaveStatus'];
+      let client, events = [], seasons = [], busy = false;
+      const say = message => { $('accessStatus').textContent = message; };
+      function audience() { const general = $('accessAudience').value === 'campus_wide'; $('accessGeneralField').hidden = !general; $('accessGeneralOpens').required = general; }
+      function reset() { $('accessForm').reset(); $('accessEventId').value = ''; $('accessCapacity').value = 20; $('accessSaveStatus').value = 'draft'; const active = seasons.find(x => x.status === 'active'); $('accessSeason').value = active?.id || seasons[0]?.id || ''; audience(); $('accessSave').textContent = '💗 Save to Supabase'; }
+      function lock(value) { busy = value; $('accessSave').disabled = value; $('accessRefresh').disabled = value; }
+      function edit(e) {
+        $('accessEventId').value = e.id; $('accessSeason').value = e.honors_season_id; $('accessTitle').value = e.title;
+        $('accessDescription').value = e.description || ''; $('accessLocation').value = e.location_details || '';
+        $('accessStarts').value = localValue(e.starts_at); $('accessEnds').value = localValue(e.ends_at);
+        $('accessCapacity').value = e.capacity; $('accessAudience').value = e.audience;
+        $('accessVipOpens').value = localValue(e.vip_opens_at); $('accessGeneralOpens').value = localValue(e.general_opens_at);
+        $('accessCloses').value = localValue(e.registration_closes_at); $('accessCancelCloses').value = localValue(e.cancellation_closes_at);
+        $('accessSaveStatus').value = e.status;
+        audience(); $('accessSave').textContent = '💗 Save Changes'; $('accessForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      say('💎 '+events.length+' live event'+(events.length===1?'':'s')+' loaded from Supabase.');
-    }
-    async function init(){
-      client=window.BB_CAMPUS_CLIENT;
-      if(!client){say('⚠️ Campus HQ connection unavailable.');return;}
-      const {data:staff,error:staffError}=await client.rpc('is_campus_staff');
-      if(staffError||staff!==true){say('⚠️ Campus staff access required.');$('accessSave').disabled=true;return;}
-      const {data,error}=await client.from('honors_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false});
-      if(error){say('⚠️ Could not load seasons: '+errorText(error));return;}
-      seasons=data||[];const select=$('accessSeason');select.replaceChildren();
-      for(const season of seasons){const option=make('option',`${season.name} · ${season.status}`);option.value=season.id;select.append(option);}
-      $('accessAudience').addEventListener('change',audience);
-      $('accessForm').addEventListener('submit',save);
-      $('accessClear').addEventListener('click',()=>{reset();say('Editor cleared.');});
-      $('accessRefresh').addEventListener('click',load);
-      reset();await load();
-    }
-    document.addEventListener('bb:campus-hq-ready',init,{once:true});
-  })();
+      async function save(ev) {
+        ev.preventDefault(); if (busy) return;
+        const audienceValue = $('accessAudience').value;
+        const starts = iso('accessStarts'), ends = iso('accessEnds'), vip = iso('accessVipOpens'), general = audienceValue === 'campus_wide' ? iso('accessGeneralOpens') : null, closes = iso('accessCloses'), cancel = iso('accessCancelCloses');
+        if (!starts || !ends || !vip || !closes || (audienceValue === 'campus_wide' && !general)) { say('Please complete all required dates.'); return; }
+        if (!(ends > starts && vip < closes && closes <= starts && (!general || (general >= vip && general < closes)) && (!cancel || cancel <= starts))) { say('⚠️ Check your dates: event end after start; VIP opens before registration closes; general opens after VIP; registration closes before the event starts.'); return; }
+        const capacity = Number($('accessCapacity').value);
+        if (!Number.isInteger(capacity) || capacity < 1 || capacity > 10000) { say('Enter a capacity between 1 and 10,000.'); return; }
+        const args = { p_event_id: $('accessEventId').value || null, p_season_id: $('accessSeason').value, p_title: $('accessTitle').value.trim(), p_description: $('accessDescription').value.trim(), p_location_details: $('accessLocation').value.trim() || null, p_starts_at: starts, p_ends_at: ends, p_capacity: capacity, p_audience: audienceValue, p_vip_opens_at: vip, p_general_opens_at: general, p_registration_closes_at: closes, p_cancellation_closes_at: cancel, p_waitlist_enabled: false, p_status: $('accessSaveStatus').value };
+        if (!args.p_season_id) { say('Choose an Honors Society season.'); return; }
+        lock(true); say('💌 Saving your live event...');
+        try { const { error } = await client.rpc('honors_access_save_event', args); if (error) throw error; reset(); say('💗 Event saved to Supabase!'); await load(); }
+        catch (e) { say('⚠️ Could not save event: ' + errorText(e)); }
+        finally { lock(false); }
+      }
+      async function changeStatus(e, next) {
+        const wording = next === 'cancelled' ? 'Cancel this event? Existing registrations will remain in the history.' : `Change this event to ${next}?`;
+        if (!window.confirm(wording)) return;
+        say('Updating event status...');
+        const { error } = await client.rpc('honors_access_set_status', { p_event_id: e.id, p_status: next });
+        if (error) { say('⚠️ ' + errorText(error)); return; }
+        say('💗 Event status updated.'); await load();
+      }
+      function action(parent, label, callback, cls = 'light') {
+        const b = make('button', label, 'btn ' + cls); b.type = 'button'; b.addEventListener('click', callback); parent.append(b);
+      }
+      async function load() {
+        if (!client) return;
+        say('💌 Loading live Bestie Access events...');
+        const [eventResult, regResult] = await Promise.all([
+          client.from('honors_access_events').select('*').order('starts_at', { ascending: false }).limit(500),
+          client.from('honors_access_registrations').select('id,event_id,user_id,status,registered_at').limit(5000)
+        ]);
+        const err = eventResult.error || regResult.error;
+        if (err) { say('⚠️ Could not load Bestie Access: ' + errorText(err)); return; }
+        events = eventResult.data || [];
+        const registrations = regResult.data || [];
+        $('accessEventCount').textContent = events.length;
+        $('accessRegistrationCount').textContent = registrations.filter(r => r.status === 'confirmed').length;
+        const root = $('accessEventList'); root.replaceChildren();
+        if (!events.length) { root.append(make('p', '🎀 No live events yet! Create your first event above.', 'empty')); say('💗 Ready for your first event!'); return; }
+        const userIds = [...new Set(registrations.map(r => r.user_id))];
+        let profiles = [];
+        for (let i = 0; i < userIds.length; i += 100) { const { data, error } = await client.from('profiles').select('id,display_name').in('id', userIds.slice(i, i + 100)); if (!error) profiles.push(...(data || [])); }
+        const names = new Map(profiles.map(p => [p.id, p.display_name || 'Bestie']));
+        for (const e of events) {
+          const confirmed = registrations.filter(r => r.event_id === e.id && r.status === 'confirmed');
+          const card = make('article', undefined, 'item');
+          card.append(make('h4', '💌 ' + e.title));
+          card.append(make('span', e.status.toUpperCase(), 'tag ' + (e.status === 'published' ? 'green' : 'gray')));
+          card.append(make('p', `${e.audience === 'vip_only' ? '💎 VIP only' : '🎓 VIP first → campus-wide'} · ${seasons.find(x => x.id === e.honors_season_id)?.name || 'Season'} · ${e.capacity} spots`, 'mini'));
+          card.append(make('p', `📅 ${dateLabel(e.starts_at)} – ${dateLabel(e.ends_at)}`, 'mini'));
+          card.append(make('p', `💎 VIP opens ${dateLabel(e.vip_opens_at)}${e.general_opens_at ? ' · 🎓 General opens ' + dateLabel(e.general_opens_at) : ''} · Registration closes ${dateLabel(e.registration_closes_at)}`, 'mini'));
+          card.append(make('p', `🎟️ ${confirmed.length} confirmed · ${offered.length} offers · ${waiting.length} waiting · ${Math.max(0, e.capacity - confirmed.length - offered.length)} unreserved spots`, 'mini'));
+          if (e.description) card.append(make('p', e.description));
+          const actions = make('div', undefined, 'actions');
+          if (['draft', 'published'].includes(e.status)) action(actions, '✏️ Edit', () => edit(e));
+          if (e.status === 'draft') action(actions, '💗 Publish', () => changeStatus(e, 'published'), 'secondary');
+          if (['draft', 'published'].includes(e.status)) action(actions, '🚫 Cancel Event', () => changeStatus(e, 'cancelled'), 'danger');
+          if (e.status === 'published') action(actions, '✓ Mark Completed', () => changeStatus(e, 'completed'));
+          if (e.status === 'completed') action(actions, '📦 Archive', () => changeStatus(e, 'archived'));
+          card.append(actions);
+          const details = make('details'); details.style.marginTop = '14px';
+          const summary = make('summary', `👥 View roster (${confirmed.length} confirmed)`); summary.style.cursor = 'pointer'; summary.style.fontWeight = '900'; details.append(summary);
+          const roster = make('div', undefined, 'item');
+          const addGroup = (title, rows, formatter) => { roster.append(make('h4', title)); if (!rows.length) roster.append(make('p', 'No entries.', 'mini')); else rows.forEach((r, i) => roster.append(make('p', formatter(r, i), 'mini'))); };
+          addGroup('💗 Confirmed', confirmed, r => `${names.get(r.user_id) || 'Member (' + r.user_id.slice(0, 8) + ')'} · ${dateLabel(r.registered_at)}`);
+          details.append(roster); card.append(details); root.append(card);
+        }
+        say('💎 ' + events.length + ' live event' + (events.length === 1 ? '' : 's') + ' loaded from Supabase.');
+      }
+      async function init() {
+        client = window.BB_CAMPUS_CLIENT;
+        if (!client) { say('⚠️ Campus HQ connection unavailable.'); return; }
+        const { data: staff, error: staffError } = await client.rpc('is_campus_staff');
+        if (staffError || staff !== true) { say('⚠️ Campus staff access required.'); $('accessSave').disabled = true; return; }
+        const { data, error } = await client.from('honors_seasons').select('id,name,starts_on,ends_on,status').order('starts_on', { ascending: false });
+        if (error) { say('⚠️ Could not load seasons: ' + errorText(error)); return; }
+        seasons = data || []; const select = $('accessSeason'); select.replaceChildren();
+        for (const season of seasons) { const option = make('option', `${season.name} · ${season.status}`); option.value = season.id; select.append(option); }
+        $('accessAudience').addEventListener('change', audience);
+        $('accessForm').addEventListener('submit', save);
+        $('accessClear').addEventListener('click', () => { reset(); say('Editor cleared.'); });
+        $('accessRefresh').addEventListener('click', load);
+        reset(); await load();
+      }
+      document.addEventListener('bb:campus-hq-ready', init, { once: true });
+    })();
   </script>
 
 </body>
+
 </html>
