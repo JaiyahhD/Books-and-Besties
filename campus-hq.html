@@ -528,7 +528,7 @@
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
         Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
-        Dorm Design Studio, and Dorm Assignments are live. Activity and Bestie Access planners remain browser-local previews; Honors Society and Pink Ballot are live.
+        Dorm Design Studio, and Dorm Assignments are live. The Activity Manager remains a browser-local preview. Honors Society, Pink Ballot, and Bestie Access event management are live.
       </div>
 
       <div class="layout">
@@ -905,65 +905,40 @@
             <div class="panel"><div class="panel-head">📋 LIVE PINK BALLOT REGISTRY</div><div class="panel-body"><button class="btn light" id="pinkLiveRefresh" type="button">🔄 Refresh Ballots</button><div id="pinkLiveList" aria-live="polite"><p class="empty">Loading ballots...</p></div></div></div>
           </section>
 
-          <!-- BESTIE ACCESS -->
-
+          <!-- PHASE 7.5B: LIVE BESTIE ACCESS STUDIO -->
           <section class="section" id="section-access">
-            <h2 class="section-heading">
-              💌 Bestie Access Manager
-            </h2>
-
-            <p class="section-description">
-              Plan VIP early-registration opportunities
-              and event signups.
-            </p>
-
-            <div class="panel">
-              <div class="panel-head">
-                💌 CREATE AN EARLY ACCESS EVENT
-              </div>
-
-              <div class="panel-body">
-                <form id="eventForm">
-
-                  <label class="field">
-                    <span>Event Name</span>
-                    <input
-                      id="eventName"
-                      required
-                      maxlength="100"
-                      placeholder="Velvet Latte Reading Social"
-                    >
-                  </label>
-
-                  <div class="form-grid">
-
-                    <label class="field">
-                      <span>Capacity</span>
-                      <input
-                        id="eventCapacity"
-                        type="number"
-                        min="1"
-                        max="10000"
-                        value="20"
-                        required
-                      >
-                    </label>
-
-                    <label class="field">
-                      <span>Early Access Date</span>
-                      <input id="eventDate" type="date">
-                    </label>
-
-                  </div>
-
-                  <button class="btn" type="submit">
-                    💌 Create Demo Event
-                  </button>
-                </form>
-
-                <div id="eventList"></div>
-              </div>
+            <h2 class="section-heading">💌 Bestie Access Studio</h2>
+            <p class="section-description">Create live VIP-first experiences, choose VIP-only or campus-wide admission, and manage registration rosters and waitlists in Supabase.</p>
+            <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+              <div class="stat"><strong id="accessEventCount">—</strong><span>EVENTS</span></div>
+              <div class="stat"><strong id="accessRegistrationCount">—</strong><span>CONFIRMED SPOTS</span></div>
+              <div class="stat"><strong id="accessWaitlistCount">—</strong><span>WAITING / OFFERED</span></div>
             </div>
+            <div class="panel"><div class="panel-head">🎀 CREATE OR EDIT A LIVE EVENT</div><div class="panel-body">
+              <p id="accessStatus" class="mini" role="status" aria-live="polite">Waiting for staff verification...</p>
+              <form id="accessForm">
+                <input type="hidden" id="accessEventId">
+                <label class="field"><span>Event title</span><input id="accessTitle" required minlength="3" maxlength="160" placeholder="☕ Velvet Latte Reading Social"></label>
+                <label class="field"><span>Description</span><textarea id="accessDescription" maxlength="5000" placeholder="Give your Besties all the details..."></textarea></label>
+                <label class="field"><span>Location or online meeting details (optional)</span><textarea id="accessLocation" maxlength="2000" placeholder="Where will we meet?"></textarea></label>
+                <div class="form-grid">
+                  <label class="field"><span>Honors Society season</span><select id="accessSeason" required><option value="">Loading seasons...</option></select></label>
+                  <label class="field"><span>Registration audience</span><select id="accessAudience"><option value="vip_only">💎 VIP Only</option><option value="campus_wide">🎓 VIP First → All Approved Besties</option></select></label>
+                  <label class="field"><span>Event begins (local time)</span><input id="accessStarts" type="datetime-local" required></label>
+                  <label class="field"><span>Event ends (local time)</span><input id="accessEnds" type="datetime-local" required></label>
+                  <label class="field"><span>VIP registration opens (local time)</span><input id="accessVipOpens" type="datetime-local" required></label>
+                  <label class="field" id="accessGeneralField" hidden><span>General registration opens (local time)</span><input id="accessGeneralOpens" type="datetime-local"></label>
+                  <label class="field"><span>Registration closes (local time)</span><input id="accessCloses" type="datetime-local" required></label>
+                  <label class="field"><span>Cancellation cutoff (optional, local time)</span><input id="accessCancelCloses" type="datetime-local"></label>
+                  <label class="field"><span>Capacity</span><input id="accessCapacity" type="number" min="1" max="10000" value="20" required></label>
+                </div>
+                <label class="field" style="display:flex;align-items:center;gap:10px"><input id="accessWaitlistEnabled" type="checkbox" checked style="width:auto"><span style="margin:0">Enable the waitlist when full</span></label>
+                <label class="field"><span>Save as</span><select id="accessSaveStatus"><option value="draft">🎀 Draft (staff only)</option><option value="published">💌 Published (follows registration schedule)</option></select></label>
+                <p class="mini">Published events are real. VIP registration opens at the configured time. Campus-wide events open to all approved Besties at the general opening time. Events with registration history cannot be edited under the current database rules.</p>
+                <div class="actions"><button class="btn secondary" id="accessSave" type="submit">💗 Save to Supabase</button><button class="btn light" id="accessClear" type="button">Clear Editor</button><button class="btn light" id="accessRefresh" type="button">↻ Refresh Events</button></div>
+              </form>
+            </div></div>
+            <div class="panel"><div class="panel-head">📋 LIVE EVENT REGISTRY & ROSTERS</div><div class="panel-body"><div id="accessEventList" aria-live="polite"><p class="empty">Loading events...</p></div></div></div>
           </section>
 
           <!-- LIVE MONTHLY CROWN LINKS -->
@@ -1379,7 +1354,7 @@
           ],
           [
             "💌 Early Access",
-            state.events.length + " demo events created."
+            "Live events are managed in the Bestie Access Studio."
           ]
         ];
 
@@ -1538,7 +1513,7 @@
       function renderDemo() {
         renderDemoOverview();
         renderActivities();
-        renderEvents();
+        // Bestie Access is now Supabase-managed; do not render browser-local events.
       }
 
       function initializeDemo() {
@@ -1621,31 +1596,6 @@
           $("activityId").value = "";
         });
 
-        $("eventForm").addEventListener("submit", event => {
-          event.preventDefault();
-
-          const name = $("eventName").value.trim();
-          const capacity = Number($("eventCapacity").value);
-          const date = $("eventDate").value;
-
-          if (!Number.isInteger(capacity) || capacity < 1) {
-            toast("Enter a valid capacity.");
-            return;
-          }
-
-          if (update(() => {
-            state.events.push({
-              id: makeId(),
-              name,
-              capacity,
-              date,
-              status: "Draft"
-            });
-          })) {
-            event.target.reset();
-            toast("Demo early access event created!");
-          }
-        });
 
         $("year").textContent = new Date().getFullYear();
 
@@ -2449,6 +2399,128 @@
     $("pinkLiveClear").addEventListener("click",()=>{reset();say("Editor cleared.");});
     $("pinkLiveRefresh").addEventListener("click",load);
     document.addEventListener("bb:campus-hq-ready",init,{once:true});
+  })();
+  </script>
+
+  <script>
+  /* Phase 7.5B — live Bestie Access event management */
+  (() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const make = (tag, text, cls) => { const n=document.createElement(tag); if(text!==undefined)n.textContent=text; if(cls)n.className=cls; return n; };
+    const errorText = e => e?.message || String(e);
+    const dateLabel = x => x ? new Date(x).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}) : 'Not set';
+    const localValue = x => { if(!x)return ''; const d=new Date(x); const z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; };
+    const iso = id => $(id).value ? new Date($(id).value).toISOString() : null;
+    const fields = ['accessEventId','accessSeason','accessTitle','accessDescription','accessLocation','accessStarts','accessEnds','accessCapacity','accessAudience','accessVipOpens','accessGeneralOpens','accessCloses','accessCancelCloses','accessWaitlistEnabled','accessSaveStatus'];
+    let client,events=[],seasons=[],busy=false;
+    const say = message => { $('accessStatus').textContent=message; };
+    function audience(){ const general=$('accessAudience').value==='campus_wide'; $('accessGeneralField').hidden=!general; $('accessGeneralOpens').required=general; }
+    function reset(){ $('accessForm').reset(); $('accessEventId').value=''; $('accessCapacity').value=20; $('accessSaveStatus').value='draft'; const active=seasons.find(x=>x.status==='active'); $('accessSeason').value=active?.id||seasons[0]?.id||''; audience(); $('accessSave').textContent='💗 Save to Supabase'; }
+    function lock(value){busy=value; $('accessSave').disabled=value; $('accessRefresh').disabled=value;}
+    function edit(e){
+      $('accessEventId').value=e.id; $('accessSeason').value=e.honors_season_id; $('accessTitle').value=e.title;
+      $('accessDescription').value=e.description||''; $('accessLocation').value=e.location_details||'';
+      $('accessStarts').value=localValue(e.starts_at); $('accessEnds').value=localValue(e.ends_at);
+      $('accessCapacity').value=e.capacity; $('accessAudience').value=e.audience;
+      $('accessVipOpens').value=localValue(e.vip_opens_at); $('accessGeneralOpens').value=localValue(e.general_opens_at);
+      $('accessCloses').value=localValue(e.registration_closes_at); $('accessCancelCloses').value=localValue(e.cancellation_closes_at);
+      $('accessWaitlistEnabled').checked=e.waitlist_enabled; $('accessSaveStatus').value=e.status;
+      audience(); $('accessSave').textContent='💗 Save Changes'; $('accessForm').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    async function save(ev){
+      ev.preventDefault(); if(busy)return;
+      const audienceValue=$('accessAudience').value;
+      const starts=iso('accessStarts'), ends=iso('accessEnds'), vip=iso('accessVipOpens'), general=audienceValue==='campus_wide'?iso('accessGeneralOpens'):null, closes=iso('accessCloses'), cancel=iso('accessCancelCloses');
+      if(!starts||!ends||!vip||!closes||(audienceValue==='campus_wide'&&!general)){say('Please complete all required dates.');return;}
+      if(!(ends>starts && vip<closes && closes<=starts && (!general||(general>=vip&&general<closes)) && (!cancel||cancel<=starts))){say('⚠️ Check your dates: event end after start; VIP opens before registration closes; general opens after VIP; registration closes before the event starts.');return;}
+      const capacity=Number($('accessCapacity').value);
+      if(!Number.isInteger(capacity)||capacity<1||capacity>10000){say('Enter a capacity between 1 and 10,000.');return;}
+      const args={p_event_id:$('accessEventId').value||null,p_season_id:$('accessSeason').value,p_title:$('accessTitle').value.trim(),p_description:$('accessDescription').value.trim(),p_location_details:$('accessLocation').value.trim()||null,p_starts_at:starts,p_ends_at:ends,p_capacity:capacity,p_audience:audienceValue,p_vip_opens_at:vip,p_general_opens_at:general,p_registration_closes_at:closes,p_cancellation_closes_at:cancel,p_waitlist_enabled:$('accessWaitlistEnabled').checked,p_status:$('accessSaveStatus').value};
+      if(!args.p_season_id){say('Choose an Honors Society season.');return;}
+      lock(true);say('💌 Saving your live event...');
+      try{const {error}=await client.rpc('honors_access_save_event',args);if(error)throw error;reset();say('💗 Event saved to Supabase!');await load();}
+      catch(e){say('⚠️ Could not save event: '+errorText(e));}
+      finally{lock(false);}
+    }
+    async function changeStatus(e,next){
+      const wording=next==='cancelled'?'Cancel this event? This will close waitlist entries.':`Change this event to ${next}?`;
+      if(!window.confirm(wording))return;
+      say('Updating event status...');
+      const {error}=await client.rpc('honors_access_set_status',{p_event_id:e.id,p_status:next});
+      if(error){say('⚠️ '+errorText(error));return;}
+      say('💗 Event status updated.');await load();
+    }
+    function action(parent,label,callback,cls='light'){
+      const b=make('button',label,'btn '+cls);b.type='button';b.addEventListener('click',callback);parent.append(b);
+    }
+    async function load(){
+      if(!client)return;
+      say('💌 Loading live Bestie Access events...');
+      const [eventResult,regResult,waitResult]=await Promise.all([
+        client.from('honors_access_events').select('*').order('starts_at',{ascending:false}).limit(500),
+        client.from('honors_access_registrations').select('id,event_id,user_id,status,registered_at').limit(5000),
+        client.from('honors_access_waitlist').select('id,event_id,user_id,status,joined_at,offer_expires_at').limit(5000)
+      ]);
+      const err=eventResult.error||regResult.error||waitResult.error;
+      if(err){say('⚠️ Could not load Bestie Access: '+errorText(err));return;}
+      events=eventResult.data||[];
+      const registrations=regResult.data||[],waitlist=waitResult.data||[];
+      $('accessEventCount').textContent=events.length;
+      $('accessRegistrationCount').textContent=registrations.filter(r=>r.status==='confirmed').length;
+      $('accessWaitlistCount').textContent=waitlist.filter(w=>['waiting','offered'].includes(w.status)).length;
+      const root=$('accessEventList');root.replaceChildren();
+      if(!events.length){root.append(make('p','🎀 No live events yet! Create your first event above.','empty'));say('💗 Ready for your first event!');return;}
+      const userIds=[...new Set([...registrations.map(r=>r.user_id),...waitlist.map(w=>w.user_id)])];
+      let profiles=[];
+      for(let i=0;i<userIds.length;i+=100){const {data,error}=await client.from('profiles').select('id,display_name').in('id',userIds.slice(i,i+100));if(!error)profiles.push(...(data||[]));}
+      const names=new Map(profiles.map(p=>[p.id,p.display_name||'Bestie']));
+      for(const e of events){
+        const confirmed=registrations.filter(r=>r.event_id===e.id&&r.status==='confirmed');
+        const waiting=waitlist.filter(w=>w.event_id===e.id&&w.status==='waiting').sort((a,b)=>new Date(a.joined_at)-new Date(b.joined_at)||a.id.localeCompare(b.id));
+        const offered=waitlist.filter(w=>w.event_id===e.id&&w.status==='offered');
+        const card=make('article',undefined,'item');
+        card.append(make('h4','💌 '+e.title));
+        card.append(make('span',e.status.toUpperCase(),'tag '+(e.status==='published'?'green':'gray')));
+        card.append(make('p',`${e.audience==='vip_only'?'💎 VIP only':'🎓 VIP first → campus-wide'} · ${seasons.find(x=>x.id===e.honors_season_id)?.name||'Season'} · ${e.capacity} spots`,'mini'));
+        card.append(make('p',`📅 ${dateLabel(e.starts_at)} – ${dateLabel(e.ends_at)}`,'mini'));
+        card.append(make('p',`💎 VIP opens ${dateLabel(e.vip_opens_at)}${e.general_opens_at?' · 🎓 General opens '+dateLabel(e.general_opens_at):''} · Registration closes ${dateLabel(e.registration_closes_at)}`,'mini'));
+        card.append(make('p',`🎟️ ${confirmed.length} confirmed · ${offered.length} offers · ${waiting.length} waiting · ${Math.max(0,e.capacity-confirmed.length-offered.length)} unreserved spots`,'mini'));
+        if(e.description)card.append(make('p',e.description));
+        const actions=make('div',undefined,'actions');
+        if(['draft','published'].includes(e.status))action(actions,'✏️ Edit',()=>edit(e));
+        if(e.status==='draft')action(actions,'💗 Publish',()=>changeStatus(e,'published'),'secondary');
+        if(['draft','published'].includes(e.status))action(actions,'🚫 Cancel Event',()=>changeStatus(e,'cancelled'),'danger');
+        if(e.status==='published')action(actions,'✓ Mark Completed',()=>changeStatus(e,'completed'));
+        if(e.status==='completed')action(actions,'📦 Archive',()=>changeStatus(e,'archived'));
+        card.append(actions);
+        const details=make('details');details.style.marginTop='14px';
+        const summary=make('summary',`👥 View roster (${confirmed.length} confirmed, ${offered.length} offers, ${waiting.length} waiting)`);summary.style.cursor='pointer';summary.style.fontWeight='900';details.append(summary);
+        const roster=make('div',undefined,'item');
+        const addGroup=(title,rows,formatter)=>{roster.append(make('h4',title));if(!rows.length)roster.append(make('p','No entries.','mini'));else rows.forEach((r,i)=>roster.append(make('p',formatter(r,i),'mini')));};
+        addGroup('💗 Confirmed',confirmed,r=>`${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · ${dateLabel(r.registered_at)}`);
+        addGroup('💌 Active Offers',offered,r=>`${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · expires ${dateLabel(r.offer_expires_at)}`);
+        addGroup('⏳ Waiting',waiting,(r,i)=>`#${i+1} ${names.get(r.user_id)||'Member ('+r.user_id.slice(0,8)+')'} · joined ${dateLabel(r.joined_at)}`);
+        details.append(roster);card.append(details);root.append(card);
+      }
+      say('💎 '+events.length+' live event'+(events.length===1?'':'s')+' loaded from Supabase.');
+    }
+    async function init(){
+      client=window.BB_CAMPUS_CLIENT;
+      if(!client){say('⚠️ Campus HQ connection unavailable.');return;}
+      const {data:staff,error:staffError}=await client.rpc('is_campus_staff');
+      if(staffError||staff!==true){say('⚠️ Campus staff access required.');$('accessSave').disabled=true;return;}
+      const {data,error}=await client.from('honors_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false});
+      if(error){say('⚠️ Could not load seasons: '+errorText(error));return;}
+      seasons=data||[];const select=$('accessSeason');select.replaceChildren();
+      for(const season of seasons){const option=make('option',`${season.name} · ${season.status}`);option.value=season.id;select.append(option);}
+      $('accessAudience').addEventListener('change',audience);
+      $('accessForm').addEventListener('submit',save);
+      $('accessClear').addEventListener('click',()=>{reset();say('Editor cleared.');});
+      $('accessRefresh').addEventListener('click',load);
+      reset();await load();
+    }
+    document.addEventListener('bb:campus-hq-ready',init,{once:true});
   })();
   </script>
 

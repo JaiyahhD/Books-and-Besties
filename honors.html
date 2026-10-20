@@ -354,7 +354,7 @@ body.invite-open{overflow:hidden}
   <div id="vipExperience" hidden>
     <div class="notice" id="seasonBanner" hidden>📅 Loading current season...</div>
     <div class="notice" id="vipWelcome">💎 Welcome to your Honors Society lounge!</div>
-    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive and Pink Ballot are LIVE! Bestie Access signups are still a browser-only preview.</div>
+    <div class="notice" style="font-size:13px">🎀 Bestie Exclusive, Pink Ballot, and Bestie Access are connected to our live campus system!</div>
 <div class="layout">
 
     <aside class="sidebar">
@@ -404,31 +404,13 @@ body.invite-open{overflow:hidden}
           <h2 class="section-title">First in Line, Bestie! ♡</h2>
           <p>Get first dibs on special events, limited signups, and activities with registration windows. Early access doesn't guarantee a spot when capacity is limited.</p>
 
-          <div class="event">
-            <div>
-              <span class="tag">SAMPLE EARLY REGISTRATION</span>
-              <h3>☕ Velvet Latte Reading Social</h3>
-              <p>A cozy community reading hangout with bookish conversation and warm-drink vibes.</p>
-              <p class="small">Dates and official registration have not been announced.</p>
-            </div>
-            <button class="btn" id="rsvpSocial" type="button">Join Demo List</button>
+          <div class="insider-toolbar">
+            <span class="tag">💎 OFFICIAL LIVE REGISTRATION</span>
+            <button class="btn secondary" id="refreshAccess" type="button">↻ Refresh Events</button>
           </div>
-
-          <div class="event">
-            <div>
-              <span class="tag">SAMPLE EARLY SIGNUP</span>
-              <h3>🎀 Bestie Creative Night</h3>
-              <p>A little creative campus activity where Besties can unwind, chat, and make something cute.</p>
-              <p class="small">Dates and official registration have not been announced.</p>
-            </div>
-            <button class="btn" id="rsvpCreative" type="button">Join Demo List</button>
-          </div>
-
-          <p id="rsvpMessage" class="small" role="status"></p>
-
-          <div class="status">
-            💌 Future feature: Admin-controlled registration, limited capacities, waitlists, and VIP early-access windows.
-          </div>
+          <p id="accessStatus" class="small" role="status" aria-live="polite">Preparing your private registration desk...</p>
+          <div id="accessEventList" aria-live="polite"></div>
+          <div class="status">💌 VIP-only events are reserved for eligible Honors Society Besties. Campus-wide events open to VIPs first, then to approved Besties when general registration begins. Availability is checked securely when you register.</div>
         </div>
       </section>
 
@@ -894,37 +876,152 @@ body.invite-open{overflow:hidden}
 })();
 </script>
 <script>
-/* Bestie Access remains a browser-only preview until Phase 7.4 */
+/* Phase 7.5C — live Bestie Access member registrations */
 (() => {
   'use strict';
-  const KEY='bb_honors_demo_v1';
-  let rsvps=[];
-  try{
-    const saved=JSON.parse(localStorage.getItem(KEY));
-    if(Array.isArray(saved?.rsvps)) rsvps=saved.rsvps.filter(x=>['social','creative'].includes(x));
-  }catch(error){console.warn('Could not restore demo RSVPs:',error);}
-  function render(){
-    for(const [key,id] of [['social','rsvpSocial'],['creative','rsvpCreative']]){
-      const button=document.getElementById(id);
-      const joined=rsvps.includes(key);
-      button.textContent=joined?'✓ On Demo List':'Join Demo List';
-      button.setAttribute('aria-pressed',String(joined));
+  const $ = id => document.getElementById(id);
+  const make = (tag, className, text) => {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  };
+  const fmt = value => value ? new Date(value).toLocaleString(undefined, {dateStyle:'medium',timeStyle:'short'}) : 'Not scheduled';
+  const errText = error => error?.message || String(error);
+  let client, user, seasonId, busy = false, initialized = false;
+  const status = text => { $('accessStatus').textContent = text; };
+
+  async function perform(eventId, functionName, confirmation) {
+    if (busy) return;
+    if (confirmation && !window.confirm(confirmation)) return;
+    busy = true;
+    status('💌 Saving your Bestie Access update...');
+    $('refreshAccess').disabled = true;
+    try {
+      const {data, error} = await client.rpc(functionName, {p_event_id:eventId});
+      if (error) throw error;
+      const messages = {
+        confirmed:'🎟️ Your registration is CONFIRMED!',
+        waitlisted:'💌 You joined the waitlist!',
+        offered:'💎 A spot is being offered to you! Accept it before the deadline.',
+        full:'🎟️ This event is full and its waitlist is closed.'
+      };
+      const message = typeof data === 'string' ? (messages[data] || data) :
+        functionName === 'honors_access_cancel' ? (data ? '💗 Your spot or waitlist entry was cancelled.' : 'No active signup was found.') :
+        data ? '🎟️ Your waitlist offer was accepted!' : 'No change was made.';
+      await load(message);
+    } catch (error) {
+      console.error('Bestie Access action:',error);
+      status('⚠️ Could not update your registration: ' + errText(error));
+    } finally {
+      busy = false;
+      $('refreshAccess').disabled = false;
     }
   }
-  function toggle(key){
-    rsvps=rsvps.includes(key)?rsvps.filter(x=>x!==key):[...rsvps,key];
-    try{
-      localStorage.setItem(KEY,JSON.stringify({rsvps}));
-      document.getElementById('rsvpMessage').textContent='💌 Demo signup preference updated in this browser!';
-    }catch(error){
-      document.getElementById('rsvpMessage').textContent='Unable to save your demo signup preference.';
-    }
-    render();
+
+  function action(text, handler, secondary = false) {
+    const button = make('button','btn' + (secondary ? ' secondary' : ''),text);
+    button.type = 'button';
+    button.addEventListener('click',handler);
+    return button;
   }
-  document.getElementById('rsvpSocial').addEventListener('click',()=>toggle('social'));
-  document.getElementById('rsvpCreative').addEventListener('click',()=>toggle('creative'));
-  document.getElementById('year').textContent=new Date().getFullYear();
-  render();
+
+  async function load(message = '') {
+    if (!client || !user || !seasonId) {
+      status('📅 No active Honors Society season to display.');
+      return;
+    }
+    if (busy && !message) return;
+    $('refreshAccess').disabled = true;
+    status(message || '💌 Checking live event registration...');
+    try {
+      const {data:events,error:eventError} = await client.from('honors_access_events')
+        .select('id,title,description,location_details,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,waitlist_enabled,status')
+        .eq('honors_season_id',seasonId)
+        .eq('status','published')
+        .order('starts_at',{ascending:true});
+      if (eventError) throw eventError;
+      const list = $('accessEventList');
+      list.replaceChildren();
+      if (!events?.length) {
+        list.append(make('div','insider-empty','🎀 No published Bestie Access events for this season yet. Check back soon!'));
+        status(message || '💗 No published events yet.');
+        return;
+      }
+      const ids = events.map(event => event.id);
+      const [regResult,waitResult] = await Promise.all([
+        client.from('honors_access_registrations').select('event_id,status').eq('user_id',user.id).in('event_id',ids),
+        client.from('honors_access_waitlist').select('event_id,status,offer_expires_at,joined_at').eq('user_id',user.id).in('event_id',ids)
+      ]);
+      if (regResult.error) throw regResult.error;
+      if (waitResult.error) throw waitResult.error;
+      const registrations = new Map((regResult.data || []).map(entry => [entry.event_id,entry]));
+      const waitlist = new Map((waitResult.data || []).map(entry => [entry.event_id,entry]));
+      for (const event of events) {
+        const now = Date.now();
+        const reg = registrations.get(event.id);
+        const wait = waitlist.get(event.id);
+        const confirmed = reg?.status === 'confirmed';
+        const offered = wait?.status === 'offered' && new Date(wait.offer_expires_at).getTime() > now;
+        const waiting = wait?.status === 'waiting';
+        const beforeOpen = now < new Date(event.vip_opens_at).getTime();
+        const closed = now >= new Date(event.registration_closes_at).getTime();
+        const canCancel = now < new Date(event.starts_at).getTime() &&
+          (!event.cancellation_closes_at || now < new Date(event.cancellation_closes_at).getTime());
+        const card = make('article','insider-post');
+        const body = make('div','insider-post-body');
+        body.append(make('span','tag',event.audience === 'vip_only' ? '💎 VIP EXCLUSIVE' : '💌 VIP FIRST · CAMPUS-WIDE'));
+        body.append(make('h3','',event.title));
+        if (event.description) body.append(make('p','',event.description));
+        if (event.location_details) body.append(make('p','small','📍 ' + event.location_details));
+        body.append(make('p','small','📅 ' + fmt(event.starts_at) + ' – ' + fmt(event.ends_at)));
+        body.append(make('p','small','💎 VIP registration: ' + fmt(event.vip_opens_at)));
+        if (event.audience === 'campus_wide') body.append(make('p','small','🎓 General registration: ' + fmt(event.general_opens_at)));
+        body.append(make('p','small','🔒 Registration closes: ' + fmt(event.registration_closes_at) + ' · ' + event.capacity + ' total spots'));
+        const controls = make('div','insider-toolbar');
+        const note = make('p','small');
+        if (confirmed) {
+          note.textContent = '🎟️ CONFIRMED! Your place is reserved.';
+          if (canCancel) controls.append(action('Cancel My Registration',()=>perform(event.id,'honors_access_cancel','Cancel your confirmed registration for this event?'),true));
+        } else if (offered) {
+          note.textContent = '💎 A spot is waiting for you! Offer expires ' + fmt(wait.offer_expires_at) + '.';
+          controls.append(action('💗 Accept My Spot',()=>perform(event.id,'honors_access_accept_offer')));
+          if (canCancel) controls.append(action('Decline Offer',()=>perform(event.id,'honors_access_cancel','Decline this spot offer?'),true));
+        } else if (waiting) {
+          note.textContent = '💌 You are on the waitlist. Check back for an offer!';
+          if (canCancel) controls.append(action('Leave Waitlist',()=>perform(event.id,'honors_access_cancel','Leave this event waitlist?'),true));
+        } else if (closed) {
+          note.textContent = '🔒 Registration is closed.';
+        } else if (beforeOpen) {
+          note.textContent = '⏳ VIP registration has not opened yet.';
+        } else {
+          note.textContent = '💗 Registration is open! Availability is confirmed when you submit.';
+          controls.append(action('🎟️ Claim My Spot',()=>perform(event.id,'honors_access_register')));
+        }
+        note.setAttribute('role','status');
+        body.append(note,controls);
+        card.append(body);
+        list.append(card);
+      }
+      status(message || '💎 ' + events.length + ' live ' + (events.length === 1 ? 'event' : 'events') + ' available to browse.');
+    } catch (error) {
+      console.error('Bestie Access load:',error);
+      status('⚠️ Could not load live Bestie Access: ' + errText(error));
+    } finally {
+      $('refreshAccess').disabled = false;
+    }
+  }
+  document.addEventListener('bb:honors-vip-ready', event => {
+    client = event.detail.client;
+    user = event.detail.user;
+    seasonId = event.detail.seasonId;
+    if (!initialized) {
+      initialized = true;
+      $('refreshAccess').addEventListener('click',()=>load());
+    }
+    load();
+  });
+  document.getElementById('year').textContent = new Date().getFullYear();
 })();
 </script>
 </body>
