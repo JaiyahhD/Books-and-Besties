@@ -528,8 +528,7 @@
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
         Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
-        Dorm Design Studio, and Dorm Assignments are live. Activity, Honors, Pink Ballot,
-        and Bestie Access planners remain browser-local previews.
+        Dorm Design Studio, and Dorm Assignments are live. Activity and Bestie Access planners remain browser-local previews; Honors Society and Pink Ballot are live.
       </div>
 
       <div class="layout">
@@ -823,6 +822,20 @@
           <section class="section" id="section-honors">
             <h2 class="section-heading">💎 Honors Society Management</h2>
             <p class="section-description">Your live, invitation-only VIP roster. Administrators and moderators share the same Honors Society management permissions.</p>
+            <div class="panel"><div class="panel-head">📅 HONORS SOCIETY SEASON MANAGER</div><div class="panel-body">
+              <p id="honorsSeasonStatus" class="mini" role="status">Loading Honors Society seasons...</p>
+              <label class="field"><span>Browse season and its VIP history</span><select id="honorsSeasonSelect"><option value="">Loading seasons...</option></select></label>
+              <div id="honorsSeasonDetails" class="item">Select a season to view its dates and status.</div>
+              <form id="honorsSeasonForm">
+                <h3>🎀 Create a new two-month season</h3>
+                <div class="form-grid">
+                  <label class="field"><span>Season name</span><input id="honorsSeasonName" required maxlength="120" placeholder="January–February 2027"></label>
+                  <label class="field"><span>First day (must be the 1st)</span><input id="honorsSeasonStart" type="date" required></label>
+                </div>
+                <div class="actions"><button class="btn secondary" id="honorsSeasonCreate" type="submit">💗 Create Draft Season</button><button class="btn light" id="honorsSeasonActivate" type="button">👑 Activate Selected Draft</button><button class="btn danger" id="honorsSeasonClose" type="button">📦 Close Selected Season</button></div>
+              </form>
+              <p class="mini">Only the active season accepts invitations. Drafts and past seasons are available for roster/history review. VIP access expires at the end of the selected season regardless of its status.</p>
+            </div></div>
             <div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">
               <div class="stat"><strong id="honorsActiveCount">—</strong><span>ACTIVE VIPS</span></div>
               <div class="stat"><strong id="honorsPendingCount">—</strong><span>PENDING INVITES</span></div>
@@ -1959,148 +1972,158 @@
   </script>
 
   <script>
-    // Phase 7.1B — Live Honors Society HQ management.
-    // Runs only after the existing campus-hq-auth.js staff gate succeeds.
+    // Phase 7.4B — Seasonal Honors Society HQ.
     (() => {
       "use strict";
       const $ = id => document.getElementById(id);
-      let client;
-      let approved = [], invitations = [], memberships = [];
-      let busy = false;
-      const status = message => { $("honorsStatus").textContent = message; };
-      const errorText = error => error?.message || "Unknown database error";
-      const nameFor = id => approved.find(person => person.id === id)?.display_name || `Member ${id.slice(0,8)}…`;
-      const make = (tag, value, cls) => {
-        const node = document.createElement(tag);
-        if (value !== undefined) node.textContent = value;
-        if (cls) node.className = cls;
-        return node;
-      };
+      let client, approved = [], invitations = [], memberships = [], seasons = [], selectedId = "", activeId = null, busy = false;
+      const status = text => { $("honorsStatus").textContent = text; };
+      const seasonStatus = text => { $("honorsSeasonStatus").textContent = text; };
+      const err = e => e?.message || "Unknown database error";
+      const nameFor = id => approved.find(p => p.id === id)?.display_name || `Member ${String(id).slice(0,8)}…`;
+      const make = (tag, text, cls) => { const n = document.createElement(tag); if (text !== undefined) n.textContent = text; if (cls) n.className = cls; return n; };
       const dateText = value => value ? new Date(value).toLocaleDateString() : "—";
+      const chosen = () => seasons.find(s => s.id === selectedId);
+      const inWindow = s => s && new Date() < new Date(s.ends_on + "T00:00:00Z").getTime() + 86400000 && (new Date() >= new Date(s.starts_on + "T00:00:00Z") || (s.starts_on === "2026-11-01" && s.ends_on === "2026-12-31"));
+      const accepting = () => chosen()?.status === "active" && selectedId === activeId && inWindow(chosen());
       function setBusy(value) {
         busy = value;
-        $("honorsSend").disabled = value;
-        $("honorsRefresh").disabled = value;
+        ["honorsSend","honorsRefresh","honorsSeasonCreate","honorsSeasonActivate","honorsSeasonClose"].forEach(id => { $(id).disabled = value; });
+        if (!value) renderSeason();
       }
       function options() {
-        const search = $("honorsSearch").value.trim().toLowerCase();
-        const select = $("honorsInvitee");
-        const selected = select.value;
+        const query = $("honorsSearch").value.trim().toLowerCase();
+        const select = $("honorsInvitee"), previous = select.value;
         select.replaceChildren(new Option("Choose an approved Bestie", ""));
-        approved.filter(p => (p.display_name || "").toLowerCase().includes(search))
+        approved.filter(p => (p.display_name || "").toLowerCase().includes(query))
           .sort((a,b) => (a.display_name || "").localeCompare(b.display_name || ""))
-          .forEach(person => {
-            const active = memberships.some(m => m.user_id === person.id && m.status === "active");
-            const pending = invitations.some(i => i.invitee_id === person.id && i.status === "pending");
-            const suffix = active ? " · Active VIP" : pending ? " · Pending invitation" : "";
-            const option = new Option(`${person.display_name || "Unnamed Bestie"}${suffix}`, person.id);
-            option.disabled = active || pending;
-            select.add(option);
+          .forEach(p => {
+            const active = memberships.some(m => m.user_id === p.id && m.status === "active");
+            const pending = invitations.some(i => i.invitee_id === p.id && i.status === "pending");
+            const o = new Option(`${p.display_name || "Unnamed Bestie"}${active ? " · Active VIP" : pending ? " · Pending invitation" : ""}`, p.id);
+            o.disabled = active || pending || !accepting(); select.add(o);
           });
-        if ([...select.options].some(o => o.value === selected && !o.disabled)) select.value = selected;
+        if ([...select.options].some(o => o.value === previous && !o.disabled)) select.value = previous;
+        $("honorsSend").disabled = busy || !accepting();
       }
-      function actionButton(label, onClick, danger = false) {
-        const btn = make("button", label, danger ? "btn danger" : "btn light");
-        btn.type = "button";
-        btn.disabled = busy;
-        btn.addEventListener("click", onClick);
-        return btn;
+      function actionButton(label, fn) {
+        const b = make("button", label, "btn danger"); b.type = "button"; b.disabled = busy || !accepting(); b.addEventListener("click", fn); return b;
       }
-      function card(title, description, badge) {
-        const node = make("div", undefined, "item");
-        node.append(make("h4", title), make("p", description, "mini"));
-        if (badge) node.append(make("span", badge, "tag " + (badge === "active" || badge === "accepted" ? "green" : "gray")));
-        return node;
+      function card(title, detail, badge) {
+        const n = make("div", undefined, "item"); n.append(make("h4", title), make("p", detail, "mini"));
+        if (badge) n.append(make("span", badge, "tag " + (badge === "active" || badge === "accepted" ? "green" : "gray")));
+        return n;
+      }
+      function renderSeason() {
+        const s = chosen(), details = $("honorsSeasonDetails"); details.replaceChildren();
+        if (!s) { details.textContent = "No season selected."; return; }
+        details.append(make("h4", s.name), make("p", `${s.starts_on} – ${s.ends_on} · ${s.status.toUpperCase()}`, "mini"));
+        if (s.status === "active" && !inWindow(s)) details.append(make("p", "The season is outside its access window. Member VIP access has expired.", "mini"));
+        $("honorsSeasonActivate").disabled = busy || s.status !== "draft";
+        $("honorsSeasonClose").disabled = busy || s.status !== "active";
+        options();
       }
       function render() {
-        $("honorsActiveCount").textContent = memberships.filter(m => m.status === "active").length;
+        const active = memberships.filter(m => m.status === "active");
+        $("honorsActiveCount").textContent = active.length;
         $("honorsPendingCount").textContent = invitations.filter(i => i.status === "pending").length;
         $("honorsInvitedCount").textContent = invitations.length;
-        const invites = $("honorsInvitationsList");
-        invites.replaceChildren();
-        if (!invitations.length) invites.append(make("p", "No invitations sent yet, Bestie!", "empty"));
+        const invites = $("honorsInvitationsList"); invites.replaceChildren();
+        if (!invitations.length) invites.append(make("p", "No invitations for this season.", "empty"));
         invitations.forEach(inv => {
-          const node = card(`💌 ${nameFor(inv.invitee_id)}`, `Sent ${dateText(inv.created_at)}${inv.invitation_message ? " · Message: " + inv.invitation_message : ""}`, inv.status);
-          if (inv.status === "pending") node.append(actionButton("Revoke Invitation", async () => {
-            if (!confirm(`Revoke the pending invitation for ${nameFor(inv.invitee_id)}?`)) return;
-            await mutate("honors_revoke_invitation", {p_invitation_id: inv.id}, "Invitation revoked.");
-          }, true));
-          invites.append(node);
+          const n = card(`💌 ${nameFor(inv.invitee_id)}`, `Sent ${dateText(inv.created_at)}${inv.invitation_message ? " · Message: " + inv.invitation_message : ""}`, inv.status);
+          if (inv.status === "pending" && accepting()) n.append(actionButton("Revoke Invitation", async () => {
+            if (confirm(`Revoke the invitation for ${nameFor(inv.invitee_id)}?`)) await mutate("honors_revoke_invitation", {p_invitation_id:inv.id}, "Invitation revoked.");
+          }));
+          invites.append(n);
         });
-        const roster = $("honorsMembershipsList");
-        roster.replaceChildren();
-        const active = memberships.filter(m => m.status === "active");
-        if (!active.length) roster.append(make("p", "No active VIP memberships yet. Invitations must be accepted first.", "empty"));
-        active.forEach(member => {
-          const node = card(`💎 ${nameFor(member.user_id)}`, `VIP since ${dateText(member.activated_at)}`, "active");
-          node.append(actionButton("Revoke VIP Membership", async () => {
-            if (!confirm(`Remove ${nameFor(member.user_id)} from the Honors Society? Their VIP access will end immediately.`)) return;
-            await mutate("honors_revoke_membership", {p_user_id: member.user_id}, "VIP membership revoked.");
-          }, true));
-          roster.append(node);
+        const roster = $("honorsMembershipsList"); roster.replaceChildren();
+        if (!memberships.length) roster.append(make("p", "No membership records for this season.", "empty"));
+        memberships.forEach(m => {
+          const n = card(`💎 ${nameFor(m.user_id)}`, `Activated ${dateText(m.activated_at)}${m.revoked_at ? " · Revoked " + dateText(m.revoked_at) : ""}`, m.status);
+          if (m.status === "active" && accepting()) n.append(actionButton("Revoke VIP Membership", async () => {
+            if (confirm(`Revoke ${nameFor(m.user_id)}'s membership for this season?`)) await mutate("honors_revoke_membership", {p_user_id:m.user_id}, "Season membership revoked.");
+          }));
+          roster.append(n);
         });
         options();
+        // Keep the Campus Overview VIP counter tied to the current season, not historical rows.
+        $("statVIP").textContent = selectedId === activeId && inWindow(chosen()) ? active.length : $("statVIP").textContent;
+      }
+      async function loadSeasons(preserve = true) {
+        const {data,error} = await client.from("honors_seasons").select("id,name,starts_on,ends_on,status,created_at").order("starts_on",{ascending:false});
+        if (error) throw error;
+        seasons = data || []; activeId = seasons.find(s => s.status === "active")?.id || null;
+        const old = preserve ? selectedId : "";
+        selectedId = seasons.some(s => s.id === old) ? old : (activeId || seasons[0]?.id || "");
+        const select = $("honorsSeasonSelect"); select.replaceChildren();
+        if (!seasons.length) select.add(new Option("No seasons created", ""));
+        seasons.forEach(s => select.add(new Option(`${s.name} · ${s.status}`,s.id)));
+        select.value = selectedId; renderSeason();
+        seasonStatus(seasons.length ? `${seasons.length} season(s) loaded. Select any season to browse its records.` : "Create your first draft season.");
       }
       async function load() {
         if (!client) return;
-        setBusy(true);
-        status("Loading approved Besties, invitations, and VIP memberships...");
+        setBusy(true); status("Loading selected season's invitations and VIP roster...");
         try {
-          const [membersResult, invitesResult, rosterResult] = await Promise.all([
-            client.from("profiles").select("id,display_name").eq("membership_status","approved").order("display_name"),
-            client.from("honors_invitations").select("id,invitee_id,invited_by,status,invitation_message,created_at,responded_at").order("created_at",{ascending:false}),
-            client.from("honors_memberships").select("id,user_id,status,activated_at,revoked_at").order("activated_at",{ascending:false})
-          ]);
-          const problem = membersResult.error || invitesResult.error || rosterResult.error;
-          if (problem) throw problem;
-          approved = membersResult.data || [];
-          invitations = invitesResult.data || [];
-          memberships = rosterResult.data || [];
-          render();
-          status(`${approved.length} approved Besties found · ${invitations.length} invitations · ${memberships.filter(m => m.status === "active").length} active VIPs.`);
-        } catch (error) {
-          status("Unable to load Honors Society records: " + errorText(error));
-        } finally { setBusy(false); }
+          await loadSeasons();
+          const base = [client.from("profiles").select("id,display_name").eq("membership_status","approved").order("display_name")];
+          if (selectedId) base.push(client.from("honors_invitations").select("id,season_id,invitee_id,status,invitation_message,created_at").eq("season_id",selectedId).order("created_at",{ascending:false}), client.from("honors_memberships").select("id,season_id,user_id,status,activated_at,revoked_at").eq("season_id",selectedId).order("activated_at",{ascending:false}));
+          const result = await Promise.all(base);
+          const problem = result.find(r => r.error)?.error; if (problem) throw problem;
+          approved = result[0].data || []; invitations = result[1]?.data || []; memberships = result[2]?.data || [];
+          render(); status(`${chosen()?.name || "No season"} · ${invitations.length} invitations · ${memberships.filter(m => m.status === "active").length} active membership records.`);
+        } catch (e) { status("Unable to load Honors Society: " + err(e)); }
+        finally { setBusy(false); }
       }
       async function mutate(rpc, params, success) {
-        if (busy) return;
-        setBusy(true);
-        status("Saving to Supabase...");
-        try {
-          const { error } = await client.rpc(rpc, params);
-          if (error) throw error;
-          await load();
-          status("💗 " + success);
-        } catch (error) {
-          status("Could not save: " + errorText(error));
-        } finally { setBusy(false); }
+        if (busy) return; setBusy(true); status("Saving to Supabase...");
+        try { const {error} = await client.rpc(rpc,params); if (error) throw error; setBusy(false); await load(); status("💗 " + success); }
+        catch (e) { status("Could not save: " + err(e)); }
+        finally { setBusy(false); }
+      }
+      async function seasonAction(rpc, params, success) {
+        if (busy) return; setBusy(true); seasonStatus("Saving season...");
+        try { const {error} = await client.rpc(rpc,params); if (error) throw error; setBusy(false); await load(); seasonStatus("💗 " + success); }
+        catch(e) { seasonStatus("Season change failed: " + err(e)); }
+        finally { setBusy(false); }
       }
       async function initialize() {
         client = window.BB_CAMPUS_CLIENT;
-        if (!client) { status("Campus staff connection unavailable. Refresh the page."); return; }
+        if (!client) { status("Campus staff connection unavailable."); return; }
         const role = await client.rpc("is_campus_staff");
-        if (role.error || role.data !== true) {
-          status("Only verified campus staff can manage VIP memberships.");
-          $("honorsSend").disabled = true;
-          return;
-        }
+        if (role.error || role.data !== true) { status("Verified campus staff only."); return; }
         await load();
       }
-      $("honorsSearch").addEventListener("input", options);
-      $("honorsRefresh").addEventListener("click", load);
-      $("honorsInviteForm").addEventListener("submit", async event => {
-        event.preventDefault();
-        const id = $("honorsInvitee").value;
-        if (!id || busy) { status("Select an eligible approved Bestie first."); return; }
-        const name = nameFor(id);
-        if (!confirm(`Send an Honors Society invitation to ${name}?`)) return;
-        await mutate("honors_send_invitation", {
-          p_invitee_id: id,
-          p_message: $("honorsMessage").value.trim() || null
-        }, `Invitation sent to ${name}!`);
+      $("honorsSeasonSelect").addEventListener("change", e => { selectedId = e.target.value; load(); });
+      $("honorsSeasonForm").addEventListener("submit", async e => {
+        e.preventDefault();
+        const name = $("honorsSeasonName").value.trim(), start = $("honorsSeasonStart").value;
+        if (!/^\d{4}-\d{2}-01$/.test(start)) { seasonStatus("Season start must be the first day of a month."); return; }
+        if (!confirm(`Create ${name} as a draft two-month season?`)) return;
+        await seasonAction("honors_create_season", {p_name:name,p_starts_on:start}, "Draft season created.");
+        $("honorsSeasonForm").reset();
+      });
+      $("honorsSeasonActivate").addEventListener("click", async () => {
+        if (!chosen() || chosen().status !== "draft") return;
+        if (!confirm(`Activate ${chosen().name}? The previously active season will close. Existing memberships will NOT transfer.`)) return;
+        await seasonAction("honors_activate_season", {p_season_id:selectedId}, "Season activated.");
+      });
+      $("honorsSeasonClose").addEventListener("click", async () => {
+        if (!chosen() || chosen().status !== "active") return;
+        if (!confirm(`Close ${chosen().name} now? VIP access will end immediately.`)) return;
+        await seasonAction("honors_close_season", {p_season_id:selectedId}, "Season closed.");
+      });
+      $("honorsSearch").addEventListener("input",options);
+      $("honorsRefresh").addEventListener("click",load);
+      $("honorsInviteForm").addEventListener("submit", async e => {
+        e.preventDefault(); if (!accepting()) { status("Select the active, in-date season to send invitations."); return; }
+        const id = $("honorsInvitee").value; if (!id || busy) return;
+        if (!confirm(`Invite ${nameFor(id)} to ${chosen().name}?`)) return;
+        await mutate("honors_send_invitation", {p_invitee_id:id,p_message:$("honorsMessage").value.trim() || null}, `Invitation sent to ${nameFor(id)}.`);
         $("honorsMessage").value = "";
       });
-      document.addEventListener("bb:campus-hq-ready", initialize, {once:true});
+      document.addEventListener("bb:campus-hq-ready",initialize,{once:true});
     })();
   </script>
 
