@@ -876,7 +876,7 @@ body.invite-open{overflow:hidden}
 })();
 </script>
 <script>
-/* Phase 7.5C — live Bestie Access member registrations */
+/* Phase 7.5C — VIP-first Bestie Access, no waitlists or offers */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -900,15 +900,11 @@ body.invite-open{overflow:hidden}
     try {
       const {data, error} = await client.rpc(functionName, {p_event_id:eventId});
       if (error) throw error;
-      const messages = {
-        confirmed:'🎟️ Your registration is CONFIRMED!',
-        waitlisted:'💌 You joined the waitlist!',
-        offered:'💎 A spot is being offered to you! Accept it before the deadline.',
-        full:'🎟️ This event is full and its waitlist is closed.'
-      };
-      const message = typeof data === 'string' ? (messages[data] || data) :
-        functionName === 'honors_access_cancel' ? (data ? '💗 Your spot or waitlist entry was cancelled.' : 'No active signup was found.') :
-        data ? '🎟️ Your waitlist offer was accepted!' : 'No change was made.';
+      const message = functionName === 'honors_access_cancel'
+        ? (data ? '💗 Your registration was cancelled.' : 'No confirmed registration was found.')
+        : data === 'confirmed' ? '🎟️ Your registration is CONFIRMED!'
+        : data === 'full' ? '🎟️ This event is full. No additional spots are available.'
+        : '💌 Registration response: ' + String(data);
       await load(message);
     } catch (error) {
       console.error('Bestie Access action:',error);
@@ -936,7 +932,7 @@ body.invite-open{overflow:hidden}
     status(message || '💌 Checking live event registration...');
     try {
       const {data:events,error:eventError} = await client.from('honors_access_events')
-        .select('id,title,description,location_details,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,waitlist_enabled,status')
+        .select('id,title,description,location_details,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,status')
         .eq('honors_season_id',seasonId)
         .eq('status','published')
         .order('starts_at',{ascending:true});
@@ -949,23 +945,15 @@ body.invite-open{overflow:hidden}
         return;
       }
       const ids = events.map(event => event.id);
-      const [regResult,waitResult] = await Promise.all([
-        client.from('honors_access_registrations').select('event_id,status').eq('user_id',user.id).in('event_id',ids),
-        client.from('honors_access_waitlist').select('event_id,status,offer_expires_at,joined_at').eq('user_id',user.id).in('event_id',ids)
-      ]);
-      if (regResult.error) throw regResult.error;
-      if (waitResult.error) throw waitResult.error;
-      const registrations = new Map((regResult.data || []).map(entry => [entry.event_id,entry]));
-      const waitlist = new Map((waitResult.data || []).map(entry => [entry.event_id,entry]));
+      const {data:regData,error:regError} = await client.from('honors_access_registrations')
+        .select('event_id,status').eq('user_id',user.id).in('event_id',ids);
+      if (regError) throw regError;
+      const registrations = new Map((regData || []).map(entry => [entry.event_id,entry]));
       for (const event of events) {
         const now = Date.now();
-        const reg = registrations.get(event.id);
-        const wait = waitlist.get(event.id);
-        const confirmed = reg?.status === 'confirmed';
-        const offered = wait?.status === 'offered' && new Date(wait.offer_expires_at).getTime() > now;
-        const waiting = wait?.status === 'waiting';
+        const confirmed = registrations.get(event.id)?.status === 'confirmed';
         const beforeOpen = now < new Date(event.vip_opens_at).getTime();
-        const closed = now >= new Date(event.registration_closes_at).getTime();
+        const closed = now >= new Date(event.registration_closes_at).getTime() || now >= new Date(event.starts_at).getTime();
         const canCancel = now < new Date(event.starts_at).getTime() &&
           (!event.cancellation_closes_at || now < new Date(event.cancellation_closes_at).getTime());
         const card = make('article','insider-post');
@@ -983,19 +971,12 @@ body.invite-open{overflow:hidden}
         if (confirmed) {
           note.textContent = '🎟️ CONFIRMED! Your place is reserved.';
           if (canCancel) controls.append(action('Cancel My Registration',()=>perform(event.id,'honors_access_cancel','Cancel your confirmed registration for this event?'),true));
-        } else if (offered) {
-          note.textContent = '💎 A spot is waiting for you! Offer expires ' + fmt(wait.offer_expires_at) + '.';
-          controls.append(action('💗 Accept My Spot',()=>perform(event.id,'honors_access_accept_offer')));
-          if (canCancel) controls.append(action('Decline Offer',()=>perform(event.id,'honors_access_cancel','Decline this spot offer?'),true));
-        } else if (waiting) {
-          note.textContent = '💌 You are on the waitlist. Check back for an offer!';
-          if (canCancel) controls.append(action('Leave Waitlist',()=>perform(event.id,'honors_access_cancel','Leave this event waitlist?'),true));
         } else if (closed) {
           note.textContent = '🔒 Registration is closed.';
         } else if (beforeOpen) {
           note.textContent = '⏳ VIP registration has not opened yet.';
         } else {
-          note.textContent = '💗 Registration is open! Availability is confirmed when you submit.';
+          note.textContent = '💗 VIP registration is open! Availability is confirmed when you submit.';
           controls.append(action('🎟️ Claim My Spot',()=>perform(event.id,'honors_access_register')));
         }
         note.setAttribute('role','status');
@@ -1011,6 +992,7 @@ body.invite-open{overflow:hidden}
       $('refreshAccess').disabled = false;
     }
   }
+
   document.addEventListener('bb:honors-vip-ready', event => {
     client = event.detail.client;
     user = event.detail.user;

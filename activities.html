@@ -807,8 +807,8 @@ footer {
 
 
 <script>
-/* Phase 7.5D — live Supabase campus-wide registration desk.
-   The database RPCs are authoritative for eligibility, capacity and waitlist transitions. */
+/* Phase 7.5D — campus-wide registration, VIP-first, no waitlists.
+   Supabase RPCs remain authoritative for eligibility and capacity. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -820,108 +820,107 @@ footer {
   };
   const format = value => value ? new Date(value).toLocaleString(undefined, {dateStyle:'medium',timeStyle:'short'}) : 'Not scheduled';
   const errorText = error => error?.message || 'Please try again.';
-  let client, user, loading = false, initialized = false;
+  let client, user, loading = false, acting = false, initialized = false, isVip = false;
   const status = message => { $('campusEventsStatus').textContent = message; };
 
-  async function load() {
+  async function load(message = '') {
     if (!client || !user || loading) return;
     loading = true;
     $('refreshCampusEvents').disabled = true;
-    status('💌 Checking the campus-wide event registry...');
+    status(message || '💌 Checking the campus-wide event registry...');
     const list = $('campusEventsList');
     try {
-      // RLS limits the visible records; the explicit audience filter keeps VIP-only events out.
+      // VIP-only events are intentionally not listed on the campus-wide page.
       const {data:events,error:eventError} = await client.from('honors_access_events')
-        .select('id,title,description,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,waitlist_enabled,status')
+        .select('id,title,description,location_details,starts_at,ends_at,capacity,audience,vip_opens_at,general_opens_at,registration_closes_at,cancellation_closes_at,status')
         .eq('audience','campus_wide').eq('status','published')
         .order('starts_at',{ascending:true});
       if (eventError) throw eventError;
       list.replaceChildren();
       if (!events?.length) {
         list.append(make('div','access-empty','🎀 No campus-wide event signups have been published yet. Check back soon, Bestie!'));
-        status('💗 You’re all caught up!');
+        status(message || '💗 You’re all caught up!');
         return;
       }
       const ids = events.map(event => event.id);
-      const [{data:registrations,error:registrationError},{data:waitlist,error:waitError}] = await Promise.all([
-        client.from('honors_access_registrations').select('event_id,status').eq('user_id',user.id).in('event_id',ids),
-        client.from('honors_access_waitlist').select('event_id,status,offer_expires_at').eq('user_id',user.id).in('event_id',ids)
-      ]);
+      const {data:registrations,error:registrationError} = await client.from('honors_access_registrations')
+        .select('event_id,status').eq('user_id',user.id).in('event_id',ids);
       if (registrationError) throw registrationError;
-      if (waitError) throw waitError;
-      const registrationsByEvent = new Map((registrations||[]).map(row => [row.event_id,row]));
-      const waitByEvent = new Map((waitlist||[]).map(row => [row.event_id,row]));
+      const registrationsByEvent = new Map((registrations || []).map(row => [row.event_id,row]));
       for (const event of events) {
         const card = make('article','access-event');
-        const tag = make('span','pill','🎟️ CAMPUS-WIDE EVENT');
-        const title = make('h3','',event.title);
-        card.append(tag,title);
+        card.append(make('span','pill','🎟️ VIP FIRST · CAMPUS-WIDE EVENT'));
+        card.append(make('h3','',event.title));
         if (event.description) card.append(make('p','',event.description));
+        if (event.location_details) card.append(make('div','access-meta','📍 '+event.location_details));
         card.append(make('div','access-meta','📅 '+format(event.starts_at)+' – '+format(event.ends_at)));
-        card.append(make('div','access-meta','🎀 VIP early access: '+format(event.vip_opens_at)));
-        card.append(make('div','access-meta','💗 General admission: '+format(event.general_opens_at)));
+        card.append(make('div','access-meta','💎 VIP early access: '+format(event.vip_opens_at)));
+        card.append(make('div','access-meta','💗 General registration: '+format(event.general_opens_at)));
         card.append(make('div','access-meta','🔒 Registration closes: '+format(event.registration_closes_at)));
-        if (event.capacity != null) card.append(make('div','access-meta','🎟️ Capacity: '+event.capacity+' total spots · live availability confirmed when registering'));
+        if (event.capacity != null) card.append(make('div','access-meta','🎟️ Capacity: '+event.capacity+' total spots · availability checked when claiming'));
         const feedback = make('p','access-feedback','');
         feedback.setAttribute('role','status');
         const actions = make('div','access-actions');
-        const button = make('button','btn');
-        button.type = 'button';
-        const vipLink = make('a','btn access-secondary','💎 VIP? Visit Honors Society ↗');
-        vipLink.href = 'honors.html#access';
-        const registration = registrationsByEvent.get(event.id);
-        const wait = waitByEvent.get(event.id);
         const now = Date.now();
-        const generalStart = event.general_opens_at ? new Date(event.general_opens_at).getTime() : Infinity;
+        const vipOpen = event.vip_opens_at ? new Date(event.vip_opens_at).getTime() : Infinity;
+        const generalOpen = event.general_opens_at ? new Date(event.general_opens_at).getTime() : Infinity;
         const close = event.registration_closes_at ? new Date(event.registration_closes_at).getTime() : Infinity;
+        const starts = event.starts_at ? new Date(event.starts_at).getTime() : Infinity;
         const cancelClose = event.cancellation_closes_at ? new Date(event.cancellation_closes_at).getTime() : Infinity;
-        const confirmed = registration?.status === 'confirmed';
-        const waiting = wait?.status === 'waiting';
-        const offered = wait?.status === 'offered' && (!wait.offer_expires_at || new Date(wait.offer_expires_at).getTime() > now);
-        let action = null;
+        const confirmed = registrationsByEvent.get(event.id)?.status === 'confirmed';
+        const canCancel = now < starts && now < cancelClose;
+        const registrationOpen = now >= (isVip ? vipOpen : generalOpen) && now < close && now < starts;
+        let operation = null;
         if (confirmed) {
           feedback.textContent = '✅ You’re officially registered, Bestie!';
-          if (now < cancelClose) {action = 'cancel';button.textContent = 'Cancel My Registration';}
+          if (canCancel) operation = 'cancel';
           else feedback.textContent += ' Cancellation is closed.';
-        } else if (offered) {
-          feedback.textContent = '💌 A waitlist spot is waiting for you! Accept before '+format(wait.offer_expires_at)+'.';
-          action = 'accept';button.textContent = '💗 Accept My Spot';
-        } else if (waiting) {
-          feedback.textContent = '⏳ You’re on the waitlist.';
-          action = 'cancel';button.textContent = 'Leave Waitlist';
-        } else if (now >= close) {
+        } else if (now >= close || now >= starts) {
           feedback.textContent = '🔒 Registration is closed.';
-        } else if (now < generalStart) {
-          feedback.textContent = '⏳ General admission has not opened yet. Honors Society Besties may have early access.';
+        } else if (now < vipOpen) {
+          feedback.textContent = '⏳ VIP early registration has not opened yet.';
+        } else if (!registrationOpen) {
+          feedback.textContent = '💎 VIP registration is underway! General registration opens '+format(event.general_opens_at)+'.';
+          const vipLink = make('a','btn access-secondary','💎 Honors Society Lounge ↗');
+          vipLink.href = 'honors.html#access';
           actions.append(vipLink);
         } else {
-          action = 'register';button.textContent = '💗 Claim My Spot';
-          feedback.textContent = event.waitlist_enabled ? '🎟️ If spots are full, you may be offered the waitlist.' : '🎟️ Registration is open while spots remain.';
+          feedback.textContent = '🎟️ Registration is open while spots remain!';
+          operation = 'register';
         }
-        if (action) {
+        if (operation) {
+          const button = make('button','btn',operation === 'cancel' ? 'Cancel My Registration' : '💗 Claim My Spot');
+          button.type = 'button';
           actions.prepend(button);
           button.addEventListener('click', async () => {
-            if (button.disabled) return;
-            if (action === 'cancel' && !window.confirm(confirmed ? 'Cancel your event registration?' : 'Leave this event waitlist?')) return;
+            if (button.disabled || acting) return;
+            if (operation === 'cancel' && !window.confirm('Cancel your event registration?')) return;
+            acting = true;
             button.disabled = true;
             feedback.textContent = '💌 Updating your event registration...';
-            const fn = action === 'register' ? 'honors_access_register' : action === 'accept' ? 'honors_access_accept_offer' : 'honors_access_cancel';
             try {
-              const {error} = await client.rpc(fn,{p_event_id:event.id});
+              const fn = operation === 'cancel' ? 'honors_access_cancel' : 'honors_access_register';
+              const {data,error} = await client.rpc(fn,{p_event_id:event.id});
               if (error) throw error;
-              // Reload authoritative registration/waitlist state, including waitlist placement.
-              await loadAfterAction();
+              const message = operation === 'cancel'
+                ? (data === true ? '💗 Your registration was cancelled.' : 'No active registration was found.')
+                : data === 'confirmed' ? '🎟️ Your registration is CONFIRMED!'
+                : data === 'full' ? '🎟️ This event is currently full.'
+                : '💌 Your registration status was updated.';
+              await load(message);
             } catch (error) {
               console.error('Campus-wide event action:',error);
               feedback.textContent = '⚠️ '+errorText(error);
               button.disabled = false;
+            } finally {
+              acting = false;
             }
           });
         }
         card.append(actions,feedback);
         list.append(card);
       }
-      status('💗 '+events.length+' published campus-wide '+(events.length === 1 ? 'event' : 'events')+' on the board.');
+      if (!message) status('💗 '+events.length+' published campus-wide '+(events.length === 1 ? 'event' : 'events')+' on the board.');
     } catch (error) {
       console.error('Campus-wide events:',error);
       status('⚠️ Could not load campus-wide events: '+errorText(error));
@@ -931,14 +930,11 @@ footer {
       $('refreshCampusEvents').disabled = false;
     }
   }
-  async function loadAfterAction() {
-    // Called during an action while a prior load has already finished.
-    await load();
-  }
+
   document.addEventListener('bb:activities-approved', async () => {
     if (!initialized) {
       initialized = true;
-      $('refreshCampusEvents').addEventListener('click',load);
+      $('refreshCampusEvents').addEventListener('click',() => load());
     }
     try {
       const config = window.BB_CONFIG;
@@ -947,6 +943,13 @@ footer {
       const {data,error} = await client.auth.getUser();
       if (error || !data?.user) throw error || new Error('Please sign in again.');
       user = data.user;
+      const [vipResult,staffResult] = await Promise.all([
+        client.rpc('has_honors_access'),
+        client.rpc('is_campus_staff')
+      ]);
+      if (vipResult.error) throw vipResult.error;
+      if (staffResult.error) throw staffResult.error;
+      isVip = vipResult.data === true || staffResult.data === true;
       await load();
     } catch (error) {
       status('⚠️ Could not initialize Bestie Access: '+errorText(error));
