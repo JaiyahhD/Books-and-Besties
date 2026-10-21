@@ -205,6 +205,53 @@
             font-weight: 800
         }
 
+        .cover-picker {
+            display: block;
+            border: 2px dashed #dc9fc0;
+            border-radius: 14px;
+            background: #fff5fa;
+            padding: 14px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px
+        }
+
+        .cover-picker:hover {
+            background: #ffeaf4
+        }
+
+        .cover-picker input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0
+        }
+
+        .cover-preview {
+            max-width: 140px;
+            max-height: 195px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px auto;
+            display: none
+        }
+
+        .post-cover {
+            width: 110px;
+            max-width: 32%;
+            height: 155px;
+            object-fit: cover;
+            border-radius: 10px;
+            float: left;
+            margin: 12px 17px 10px 0
+        }
+
+        .post::after {
+            content: "";
+            display: block;
+            clear: both
+        }
+
         .feed-head {
             display: flex;
             align-items: center;
@@ -384,6 +431,13 @@
                         <option>Nonfiction</option>
                         <option>Other</option>
                     </select>
+                    <label for="coverFile">📸 Book cover (optional)</label>
+                    <label class="cover-picker" for="coverFile">📁 Click to upload a book cover from your device
+                        <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+                        <img id="coverPreview" class="cover-preview" alt="Selected book cover preview">
+                        <span id="coverFilename" class="muted" style="display:block;margin-top:6px">JPG, PNG, WEBP or
+                            GIF · up to 5 MB</span>
+                    </label>
                     <label for="pitch">Why do the Besties need to read it? *</label><textarea id="pitch" required
                         minlength="10" maxlength="1500"
                         placeholder="The characters, the plot twists, the FEELINGS… spill! (No spoilers, please.)"></textarea>
@@ -418,6 +472,10 @@
             const status = $('status');
             let db, user, recommendations = [], reactions = [], names = new Map(), offset = 0, exhausted = false, loading = false;
             const PAGE_SIZE = 20;
+            const COVER_BUCKET = 'bookish-covers';
+            const coverUrls = new Map();
+            const allowedTypes = new Map([['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp'], ['image/gif', 'gif']]);
+            const MAX_COVER_BYTES = 5 * 1024 * 1024;
             const show = (msg, error = false) => { status.textContent = msg; status.style.background = error ? '#fff0e8' : '#fff0f6'; };
             const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt !== undefined) n.textContent = txt; return n; };
             const date = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -432,6 +490,7 @@
                 if (error || profile?.membership_status !== 'approved') { show('💌 The Bookish Buzz is for approved campus members. Visit your Locker for admission details.', true); return; }
                 $('content').classList.remove('hidden'); status.textContent = '';
                 $('recommendForm').addEventListener('submit', submit);
+                $('coverFile').addEventListener('change', previewCover);
                 $('search').addEventListener('input', render);
                 $('filterGenre').addEventListener('change', render);
                 $('moreBtn').addEventListener('click', load);
@@ -440,13 +499,14 @@
             async function load() {
                 if (loading || exhausted) return;
                 loading = true; $('moreBtn').disabled = true;
-                const { data, error } = await db.from('bookish_recommendations').select('id,user_id,title,author,genre,pitch,content_notes,created_at').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
+                const { data, error } = await db.from('bookish_recommendations').select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
                 loading = false; $('moreBtn').disabled = false;
                 if (error) { show('Could not load recommendations: ' + error.message, true); render(); return; }
                 const batch = data || []; offset += batch.length; exhausted = batch.length < PAGE_SIZE;
                 recommendations.push(...batch);
                 await loadReactions();
                 await loadNames();
+                await loadCovers();
                 render();
             }
             async function loadReactions() {
@@ -463,6 +523,27 @@
                 if (error) { console.warn('Bookish Buzz: profile names unavailable', error); ids.forEach(id => names.set(id, 'Campus Bestie')); return; }
                 ids.forEach(id => names.set(id, (data || []).find(p => p.id === id)?.display_name || 'Campus Bestie'));
             }
+            function previewCover() {
+                const file = $('coverFile').files?.[0], img = $('coverPreview');
+                img.style.display = 'none'; img.removeAttribute('src');
+                $('coverFilename').textContent = file ? file.name : 'JPG, PNG, WEBP or GIF · up to 5 MB';
+                if (!file) return;
+                if (!allowedTypes.has(file.type) || file.size > MAX_COVER_BYTES) {
+                    show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.', true);
+                    $('coverFile').value = ''; $('coverFilename').textContent = 'JPG, PNG, WEBP or GIF · up to 5 MB'; return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => { img.src = reader.result; img.style.display = 'block' };
+                reader.readAsDataURL(file);
+            }
+            async function loadCovers() {
+                const paths = [...new Set(recommendations.map(r => r.cover_path).filter(Boolean))].filter(path => !coverUrls.has(path));
+                if (!paths.length) return;
+                await Promise.all(paths.map(async path => {
+                    const { data, error } = await db.storage.from(COVER_BUCKET).createSignedUrl(path, 3600);
+                    if (!error && data?.signedUrl) coverUrls.set(path, { url: data.signedUrl, expires: Date.now() + 3500000 });
+                }));
+            }
             function render() {
                 const query = $('search').value.trim().toLowerCase(), genre = $('filterGenre').value;
                 const genres = [...new Set(recommendations.map(r => r.genre))].sort();
@@ -478,7 +559,10 @@
                 for (const r of filtered) {
                     const card = el('article', 'post');
                     const top = el('div', 'post-top'); const by = el('div'); by.append(el('strong', '', `💗 ${names.get(r.user_id) || 'Campus Bestie'}`), el('div', 'meta', date(r.created_at)));
-                    top.append(by, el('span', 'genre', r.genre)); card.append(top, el('h3', '', r.title), el('p', 'author', `by ${r.author}`), el('p', '', r.pitch));
+                    top.append(by, el('span', 'genre', r.genre)); card.append(top);
+                    const cover = coverUrls.get(r.cover_path);
+                    if (cover && cover.expires > Date.now()) { const img = el('img', 'post-cover'); img.src = cover.url; img.alt = `Cover for ${r.title}`; img.loading = 'lazy'; card.append(img); }
+                    card.append(el('h3', '', r.title), el('p', 'author', `by ${r.author}`), el('p', '', r.pitch));
                     if (r.content_notes) card.append(el('div', 'notes', `🕯️ Content notes: ${r.content_notes}`));
                     const actions = el('div', 'actions'); const likes = reactions.filter(x => x.recommendation_id === r.id); const mine = likes.some(x => x.user_id === user.id);
                     const like = button(`${mine ? '💖' : '🤍'} Bestie Love · ${likes.length}`); like.setAttribute('aria-pressed', String(mine)); like.addEventListener('click', () => toggleLike(r.id, mine, like)); actions.append(like);
@@ -488,12 +572,35 @@
             }
             async function submit(e) {
                 e.preventDefault(); const btn = $('submitBtn'); btn.disabled = true;
-                const payload = { user_id: user.id, title: $('title').value.trim(), author: $('author').value.trim(), genre: $('genre').value, pitch: $('pitch').value.trim(), content_notes: $('notes').value.trim() || null };
+                const file = $('coverFile').files?.[0] || null;
+                const payload = { user_id: user.id, title: $('title').value.trim(), author: $('author').value.trim(), genre: $('genre').value, pitch: $('pitch').value.trim(), content_notes: $('notes').value.trim() || null, cover_path: null };
                 if (payload.pitch.length < 10) { show('Give the Besties a little more tea (at least 10 characters).', true); btn.disabled = false; return; }
-                const { data, error } = await db.from('bookish_recommendations').insert(payload).select('id,user_id,title,author,genre,pitch,content_notes,created_at').single();
-                btn.disabled = false;
-                if (error) { show('Could not post: ' + error.message, true); return; }
-                $('recommendForm').reset(); recommendations.unshift(data); offset += 1; names.set(user.id, names.get(user.id) || 'You'); $('search').value = ''; $('filterGenre').value = ''; render(); show('💋 Your recommendation is live, Bestie!');
+                if (file && (!allowedTypes.has(file.type) || file.size > MAX_COVER_BYTES)) {
+                    show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.', true); btn.disabled = false; return;
+                }
+                let uploadedPath = null;
+                try {
+                    if (file) {
+                        show('📸 Uploading your book cover…');
+                        uploadedPath = `${user.id}/${crypto.randomUUID()}.${allowedTypes.get(file.type)}`;
+                        const { error: uploadError } = await db.storage.from(COVER_BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+                        if (uploadError) throw uploadError;
+                        payload.cover_path = uploadedPath;
+                    }
+                    const { data, error } = await db.from('bookish_recommendations').insert(payload).select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').single();
+                    if (error) throw error;
+                    $('recommendForm').reset(); $('coverPreview').style.display = 'none'; $('coverPreview').removeAttribute('src');
+                    $('coverFilename').textContent = 'JPG, PNG, WEBP or GIF · up to 5 MB';
+                    recommendations.unshift(data); offset += 1; names.set(user.id, names.get(user.id) || 'You');
+                    await loadCovers();
+                    $('search').value = ''; $('filterGenre').value = ''; render(); show('💋 Your recommendation is live, Bestie!');
+                } catch (error) {
+                    if (uploadedPath) {
+                        const cleanup = await db.storage.from(COVER_BUCKET).remove([uploadedPath]);
+                        if (cleanup.error) console.warn('Bookish cover cleanup failed:', cleanup.error);
+                    }
+                    show('Could not post: ' + error.message, true);
+                } finally { btn.disabled = false; }
             }
             async function toggleLike(id, mine, btn) {
                 btn.disabled = true;
