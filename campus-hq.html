@@ -2123,156 +2123,599 @@
     );
   }
 
-  
   function installNavigation() {
-    // Phase 8.6C — Unified Campus HQ navigation.
-    // Handles sidebar buttons, quick-access shortcuts,
-    // section visibility, browser history, and mobile scrolling.
+    document.querySelectorAll("[data-section]").forEach(node => {
+      node.addEventListener("click", () => {
+        const name = node.dataset.section;
 
-    if (window.BB_CAMPUS_NAV_INSTALLED) return;
-    window.BB_CAMPUS_NAV_INSTALLED = true;
-
-    const sections = Array.from(
-      document.querySelectorAll(".workspace > .section")
-    );
-
-    const sidebarButtons = Array.from(
-      document.querySelectorAll(".sidebar [data-section]")
-    );
-
-    const validSections = new Map(
-      sections.map(section => [
-        section.id.replace(/^section-/, ""),
-        section
-      ])
-    );
-
-    function openSection(name, options = {}) {
-      const {
-        updateHistory = true,
-        scroll = true
-      } = options;
-
-      const target = validSections.get(name);
-
-      if (!target) {
-        console.warn("Unknown Campus HQ section:", name);
-        return false;
-      }
-
-      // Exactly one workspace section is visible.
-      sections.forEach(section => {
-        const active = section === target;
-        section.classList.toggle("active", active);
-        section.hidden = !active;
-      });
-
-      // Keep sidebar highlighting synchronized.
-      sidebarButtons.forEach(button => {
-        const active = button.dataset.section === name;
-
-        button.classList.toggle("active", active);
-
-        if (active) {
-          button.setAttribute("aria-current", "page");
-        } else {
-          button.removeAttribute("aria-current");
-        }
-      });
-
-      // Remember the section in the URL so browser
-      // Back/Forward and bookmarked sections work.
-      if (updateHistory) {
-        const url = new URL(window.location.href);
-        url.hash = "hq-" + name;
-
-        if (window.location.hash !== url.hash) {
-          window.history.pushState(
-            { campusSection: name },
-            "",
-            url
+        document.querySelectorAll(".section").forEach(section => {
+          section.classList.toggle(
+            "active",
+            section.id === "section-" + name
           );
-        }
-      }
-
-      if (scroll) {
-        const reducedMotion = window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches;
-
-        target.scrollIntoView({
-          behavior: reducedMotion ? "auto" : "smooth",
-          block: "start"
         });
-      }
 
-      return true;
-    }
-
-    function sectionFromURL() {
-      const hash = decodeURIComponent(
-        window.location.hash.replace(/^#/, "")
-      );
-
-      if (!hash.startsWith("hq-")) return null;
-
-      const name = hash.slice(3);
-
-      return validSections.has(name) ? name : null;
-    }
-
-    // One delegated click handler for ALL internal navigation.
-    document.addEventListener("click", event => {
-      const control = event.target.closest(
-        "[data-section], [data-jump]"
-      );
-
-      if (!control) return;
-
-      if (!document.getElementById("campusDashboard")
-        ?.contains(control)) {
-        return;
-      }
-
-      const name =
-        control.dataset.section ||
-        control.dataset.jump;
-
-      if (!validSections.has(name)) return;
-
-      event.preventDefault();
-      openSection(name);
-    });
-
-    // Restore the correct section with Back/Forward.
-    window.addEventListener("popstate", () => {
-      openSection(sectionFromURL() || "overview", {
-        updateHistory: false
+        document.querySelectorAll(".nav-btn[data-section]")
+          .forEach(button => {
+            const active = button.dataset.section === name;
+            button.classList.toggle("active", active);
+            button.setAttribute(
+              "aria-current",
+              active ? "true" : "false"
+            );
+          });
       });
     });
 
-    // Support direct links to Campus HQ sections.
-    window.addEventListener("hashchange", () => {
-      const name = sectionFromURL();
-
-      if (name) {
-        openSection(name, {
-          updateHistory: false
-        });
-      }
+    document.querySelectorAll("[data-jump]").forEach(node => {
+      node.addEventListener("click", () => {
+        const target = document.querySelector(
+          '.nav-btn[data-section="' +
+          node.dataset.jump + '"]'
+        );
+        if (target) {
+          target.click();
+        } else {
+          // Some sub-pages are reached by an in-page shortcut rather
+          // than a dedicated sidebar button (e.g. Crown Season Studio).
+          const section = document.getElementById("section-" + node.dataset.jump);
+          if (!section) return;
+          document.querySelectorAll(".section").forEach(item => {
+            item.classList.toggle("active", item === section);
+          });
+          document.querySelectorAll(".nav-btn[data-section]").forEach(button => {
+            button.classList.remove("active");
+            button.setAttribute("aria-current", "false");
+          });
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
     });
-
-    // Make the starting section and sidebar agree.
-    openSection(sectionFromURL() || "overview", {
-      updateHistory: false,
-      scroll: false
-    });
-
-    // Other Campus HQ modules can use this function
-    // without installing their own navigation listeners.
-    window.BB_CAMPUS_NAVIGATE = openSection;
   }
 
+  async function initialize() {
+    if (initialized) return;
+    initialized = true;
+
+    installNavigation();
+    installEditor();
+
+    $("year").textContent = new Date().getFullYear();
+
+    client = window.BB_CAMPUS_CLIENT;
+
+    if (!client) {
+      message("⚠️ Campus HQ Supabase connection unavailable.");
+      return;
+    }
+
+    const { data: isStaff, error } =
+      await client.rpc("is_campus_staff");
+
+    if (error || isStaff !== true) {
+      message("🔒 Campus staff authorization required.");
+      $("activityForm").hidden = true;
+      return;
+    }
+
+    try {
+      await loadTemplates();
+      await loadActivities();
+    } catch (error) {
+      message("⚠️ Initialization failed: " + errorText(error));
+    }
+  }
+
+  // Existing campus-hq-auth.js dispatches this event
+  // after staff authentication succeeds.
+  document.addEventListener(
+    "bb:campus-hq-ready",
+    initialize,
+    { once: true }
+  );
+})();
+</script>
+
+
+<script>
+/* BESTIE UNIVERSITY — PHASE 8.3: MONTHLY CROWN COMMAND CENTER
+   Existing crown_* tables and official RPCs are the only sources of truth. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let client, seasonId = '', submissions = [], names = new Map(), teamNames = new Map(), busy = false, generation = 0;
+  const text = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+  const errorMessage = error => error?.message || String(error);
+  const node = (tag, value, cls) => { const n = document.createElement(tag); if (value !== undefined) n.textContent = value; if (cls) n.className = cls; return n; };
+  const row = (heading, sub) => { const d=node('div',undefined,'item');d.append(node('strong',heading),node('p',sub,'mini'));return d; };
+  async function loadSeasons() {
+    const {data,error}=await client.from('crown_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false});
+    if(error) throw error;
+    const select=$('c83Season'), previous=select.value;
+    select.replaceChildren(new Option('Choose a season',''));
+    for(const s of data||[]) select.add(new Option(`${s.name} · ${s.status||'season'} · ${s.starts_on}–${s.ends_on}`,s.id));
+    select.value=(data||[]).some(s=>s.id===previous)?previous:(data?.[0]?.id||'');
+    seasonId=select.value;
+  }
+  async function load() {
+    if(!client || busy) return;
+    busy=true; const run=++generation;
+    $('c83Refresh').disabled=true; $('c83Season').disabled=true;
+    text('c83Status','👑 Refreshing official season records...');
+    try {
+      const sid=seasonId;
+      if(!sid) {text('c83Status','No Monthly Crown season selected.');return;}
+      const [teams, members, books, rosters, teamRecords]=await Promise.all([
+        client.rpc('get_crown_team_leaderboard',{p_season_id:sid}),
+        client.rpc('get_crown_member_leaderboard',{p_season_id:sid}),
+        client.from('crown_submissions').select('id,user_id,team_id,book_title,book_author,pages_read,rating,completed_on,status,staff_note,created_at').eq('season_id',sid).order('created_at',{ascending:false}).limit(500),
+        client.from('crown_enrollments').select('id,status,team_id').eq('season_id',sid).limit(2000),
+        client.from('crown_teams').select('id,name,emoji').eq('season_id',sid)
+      ]);
+      for(const result of [teams,members,books,rosters,teamRecords]) if(result.error) throw result.error;
+      if(run!==generation || sid!==seasonId) return;
+      submissions=books.data||[];
+      teamNames=new Map((teamRecords.data||[]).map(t=>[t.id,`${t.emoji||'🏡'} ${t.name}`]));
+      const ids=[...new Set(submissions.map(b=>b.user_id).filter(Boolean))];
+      names=new Map();
+      if(ids.length){
+        for(let i=0;i<ids.length;i+=100){
+          const {data,error}=await client.from('profiles').select('id,display_name').in('id',ids.slice(i,i+100));
+          if(error) throw error;
+          for(const p of data||[]) names.set(p.id,p.display_name||'Bestie');
+        }
+      }
+      const approved=(rosters.data||[]).filter(e=>e.status==='approved');
+      const eligible=submissions.filter(b=>b.status==='eligible').length;
+      const voided=submissions.filter(b=>b.status==='voided').length;
+      const truncated=submissions.length===500;
+      const rosterLimited=(rosters.data||[]).length===2000;
+      const snapshot=$('c83Snapshot');snapshot.replaceChildren();
+      snapshot.append(row('🏡 '+(teamRecords.data||[]).length+' Crown teams',approved.length+' approved enrollments'+(rosterLimited?' (roster query capped at 2,000)':'')),row('📚 '+submissions.length+' recent submissions',eligible+' eligible · '+voided+' voided'+(truncated?' · latest 500 only':'')),row('👑 Official pages','See official leaderboard totals — review counts are not used to calculate scores.'));
+      const showStandings=(id,records,team)=>{
+        const box=$(id);box.replaceChildren();
+        if(!records?.length){box.append(node('p','No standings for this season yet.','mini'));return;}
+        for(const [i,r] of records.entries()){
+          const name=team?`${r.team_emoji||'🏡'} ${r.team_name||'Team'}`:(r.display_name||'Bestie');
+          const info=team?`${r.books_logged||0} books · ${r.contributing_members||0} contributing Besties`:`${r.team_name||'Unassigned'} · ${r.books_logged||0} books`;
+          box.append(row(`${i+1}. ${name} — ${Number(r.total_pages||0).toLocaleString()} pages`,info));
+        }
+      };
+      showStandings('c83Teams',teams.data,true);
+      showStandings('c83Members',members.data,false);
+      renderReviews();
+      text('c83Status','💗 Command Center synced to existing Monthly Crown records.'+(truncated?' Showing only the 500 newest submissions.':''));
+    } catch(error){console.error('Monthly Crown Command Center:',error);text('c83Status','⚠️ Could not load Crown records: '+errorMessage(error));}
+    finally{busy=false;$('c83Refresh').disabled=false;$('c83Season').disabled=false;}
+  }
+  function renderReviews(){
+    const filter=$('c83Filter').value;
+    const list=$('c83Reviews');list.replaceChildren();
+    const visible=submissions.filter(b=>filter==='all'||b.status===filter);
+    text('c83ReviewStatus',visible.length+' shown · newest 500 submissions maximum');
+    if(!visible.length){list.append(node('p','No matching submissions.','mini'));return;}
+    for(const b of visible){
+      const card=node('div',undefined,'item');
+      card.append(node('h4',b.book_title||'Untitled book'),node('p',`${b.book_author||'Unknown author'} · ${names.get(b.user_id)||'Bestie'} · ${teamNames.get(b.team_id)||'Team'} · ${b.completed_on||'No date'} · ${b.status} · ${b.pages_read} pages`,'mini'));
+      const form=node('div',undefined,'form-grid');
+      const field=(label,control)=>{const wrap=node('label',undefined,'field');wrap.append(node('span',label),control);return wrap;};
+      const status=node('select');status.add(new Option('👑 Eligible','eligible'),new Option('🚫 Voided','voided'));status.value=b.status;
+      const pages=node('input');pages.type='number';pages.min='1';pages.max='10000';pages.step='1';pages.value=b.pages_read;
+      const note=node('textarea');note.value=b.staff_note||'';note.placeholder='Reason for correction or voiding';
+      form.append(field('Eligibility',status),field('Pages read',pages),field('Staff note',note));
+      const save=node('button','💗 Save Crown Review','btn secondary');save.type='button';
+      const feedback=node('p','','mini');feedback.setAttribute('role','status');
+      save.addEventListener('click',async()=>{
+        const count=Number(pages.value);
+        if(!Number.isInteger(count)||count<1||count>10000){feedback.textContent='⚠️ Pages must be a whole number from 1 to 10,000.';return;}
+        if(!confirm(`Save ${status.value} review for “${b.book_title}” (${count} pages)?`))return;
+        save.disabled=true;feedback.textContent='Saving to official Crown records...';
+        try{
+          const {data,error}=await client.rpc('review_crown_submission',{p_submission_id:b.id,p_status:status.value,p_pages_read:count,p_staff_note:note.value.trim()});
+          if(error)throw error;
+          if(data!==true)throw new Error('The review was not confirmed by Supabase.');
+          feedback.textContent='💗 Review saved. Refreshing official leaderboards...';
+          await load();
+        }catch(error){feedback.textContent='⚠️ '+errorMessage(error);save.disabled=false;}
+      });
+      card.append(form,save,feedback);list.append(card);
+    }
+  }
+  async function init(){
+    client=window.BB_CAMPUS_CLIENT;
+    if(!client){text('c83Status','⚠️ Campus staff database connection unavailable.');return;}
+    const {data,error}=await client.rpc('is_campus_staff');
+    if(error||data!==true){text('c83Status','🔒 Campus staff access required.');return;}
+    $('c83Season').addEventListener('change',()=>{seasonId=$('c83Season').value;generation++;load();});
+    $('c83Refresh').addEventListener('click',load);
+    $('c83Filter').addEventListener('change',renderReviews);
+    try{await loadSeasons();await load();}catch(error){text('c83Status','⚠️ '+errorMessage(error));}
+  }
+  document.addEventListener('bb:campus-hq-ready',init,{once:true});
+})();
+</script>
+
+<script>
+/* PHASE 8.3E — Uses only the four existing admin RPCs. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let client, seasons=[], teams=[];
+  const status=(id,message)=>{ $(id).textContent=message; };
+  const err=e=>e?.message||String(e);
+  const select=(id,items,placeholder,label)=>{
+    const el=$(id),old=el.value;
+    el.replaceChildren(new Option(placeholder,''));
+    for(const item of items) el.add(new Option(label(item),item.id));
+    el.value=items.some(item=>item.id===old)?old:(items[0]?.id||'');
+  };
+  function showSeason(){
+    const s=seasons.find(s=>s.id===$('c83EditSeasonSelect').value);
+    $('c83EditSeasonName').value=s?.name||'';
+    $('c83EditSeasonStart').value=s?.starts_on||'';
+    $('c83EditSeasonEnd').value=s?.ends_on||'';
+  }
+  function showTeam(){
+    const t=teams.find(t=>t.id===$('c83EditTeamSelect').value);
+    $('c83EditTeamName').value=t?.name||'';
+    $('c83EditTeamEmoji').value=t?.emoji||'👑';
+  }
+  function populateTeams(){
+    const sid=$('c83EditTeamSeason').value;
+    select('c83EditTeamSelect',teams.filter(t=>t.season_id===sid),'Choose a team',t=>`${t.emoji||'👑'} ${t.name}`);
+    showTeam();
+  }
+  async function reload(){
+    const [s,t]=await Promise.all([
+      client.from('crown_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false}),
+      client.from('crown_teams').select('id,season_id,name,emoji').order('name')
+    ]);
+    if(s.error)throw s.error;
+    if(t.error)throw t.error;
+    seasons=s.data||[];teams=t.data||[];
+    const upcoming=seasons.filter(s=>s.status==='upcoming');
+    select('c83EditSeasonSelect',upcoming,'No upcoming seasons',s=>s.name);
+    select('c83NewTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
+    select('c83EditTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
+    showSeason();populateTeams();
+    const oldLifecycle=$('c83LifecycleSeason').value;
+    select('c83LifecycleSeason',seasons,'Choose a season',s=>`${s.name} · ${s.status}`);
+    if(seasons.some(s=>s.id===oldLifecycle))$('c83LifecycleSeason').value=oldLifecycle;
+    showLifecycle();
+    const box=$('c83AdminSeasons');box.replaceChildren();
+    if(!seasons.length)box.textContent='No Crown seasons found.';
+    for(const s of seasons){
+      const row=document.createElement('p');
+      row.textContent=`👑 ${s.name} · ${s.status} · ${s.starts_on} to ${s.ends_on} · ${teams.filter(t=>t.season_id===s.id).length} team(s)`;
+      box.append(row);
+    }
+  }
+  function showLifecycle(){
+    const season=seasons.find(s=>s.id===$('c83LifecycleSeason').value);
+    const activate=$('c83ActivateSeason'),complete=$('c83CompleteSeason');
+    if(!season){$('c83LifecycleDetails').textContent='Select a season to see available actions.';activate.disabled=true;complete.disabled=true;return;}
+    const today=new Date();
+    const localToday=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const teamCount=teams.filter(t=>t.season_id===season.id).length;
+    activate.disabled=!(season.status==='upcoming'&&localToday>=season.starts_on&&localToday<=season.ends_on&&teamCount>0);
+    complete.disabled=!(season.status==='active'&&localToday>=season.ends_on);
+    $('c83LifecycleDetails').textContent=`${season.name} · ${season.status} · ${season.starts_on} to ${season.ends_on} · ${teamCount} team(s). ${activate.disabled?'Activation currently unavailable.':'Ready to activate.'} ${complete.disabled?'Completion currently unavailable.':'Ready to complete.'}`;
+  }
+  async function lifecycle(action){
+    const season=seasons.find(s=>s.id===$('c83LifecycleSeason').value);
+    if(!season)return;
+    const verb=action==='activate'?'ACTIVATE':'COMPLETE';
+    const note=action==='activate'?'This opens submissions for eligible members within the valid date window.':'This closes new submissions for the season. This action cannot be reversed from Campus HQ.';
+    if(!window.confirm(`${verb} ${season.name}?\n\n${note}`))return;
+    const activate=$('c83ActivateSeason'),complete=$('c83CompleteSeason');
+    activate.disabled=true;complete.disabled=true;
+    status('c83LifecycleFeedback',`${verb} request in progress...`);
+    try{
+      await call(action==='activate'?'admin_activate_crown_season':'admin_complete_crown_season',{p_season_id:season.id});
+      await reload();
+      status('c83LifecycleFeedback',`💗 ${season.name} ${action==='activate'?'activated':'completed'} successfully!`);
+    }catch(e){console.error('Crown lifecycle:',e);status('c83LifecycleFeedback','⚠️ '+err(e));}
+    finally{showLifecycle();}
+  }
+  function bindForm(id,feedback,fn){
+    $(id).addEventListener('submit',async event=>{
+      event.preventDefault();
+      const form=$(id),button=form.querySelector('button[type="submit"]');
+      button.disabled=true;status(feedback,'Saving to Monthly Crown...');
+      try{
+        await fn();
+        status(feedback,'💗 Saved successfully!');
+        await reload();
+      }catch(e){console.error('Crown administration:',e);status(feedback,'⚠️ '+err(e));}
+      finally{button.disabled=false;}
+    });
+  }
+  async function call(name,args){
+    const {data,error}=await client.rpc(name,args);
+    if(error)throw error;
+    if(data===false||data===null)throw new Error('Supabase did not confirm this change.');
+    return data;
+  }
+  async function init(){
+    client=window.BB_CAMPUS_CLIENT;
+    if(!client){status('c83AdminGate','⚠️ Campus database connection unavailable.');return;}
+    const {data,error}=await client.rpc('is_campus_admin');
+    if(error||data!==true){status('c83AdminGate','🔒 Season administration is reserved for campus administrators.');return;}
+    $('c83AdminContent').hidden=false;
+    status('c83AdminGate','💗 Administrator controls ready. New seasons start as upcoming.');
+    $('c83LifecycleSeason').addEventListener('change',showLifecycle);
+    $('c83ActivateSeason').addEventListener('click',()=>lifecycle('activate'));
+    $('c83CompleteSeason').addEventListener('click',()=>lifecycle('complete'));
+    $('c83EditSeasonSelect').addEventListener('change',showSeason);
+    $('c83EditTeamSeason').addEventListener('change',populateTeams);
+    $('c83EditTeamSelect').addEventListener('change',showTeam);
+    $('c83AdminReload').addEventListener('click',async()=>{try{await reload();status('c83AdminGate','💗 Season and team lists refreshed.');}catch(e){status('c83AdminGate','⚠️ '+err(e));}});
+    bindForm('c83CreateSeasonForm','c83CreateSeasonFeedback',async()=>{
+      await call('admin_create_crown_season',{p_name:$('c83NewSeasonName').value.trim(),p_starts_on:$('c83NewSeasonStart').value,p_ends_on:$('c83NewSeasonEnd').value});
+      $('c83CreateSeasonForm').reset();
+    });
+    bindForm('c83EditSeasonForm','c83EditSeasonFeedback',async()=>{
+      await call('admin_update_crown_season',{p_season_id:$('c83EditSeasonSelect').value,p_name:$('c83EditSeasonName').value.trim(),p_starts_on:$('c83EditSeasonStart').value,p_ends_on:$('c83EditSeasonEnd').value});
+    });
+    bindForm('c83CreateTeamForm','c83CreateTeamFeedback',async()=>{
+      await call('admin_create_crown_team',{p_season_id:$('c83NewTeamSeason').value,p_name:$('c83NewTeamName').value.trim(),p_emoji:$('c83NewTeamEmoji').value.trim()||'👑'});
+      $('c83NewTeamName').value='';
+    });
+    bindForm('c83EditTeamForm','c83EditTeamFeedback',async()=>{
+      await call('admin_update_crown_team',{p_team_id:$('c83EditTeamSelect').value,p_name:$('c83EditTeamName').value.trim(),p_emoji:$('c83EditTeamEmoji').value.trim()||'👑'});
+    });
+    try{await reload();}catch(e){status('c83AdminGate','⚠️ '+err(e));}
+  }
+  document.addEventListener('bb:campus-hq-ready',init,{once:true});
+})();
+</script>
+
+  <!-- PHASE 8.4D — COMMUNICATIONS STUDIO (uses existing authenticated HQ client) -->
+  <script>
+  (() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    let client = null, records = [], busy = false, admin = false;
+    const errorText = e => e?.message || String(e || 'Unknown error');
+    const say = (id, message) => { $(id).textContent = message; };
+    const fmt = v => v ? new Date(v).toLocaleString() : '—';
+    const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const activeRecord = () => records.find(r => r.id === $('commsEditingId').value);
+    const dateValue = iso => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0,16);
+    };
+    const validate = () => {
+      const title = $('commsTitle').value.trim(), message = $('commsMessage').value.trim();
+      if (!title || title.length > 150 || !message || message.length > 2000) {
+        throw new Error('Enter a title (1–150 characters) and message (1–2000 characters).');
+      }
+      return {title, message};
+    };
+    async function rpc(name, args) {
+      const {data,error} = await client.rpc(name,args);
+      if (error) throw error;
+      return data;
+    }
+    function reset() {
+      $('commsEditor').reset();
+      $('commsEditingId').value = '';
+      $('commsEditorMode').textContent = 'Creating a fresh announcement.';
+      $('commsSaveDraft').hidden = false;
+      $('commsScheduleBtn').hidden = false;
+      $('commsPublishBtn').hidden = false;
+      $('commsSaveEdit').hidden = true;
+      $('commsScheduleField').hidden = false;
+      say('commsFeedback','');
+    }
+    function edit(id) {
+      const record = records.find(r => r.id === id);
+      if (!record || record.publication_status === 'archived') return;
+      $('commsEditingId').value = record.id;
+      $('commsTitle').value = record.title;
+      $('commsMessage').value = record.message;
+      $('commsSchedule').value = dateValue(record.scheduled_for);
+      $('commsEditorMode').textContent = 'Editing ' + record.publication_status + ' announcement · ' + record.title;
+      $('commsSaveDraft').hidden = true;
+      $('commsScheduleBtn').hidden = record.publication_status === 'published';
+      $('commsPublishBtn').hidden = record.publication_status === 'published';
+      $('commsSaveEdit').hidden = false;
+      $('commsScheduleField').hidden = record.publication_status === 'published';
+      say('commsFeedback',record.publication_status === 'published' ? 'Changes update Campus Buzz only; previously delivered mail stays unchanged.' : 'Changes are not saved until you choose an action.');
+      document.getElementById('section-communications').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function render() {
+      for (const status of ['draft','scheduled','published','archived']) {
+        $( 'comms' + status[0].toUpperCase() + status.slice(1) + 'Count').textContent = records.filter(r => r.publication_status === status).length;
+      }
+      const filter = $('commsFilter').value, search = $('commsSearch').value.trim().toLowerCase();
+      const list = records.filter(r => (filter === 'all' || r.publication_status === filter) && (!search || (r.title + ' ' + r.message).toLowerCase().includes(search)));
+      const root = $('commsList'); root.replaceChildren();
+      if (!list.length) { const p = document.createElement('p'); p.className = 'empty'; p.textContent = 'No announcements match this view yet. 💗'; root.append(p); return; }
+      for (const r of list) {
+        const item = document.createElement('div'); item.className = 'item';
+        const title = document.createElement('h4'); title.textContent = r.title;
+        const tag = document.createElement('span'); tag.className = 'tag' + (r.publication_status === 'published' ? ' green' : r.publication_status === 'archived' ? ' gray' : ''); tag.textContent = r.publication_status.toUpperCase();
+        const body = document.createElement('p'); body.style.whiteSpace = 'pre-wrap'; body.textContent = r.message;
+        const meta = document.createElement('p'); meta.className = 'mini';
+        meta.textContent = 'Created ' + fmt(r.created_at) + (r.scheduled_for && r.publication_status === 'scheduled' ? ' · Scheduled ' + fmt(r.scheduled_for) : '') + (r.published_at ? ' · Published ' + fmt(r.published_at) : '') + (r.archived_at ? ' · Archived ' + fmt(r.archived_at) : '');
+        const actions = document.createElement('div'); actions.className = 'actions';
+        function add(label, action, cls='btn light') { const b = document.createElement('button'); b.type='button'; b.className=cls; b.textContent=label; b.addEventListener('click',action); actions.append(b); }
+        if (r.publication_status !== 'archived') add('✏️ Edit', () => edit(r.id));
+        if (r.publication_status === 'scheduled') add('↩️ Return to Draft', () => act('unschedule',r.id));
+        if (r.publication_status === 'draft' || r.publication_status === 'scheduled') add('📣 Publish Now', () => act('publish',r.id),'btn secondary');
+        if (r.publication_status !== 'archived') add('📦 Archive', () => act('archive',r.id),'btn danger');
+        item.append(title,tag,body,meta,actions); root.append(item);
+      }
+    }
+    async function refresh() {
+      say('commsRegistryStatus','Refreshing announcements...');
+      const {data,error} = await client.from('campus_announcements')
+        .select('id,title,message,publication_status,scheduled_for,published_at,created_at,updated_at,archived_at')
+        .order('created_at',{ascending:false}).limit(500);
+      if (error) throw error;
+      records = data || [];
+      render();
+      say('commsRegistryStatus',records.length + ' announcements loaded (latest 500).');
+    }
+    async function run(task, success) {
+      if (busy || !admin) return;
+      busy=true;
+      const buttons = $('commsWorkspace').querySelectorAll('button'); buttons.forEach(b=>b.disabled=true);
+      say('commsFeedback','Saving to Supabase...');
+      try { await task(); reset(); await refresh(); say('commsFeedback',success); }
+      catch(e) { say('commsFeedback','⚠️ ' + errorText(e)); }
+      finally { busy=false; buttons.forEach(b=>b.disabled=false); }
+    }
+    async function act(type,id) {
+      const r = records.find(x=>x.id===id); if (!r) return;
+      const prompts = {publish:'Publish "'+r.title+'" now and deliver Campus Mail to all approved Besties?',archive:'Archive "'+r.title+'"? Existing Campus Mail will remain.',unschedule:'Return "'+r.title+'" to drafts?'};
+      if (!window.confirm(prompts[type])) return;
+      const names = {publish:'admin_publish_campus_announcement',archive:'admin_archive_campus_announcement',unschedule:'admin_unschedule_campus_announcement'};
+      await run(()=>rpc(names[type],{p_announcement_id:id}), '💗 Announcement updated successfully.');
+    }
+    async function saveDraft() {
+      const {title,message}=validate();
+      await rpc('admin_create_campus_draft',{p_title:title,p_message:message});
+    }
+    async function saveEdit() {
+      const r = activeRecord(); if (!r) throw new Error('Choose an announcement to edit.');
+      const {title,message}=validate();
+      await rpc('admin_edit_campus_announcement',{p_announcement_id:r.id,p_title:title,p_message:message});
+    }
+    async function schedule() {
+      const {title,message}=validate();
+      const value = $('commsSchedule').value;
+      if (!value) throw new Error('Choose a future publication date and time.');
+      const time = new Date(value);
+      if (Number.isNaN(time.getTime()) || time.getTime() <= Date.now()) throw new Error('Choose a future date and time.');
+      const r = activeRecord();
+      if (r && r.publication_status === 'published') throw new Error('Published posts cannot be scheduled again.');
+      let id = r?.id;
+      if (id) await saveEdit();
+      else id = await rpc('admin_create_campus_draft',{p_title:title,p_message:message});
+      await rpc('admin_schedule_campus_announcement',{p_announcement_id:id,p_scheduled_for:time.toISOString()});
+    }
+    async function publish() {
+      const {title,message}=validate();
+      const r = activeRecord();
+      if (!window.confirm('Publish this announcement NOW and deliver a Campus Mail notification to every approved Bestie?')) return;
+      if (r) {
+        await saveEdit();
+        await rpc('admin_publish_campus_announcement',{p_announcement_id:r.id});
+      } else {
+        await rpc('send_campus_announcement',{p_title:title,p_message:message});
+      }
+    }
+    async function init() {
+      client = window.BB_CAMPUS_CLIENT;
+      if (!client) {say('commsGate','⚠️ Staff database connection unavailable.');return;}
+      const {data,error} = await client.rpc('is_campus_admin');
+      if (error) {say('commsGate','⚠️ Could not verify administrator access: '+errorText(error));return;}
+      admin = data === true;
+      if (!admin) {say('commsGate','🔒 Communications publishing is reserved for campus administrators.');return;}
+      $('commsWorkspace').hidden=false;
+      say('commsGate','💗 Administrator verified. Your publishing desk is ready!');
+      $('commsEditor').addEventListener('submit',e=>e.preventDefault());
+      $('commsSaveDraft').addEventListener('click',()=>run(saveDraft,'🎀 Draft saved!'));
+      $('commsSaveEdit').addEventListener('click',()=>run(saveEdit,'💗 Changes saved!'));
+      $('commsScheduleBtn').addEventListener('click',()=>run(schedule,'🗓️ Announcement scheduled!'));
+      $('commsPublishBtn').addEventListener('click',()=>run(publish,'📣 Announcement published and Campus Mail sent!'));
+      $('commsClear').addEventListener('click',reset);
+      $('commsRefresh').addEventListener('click',()=>refresh().catch(e=>say('commsRegistryStatus','⚠️ '+errorText(e))));
+      $('commsFilter').addEventListener('change',render);
+      $('commsSearch').addEventListener('input',render);
+      try { await refresh(); } catch(e) { say('commsRegistryStatus','⚠️ '+errorText(e)); }
+    }
+    document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
+  })();
+  </script>
+
+  <!-- LOAD ADMISSIONS LISTENER BEFORE AUTH GATE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/campus-admissions.js"></script>
+  <script src="js/campus-hq-auth.js"></script>
+  <script src="js/campus-overview.js"></script>
+  <script src="js/campus-announcements.js"></script>
+  <script src="js/campus-moderation.js"></script>
+  <script>
+    // Dorm Design Studio: uses existing HQ staff authentication and
+    // a database-enforced admin-only update RPC.
+    (() => {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      let client, admin = false, current = null, teams = [];
+      const hex = (v, fallback) => /^#[0-9a-fA-F]{6}$/.test(v || "") ? v : fallback;
+      const setStatus = message => { $("dormDesignStatus").textContent = message; };
+      const errorText = error => error?.message || "Unknown database error";
+
+      function preview() {
+        const primary = $("designPrimary").value;
+        const secondary = $("designSecondary").value;
+        const accent = $("designAccent").value;
+        const box = $("designPreview");
+        box.style.background = `linear-gradient(135deg, ${primary}, ${secondary})`;
+        box.style.borderColor = accent;
+        $("designPreviewName").textContent = $("designThemeName").value || "Your Dorm";
+        $("designPreviewDescription").textContent = $("designDescription").value || "Your cozy campus home";
+        const url = $("designBanner").value.trim();
+        const img = $("designPreviewBanner");
+        if (/^https:\/\//i.test(url)) {
+          img.src = url;
+          img.hidden = false;
+        } else {
+          img.hidden = true;
+          img.removeAttribute("src");
+        }
+      }
+
+      function fill() {
+        if (!current) return;
+        $("designThemeName").value = current.theme_name || "";
+        $("designDescription").value = current.description || "";
+        $("designPrimary").value = hex(current.primary_color, "#e8b4c8");
+        $("designSecondary").value = hex(current.secondary_color, "#fff3e6");
+        $("designAccent").value = hex(current.accent_color, "#c76b91");
+        $("designBanner").value = current.banner_url || "";
+        $("designSaveMessage").textContent = "";
+        preview();
+      }
+
+      async function selectTeam() {
+        const id = $("designTeam").value;
+        current = null;
+        $("dormDesignEditor").hidden = true;
+        if (!id) return;
+        setStatus("Loading this dorm's saved design...");
+        const { data, error } = await client.from("housing_dorm_settings")
+          .select("id,team_id,theme_name,description,primary_color,secondary_color,accent_color,banner_url")
+          .eq("team_id", id).maybeSingle();
+        if (error) { setStatus("Unable to load dorm settings: " + errorText(error)); return; }
+        if (!data) { setStatus("This team has no dorm settings yet."); return; }
+        current = data;
+        fill();
+        $("designVisit").href = `dorm.html?team=${encodeURIComponent(id)}`;
+        $("dormDesignEditor").hidden = false;
+        setStatus(admin ? "Ready to customize! Changes save to Supabase." : "Viewing existing dorm design. Admin access required to save.");
+      }
+
+      async function selectSeason() {
+        const seasonId = $("designSeason").value;
+        $("dormDesignEditor").hidden = true;
+        $("designTeam").replaceChildren(new Option("Choose a dorm", ""));
+        if (!seasonId) return;
+        setStatus("Loading season teams...");
+        const { data, error } = await client.from("crown_teams")
+          .select("id,name,emoji").eq("season_id", seasonId).order("name");
+        if (error) { setStatus("Unable to load teams: " + errorText(error)); return; }
+        teams = data || [];
+        teams.forEach(t => $("designTeam").add(new Option(`${t.emoji || "🏡"} ${t.name}`, t.id)));
+        setStatus(teams.length ? "Choose a team to customize its dorm." : "No teams for this season yet.");
+      }
 
       async function initialize() {
         // Existing campus-hq-auth.js fires this event only after staff approval.
