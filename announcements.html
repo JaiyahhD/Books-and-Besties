@@ -234,6 +234,12 @@
       </form>
     </section>
 
+    <section aria-labelledby="campusBuzzHeading">
+      <h2 id="campusBuzzHeading">💌 Campus Buzz · Official Notices</h2>
+      <p id="campusBuzzStatus" class="status" role="status">Loading official campus notices...</p>
+      <div id="campusBuzzFeed"></div>
+    </section>
+
     <section>
       <h2>Latest Campus News ✨</h2>
       <p id="announcementStatus" class="status">
@@ -364,6 +370,52 @@
           option.value = dorm.id;
           option.textContent = dormNames.get(dorm.id);
           scope.appendChild(option);
+        }
+      }
+
+      // Phase 8.4E: Official Campus Buzz is distinct from housing/dorm notices.
+      // Fetch only published, non-archived announcements, even for staff.
+      // Campus Mail is managed separately and is never modified here.
+      async function loadCampusBuzz() {
+        const buzzFeed = document.getElementById("campusBuzzFeed");
+        const buzzStatus = document.getElementById("campusBuzzStatus");
+        const { data, error } = await client
+          .from("campus_announcements")
+          .select("id, title, message, published_at")
+          .eq("publication_status", "published")
+          .not("published_at", "is", null)
+          .lte("published_at", new Date().toISOString())
+          .order("published_at", { ascending: false })
+          .limit(100);
+
+        buzzFeed.replaceChildren();
+        if (error) {
+          console.error("Campus Buzz loading error:", error);
+          buzzStatus.textContent = "Unable to load official Campus Buzz notices.";
+          return;
+        }
+        const items = data || [];
+        buzzStatus.textContent = items.length
+          ? `${items.length} official campus notice(s)`
+          : "No official Campus Buzz notices yet. Check back soon! 💗";
+        for (const item of items) {
+          const card = document.createElement("article");
+          card.className = "announcement";
+          const tag = document.createElement("div");
+          tag.className = "announcement-tag";
+          tag.textContent = "📬 OFFICIAL CAMPUS BUZZ";
+          const title = document.createElement("h3");
+          title.textContent = item.title;
+          const meta = document.createElement("div");
+          meta.className = "announcement-meta";
+          meta.textContent = item.published_at
+            ? new Date(item.published_at).toLocaleString()
+            : "";
+          const body = document.createElement("div");
+          body.className = "announcement-content";
+          body.textContent = item.message;
+          card.append(tag, title, meta, body);
+          buzzFeed.appendChild(card);
         }
       }
 
@@ -579,8 +631,8 @@ if (!item.is_published) {
       // Close loadAnnouncements() properly.
       }
 
-      // Load announcements when the page opens.
-      await loadAnnouncements();
+      // Load both independent announcement feeds.
+      await Promise.all([loadCampusBuzz(), loadAnnouncements()]);
 
       if (isStaff === true) {
         form.addEventListener("submit", async event => {

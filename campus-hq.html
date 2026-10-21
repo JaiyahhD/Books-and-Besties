@@ -655,6 +655,8 @@
             🏡 Dorm Assignments
           </button>
 
+          <button class="nav-btn" data-section="communications">📬 Communications Studio</button>
+
           <button class="nav-btn" data-section="commons">
             📣 Commons Moderation
           </button>
@@ -1337,6 +1339,48 @@
               <div class="panel-body">
                 <div id="assignmentRoster" aria-live="polite">Loading residents...</div>
               </div>
+            </div>
+          </section>
+
+          <!-- PHASE 8.4D: CAMPUS COMMUNICATIONS STUDIO -->
+          <section class="section" id="section-communications">
+            <h2 class="section-heading">📬 Campus Communications Studio</h2>
+            <p class="section-description">The Dean's publishing desk for campus-wide announcements. Draft, schedule, publish, edit and archive using your existing Campus Buzz and Campus Mail system.</p>
+            <p class="notice" id="commsGate" role="status" aria-live="polite">Checking administrator access...</p>
+            <div id="commsWorkspace" hidden>
+              <div class="stats">
+                <div class="stat"><strong id="commsDraftCount">—</strong><span>DRAFTS</span></div>
+                <div class="stat"><strong id="commsScheduledCount">—</strong><span>SCHEDULED</span></div>
+                <div class="stat"><strong id="commsPublishedCount">—</strong><span>LIVE ON BUZZ</span></div>
+                <div class="stat"><strong id="commsArchivedCount">—</strong><span>ARCHIVED</span></div>
+              </div>
+              <div class="panel"><div class="panel-head">💌 THE ANNOUNCEMENT ATELIER</div><div class="panel-body">
+                <form id="commsEditor">
+                  <input id="commsEditingId" type="hidden">
+                  <p class="mini" id="commsEditorMode">Creating a fresh announcement.</p>
+                  <label class="field"><span>Announcement title</span><input id="commsTitle" required maxlength="150" placeholder="Something fabulous is happening on campus..."></label>
+                  <label class="field"><span>Message for your Besties</span><textarea id="commsMessage" required maxlength="2000" style="min-height:160px" placeholder="Give the Besties all the details..."></textarea></label>
+                  <label class="field" id="commsScheduleField"><span>Scheduled publication (your local time)</span><input id="commsSchedule" type="datetime-local"></label>
+                  <p class="mini">Publishing sends individual Campus Mail messages to approved Besties. Editing a published Buzz post will not change mail already delivered. Scheduled posts are checked approximately every minute.</p>
+                  <div class="actions">
+                    <button class="btn light" type="button" id="commsSaveDraft">🎀 Save Draft</button>
+                    <button class="btn secondary" type="button" id="commsScheduleBtn">🗓️ Schedule</button>
+                    <button class="btn" type="button" id="commsPublishBtn">📣 Publish Now</button>
+                    <button class="btn light" type="button" id="commsSaveEdit" hidden>💗 Save Changes</button>
+                    <button class="btn light" type="button" id="commsClear">↩️ New Announcement</button>
+                  </div>
+                  <p id="commsFeedback" class="mini" role="status" aria-live="polite"></p>
+                </form>
+              </div></div>
+              <div class="panel"><div class="panel-head">📋 THE PUBLISHING REGISTRY</div><div class="panel-body">
+                <div class="form-grid">
+                  <label class="field"><span>View</span><select id="commsFilter"><option value="all">All announcements</option><option value="draft">🎀 Drafts</option><option value="scheduled">🗓️ Scheduled</option><option value="published">📣 Published</option><option value="archived">📦 Archived</option></select></label>
+                  <label class="field"><span>Search titles or messages</span><input type="search" id="commsSearch" placeholder="Find an announcement..."></label>
+                </div>
+                <div class="actions"><button class="btn light" id="commsRefresh" type="button">🔄 Refresh Publications</button></div>
+                <p id="commsRegistryStatus" class="mini" role="status" aria-live="polite"></p>
+                <div id="commsList" aria-live="polite"></div>
+              </div></div>
             </div>
           </section>
 
@@ -2425,6 +2469,169 @@
   document.addEventListener('bb:campus-hq-ready',init,{once:true});
 })();
 </script>
+
+  <!-- PHASE 8.4D — COMMUNICATIONS STUDIO (uses existing authenticated HQ client) -->
+  <script>
+  (() => {
+    'use strict';
+    const $ = id => document.getElementById(id);
+    let client = null, records = [], busy = false, admin = false;
+    const errorText = e => e?.message || String(e || 'Unknown error');
+    const say = (id, message) => { $(id).textContent = message; };
+    const fmt = v => v ? new Date(v).toLocaleString() : '—';
+    const escapeHtml = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const activeRecord = () => records.find(r => r.id === $('commsEditingId').value);
+    const dateValue = iso => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0,16);
+    };
+    const validate = () => {
+      const title = $('commsTitle').value.trim(), message = $('commsMessage').value.trim();
+      if (!title || title.length > 150 || !message || message.length > 2000) {
+        throw new Error('Enter a title (1–150 characters) and message (1–2000 characters).');
+      }
+      return {title, message};
+    };
+    async function rpc(name, args) {
+      const {data,error} = await client.rpc(name,args);
+      if (error) throw error;
+      return data;
+    }
+    function reset() {
+      $('commsEditor').reset();
+      $('commsEditingId').value = '';
+      $('commsEditorMode').textContent = 'Creating a fresh announcement.';
+      $('commsSaveDraft').hidden = false;
+      $('commsScheduleBtn').hidden = false;
+      $('commsPublishBtn').hidden = false;
+      $('commsSaveEdit').hidden = true;
+      $('commsScheduleField').hidden = false;
+      say('commsFeedback','');
+    }
+    function edit(id) {
+      const record = records.find(r => r.id === id);
+      if (!record || record.publication_status === 'archived') return;
+      $('commsEditingId').value = record.id;
+      $('commsTitle').value = record.title;
+      $('commsMessage').value = record.message;
+      $('commsSchedule').value = dateValue(record.scheduled_for);
+      $('commsEditorMode').textContent = 'Editing ' + record.publication_status + ' announcement · ' + record.title;
+      $('commsSaveDraft').hidden = true;
+      $('commsScheduleBtn').hidden = record.publication_status === 'published';
+      $('commsPublishBtn').hidden = record.publication_status === 'published';
+      $('commsSaveEdit').hidden = false;
+      $('commsScheduleField').hidden = record.publication_status === 'published';
+      say('commsFeedback',record.publication_status === 'published' ? 'Changes update Campus Buzz only; previously delivered mail stays unchanged.' : 'Changes are not saved until you choose an action.');
+      document.getElementById('section-communications').scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function render() {
+      for (const status of ['draft','scheduled','published','archived']) {
+        $( 'comms' + status[0].toUpperCase() + status.slice(1) + 'Count').textContent = records.filter(r => r.publication_status === status).length;
+      }
+      const filter = $('commsFilter').value, search = $('commsSearch').value.trim().toLowerCase();
+      const list = records.filter(r => (filter === 'all' || r.publication_status === filter) && (!search || (r.title + ' ' + r.message).toLowerCase().includes(search)));
+      const root = $('commsList'); root.replaceChildren();
+      if (!list.length) { const p = document.createElement('p'); p.className = 'empty'; p.textContent = 'No announcements match this view yet. 💗'; root.append(p); return; }
+      for (const r of list) {
+        const item = document.createElement('div'); item.className = 'item';
+        const title = document.createElement('h4'); title.textContent = r.title;
+        const tag = document.createElement('span'); tag.className = 'tag' + (r.publication_status === 'published' ? ' green' : r.publication_status === 'archived' ? ' gray' : ''); tag.textContent = r.publication_status.toUpperCase();
+        const body = document.createElement('p'); body.style.whiteSpace = 'pre-wrap'; body.textContent = r.message;
+        const meta = document.createElement('p'); meta.className = 'mini';
+        meta.textContent = 'Created ' + fmt(r.created_at) + (r.scheduled_for && r.publication_status === 'scheduled' ? ' · Scheduled ' + fmt(r.scheduled_for) : '') + (r.published_at ? ' · Published ' + fmt(r.published_at) : '') + (r.archived_at ? ' · Archived ' + fmt(r.archived_at) : '');
+        const actions = document.createElement('div'); actions.className = 'actions';
+        function add(label, action, cls='btn light') { const b = document.createElement('button'); b.type='button'; b.className=cls; b.textContent=label; b.addEventListener('click',action); actions.append(b); }
+        if (r.publication_status !== 'archived') add('✏️ Edit', () => edit(r.id));
+        if (r.publication_status === 'scheduled') add('↩️ Return to Draft', () => act('unschedule',r.id));
+        if (r.publication_status === 'draft' || r.publication_status === 'scheduled') add('📣 Publish Now', () => act('publish',r.id),'btn secondary');
+        if (r.publication_status !== 'archived') add('📦 Archive', () => act('archive',r.id),'btn danger');
+        item.append(title,tag,body,meta,actions); root.append(item);
+      }
+    }
+    async function refresh() {
+      say('commsRegistryStatus','Refreshing announcements...');
+      const {data,error} = await client.from('campus_announcements')
+        .select('id,title,message,publication_status,scheduled_for,published_at,created_at,updated_at,archived_at')
+        .order('created_at',{ascending:false}).limit(500);
+      if (error) throw error;
+      records = data || [];
+      render();
+      say('commsRegistryStatus',records.length + ' announcements loaded (latest 500).');
+    }
+    async function run(task, success) {
+      if (busy || !admin) return;
+      busy=true;
+      const buttons = $('commsWorkspace').querySelectorAll('button'); buttons.forEach(b=>b.disabled=true);
+      say('commsFeedback','Saving to Supabase...');
+      try { await task(); reset(); await refresh(); say('commsFeedback',success); }
+      catch(e) { say('commsFeedback','⚠️ ' + errorText(e)); }
+      finally { busy=false; buttons.forEach(b=>b.disabled=false); }
+    }
+    async function act(type,id) {
+      const r = records.find(x=>x.id===id); if (!r) return;
+      const prompts = {publish:'Publish "'+r.title+'" now and deliver Campus Mail to all approved Besties?',archive:'Archive "'+r.title+'"? Existing Campus Mail will remain.',unschedule:'Return "'+r.title+'" to drafts?'};
+      if (!window.confirm(prompts[type])) return;
+      const names = {publish:'admin_publish_campus_announcement',archive:'admin_archive_campus_announcement',unschedule:'admin_unschedule_campus_announcement'};
+      await run(()=>rpc(names[type],{p_announcement_id:id}), '💗 Announcement updated successfully.');
+    }
+    async function saveDraft() {
+      const {title,message}=validate();
+      await rpc('admin_create_campus_draft',{p_title:title,p_message:message});
+    }
+    async function saveEdit() {
+      const r = activeRecord(); if (!r) throw new Error('Choose an announcement to edit.');
+      const {title,message}=validate();
+      await rpc('admin_edit_campus_announcement',{p_announcement_id:r.id,p_title:title,p_message:message});
+    }
+    async function schedule() {
+      const {title,message}=validate();
+      const value = $('commsSchedule').value;
+      if (!value) throw new Error('Choose a future publication date and time.');
+      const time = new Date(value);
+      if (Number.isNaN(time.getTime()) || time.getTime() <= Date.now()) throw new Error('Choose a future date and time.');
+      const r = activeRecord();
+      if (r && r.publication_status === 'published') throw new Error('Published posts cannot be scheduled again.');
+      let id = r?.id;
+      if (id) await saveEdit();
+      else id = await rpc('admin_create_campus_draft',{p_title:title,p_message:message});
+      await rpc('admin_schedule_campus_announcement',{p_announcement_id:id,p_scheduled_for:time.toISOString()});
+    }
+    async function publish() {
+      const {title,message}=validate();
+      const r = activeRecord();
+      if (!window.confirm('Publish this announcement NOW and deliver a Campus Mail notification to every approved Bestie?')) return;
+      if (r) {
+        await saveEdit();
+        await rpc('admin_publish_campus_announcement',{p_announcement_id:r.id});
+      } else {
+        await rpc('send_campus_announcement',{p_title:title,p_message:message});
+      }
+    }
+    async function init() {
+      client = window.BB_CAMPUS_CLIENT;
+      if (!client) {say('commsGate','⚠️ Staff database connection unavailable.');return;}
+      const {data,error} = await client.rpc('is_campus_admin');
+      if (error) {say('commsGate','⚠️ Could not verify administrator access: '+errorText(error));return;}
+      admin = data === true;
+      if (!admin) {say('commsGate','🔒 Communications publishing is reserved for campus administrators.');return;}
+      $('commsWorkspace').hidden=false;
+      say('commsGate','💗 Administrator verified. Your publishing desk is ready!');
+      $('commsEditor').addEventListener('submit',e=>e.preventDefault());
+      $('commsSaveDraft').addEventListener('click',()=>run(saveDraft,'🎀 Draft saved!'));
+      $('commsSaveEdit').addEventListener('click',()=>run(saveEdit,'💗 Changes saved!'));
+      $('commsScheduleBtn').addEventListener('click',()=>run(schedule,'🗓️ Announcement scheduled!'));
+      $('commsPublishBtn').addEventListener('click',()=>run(publish,'📣 Announcement published and Campus Mail sent!'));
+      $('commsClear').addEventListener('click',reset);
+      $('commsRefresh').addEventListener('click',()=>refresh().catch(e=>say('commsRegistryStatus','⚠️ '+errorText(e))));
+      $('commsFilter').addEventListener('change',render);
+      $('commsSearch').addEventListener('input',render);
+      try { await refresh(); } catch(e) { say('commsRegistryStatus','⚠️ '+errorText(e)); }
+    }
+    document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
+  })();
+  </script>
 
   <!-- LOAD ADMISSIONS LISTENER BEFORE AUTH GATE -->
 
