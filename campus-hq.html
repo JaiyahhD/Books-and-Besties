@@ -1703,6 +1703,12 @@
       return;
     }
 
+    if (window.BB_READING_SOCIAL_BUILDER &&
+        !await window.BB_READING_SOCIAL_BUILDER.validateAndSync()) {
+      message("⚠️ Review your Reading Social Design Studio.");
+      return;
+    }
+
     if (window.BB_GLAM_STUDIO) window.BB_GLAM_STUDIO.validateAndSync();
 
     const id = $("activityId").value || null;
@@ -3625,6 +3631,216 @@ sync();feedback.textContent='💗 Side Quest configuration ready to save!';retur
 function refresh(force=false){if(!root)return;root.hidden=!selected();if(!selected()){activeKey='';return;}const key=$('activityId').value+':'+$('activityTemplate').value;if(force||key!==activeKey){activeKey=key;load();const id=$('activityId').value;if(id){window.__bbSQOriginal??={};const c=parse();window.__bbSQOriginal[id]={participation_mode:c.participation_mode==='community'?'community':'individual',missions:Array.isArray(c.missions)?c.missions.map(m=>({id:m.id})):[]};}}}
 function init(){if(loaded||!$('activityTemplateConfig'))return;loaded=true;root=document.createElement('section');root.id='sideQuestVisualBuilder';root.className='item';root.hidden=true;const h=document.createElement('h3');h.textContent='☕ Side Quest Design Studio';const intro=document.createElement('p');intro.className='mini';intro.textContent='Create a fresh quest for each activity. Each mission gets a permanent ID so progress stays connected to the right challenge.';const modeField=document.createElement('label');modeField.className='field';modeField.innerHTML='<span>Adventure participation</span>';mode=document.createElement('select');mode.id='sqMode';mode.add(new Option('🎀 Individual — each Bestie has their own board','individual'));mode.add(new Option('👑 Community — one shared board','community'));mode.addEventListener('change',sync);modeField.append(mode);const rule=document.createElement('label');rule.className='field';rule.innerHTML='<span>💌 Quest instructions</span>';instructions=document.createElement('textarea');instructions.maxLength=3000;instructions.placeholder='Tell your Besties how to play...';instructions.addEventListener('input',sync);rule.append(instructions);const missionHeading=document.createElement('h4');missionHeading.textContent='🎮 Missions';rows=document.createElement('div');const add=button('＋ Add Mission',()=>{if(missions.length>=40)return;missions.push({id:uid(),icon:'✨',title:'',desc:''});draw();sync();},'btn secondary');const stampHeading=document.createElement('h4');stampHeading.textContent='🏅 Collectible Stamps';stamps=document.createElement('div');const addStamp=button('＋ Add Stamp',()=>{milestones.push({count:Math.min(missions.length,1),emoji:'🎀',title:''});drawStamps();sync();});feedback=document.createElement('p');feedback.className='mini';feedback.setAttribute('role','status');const note=document.createElement('p');note.className='mini';note.textContent='🔒 Once anyone starts, participation mode and mission identities are locked. A private diary remains available in either mode. Your Glam Studio settings stay intact.';root.append(h,intro,modeField,rule,missionHeading,rows,add,stampHeading,stamps,addStamp,note,feedback);$('activityTemplateConfig').closest('.field').before(root);$('activityFormat').addEventListener('change',()=>refresh(true));$('activityTemplate').addEventListener('change',()=>refresh(true));$('activityList').addEventListener('click',e=>{if(e.target.closest('button')?.textContent.includes('Edit'))setTimeout(()=>refresh(true),0);});$('clearActivity').addEventListener('click',()=>setTimeout(()=>refresh(true),0));window.BB_SIDE_QUEST_BUILDER={validateAndSync:validate};refresh(true);}
 document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
+})();
+</script>
+<script>
+/* PHASE 8.1K-B — READING SOCIAL DESIGN STUDIO */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const uuid = () => crypto.randomUUID();
+  const button = (label, click, cls = 'btn light') => {
+    const el = document.createElement('button');
+    el.type = 'button'; el.className = cls; el.textContent = label;
+    el.addEventListener('click', click); return el;
+  };
+  const field = (label, value, max = 250, kind = 'input') => {
+    const wrap = document.createElement('label'); wrap.className = 'field';
+    const name = document.createElement('span'); name.textContent = label;
+    const el = document.createElement(kind); el.value = value ?? '';
+    el.maxLength = max; wrap.append(name, el);
+    return {wrap, el};
+  };
+  const defaults = {
+    lounge: [{id:uuid(), emoji:'💌', title:'Bookish Confessions', description:'What fictional character has your whole heart?'},
+      {id:uuid(), emoji:'☕', title:'Spill the Bookish Tea', description:'Share your latest bookish hot take.'}],
+    challenge: [{id:uuid(), emoji:'💌', title:'Recommend a Hidden Gem', description:'Share an underrated book with the Besties.', completion_type:'response'},
+      {id:uuid(), emoji:'🎀', title:'Spread the Love', description:'React to a Bestie’s recommendation.', completion_type:'checkoff'}]
+  };
+  let root, mode, instructions, itemsBox, stampsBox, addItem, stampSection, feedback;
+  let prompts = [], missions = [], stamps = [], initialized = false, activeKey = '', original = null;
+  const config = () => {
+    try { const x = JSON.parse($('activityTemplateConfig').value || '{}');
+      return x && typeof x === 'object' && !Array.isArray(x) ? x : {}; }
+    catch { return {}; }
+  };
+  function selected() {
+    const opt = $('activityTemplate')?.selectedOptions?.[0];
+    return $('activityFormat')?.value === 'template' && !!opt &&
+      /reading\s*social/i.test(opt.textContent);
+  }
+  function data() { return mode.value === 'lounge' ? prompts : missions; }
+  function sync() {
+    if (!selected()) return true;
+    const c = config();
+    c.social_mode = mode.value;
+    c.instructions = instructions.value.trim();
+    c.prompts = prompts.map(x => ({id:x.id,emoji:x.emoji.trim(),title:x.title.trim(),description:x.description.trim()}));
+    c.missions = missions.map(x => ({id:x.id,emoji:x.emoji.trim(),title:x.title.trim(),description:x.description.trim(),completion_type:x.completion_type}));
+    c.stamp_levels = stamps.map(x => ({count:Number(x.count),emoji:x.emoji.trim(),title:x.title.trim()}));
+    $('activityTemplateConfig').value = JSON.stringify(c, null, 2);
+    return true;
+  }
+  function render() {
+    if (!itemsBox) return;
+    itemsBox.replaceChildren();
+    const arr = data();
+    arr.forEach((entry, index) => {
+      const card = document.createElement('div'); card.className = 'item';
+      const heading = document.createElement('h4');
+      heading.textContent = (mode.value === 'lounge' ? '💬 PROMPT ' : '🎯 MISSION ') + (index + 1);
+      const grid = document.createElement('div'); grid.className = 'form-grid';
+      for (const [key, label, max, kind] of [
+        ['emoji','Emoji',16,'input'], ['title','Title',120,'input'],
+        ['description',mode.value === 'lounge' ? 'Discussion question / prompt' : 'Mission instructions',1000,'textarea']
+      ]) {
+        const f = field(label,entry[key],max,kind);
+        f.el.addEventListener('input', () => {entry[key] = f.el.value; sync();});
+        grid.append(f.wrap);
+      }
+      if (mode.value === 'challenge') {
+        const f = field('Proof required', '', 50);
+        const select = document.createElement('select');
+        select.add(new Option('🎀 Simple checkoff', 'checkoff'));
+        select.add(new Option('💌 Required written response', 'response'));
+        select.value = entry.completion_type === 'response' ? 'response' : 'checkoff';
+        select.addEventListener('change', () => {entry.completion_type = select.value; sync();});
+        f.el.replaceWith(select); grid.append(f.wrap);
+      }
+      const actions = document.createElement('div'); actions.className = 'actions';
+      actions.append(
+        button('↑ Up', () => move(index,-1)),
+        button('↓ Down', () => move(index,1)),
+        button('✕ Remove', () => {arr.splice(index,1); render(); sync();},'btn danger')
+      );
+      card.append(heading,grid,actions); itemsBox.append(card);
+    });
+    addItem.textContent = mode.value === 'lounge' ? '＋ Add Discussion Prompt' : '＋ Add Social Mission';
+    stampSection.hidden = mode.value !== 'challenge';
+    renderStamps();
+  }
+  function move(index, delta) {
+    const arr = data(), next = index + delta;
+    if (next < 0 || next >= arr.length) return;
+    [arr[index],arr[next]] = [arr[next],arr[index]];
+    render(); sync();
+  }
+  function renderStamps() {
+    stampsBox.replaceChildren();
+    stamps.forEach((entry,index) => {
+      const card = document.createElement('div'); card.className = 'item';
+      const grid = document.createElement('div'); grid.className = 'form-grid';
+      for (const [key,label,max] of [['count','Completed missions required',3],['emoji','Stamp emoji',16],['title','Stamp name',100]]) {
+        const f = field(label,String(entry[key]),max);
+        if (key === 'count') { f.el.type = 'number'; f.el.min = '1'; f.el.max = '40'; }
+        f.el.addEventListener('input', () => {entry[key] = key === 'count' ? Number(f.el.value) : f.el.value; sync();});
+        grid.append(f.wrap);
+      }
+      card.append(grid,button('✕ Remove Stamp',() => {stamps.splice(index,1); renderStamps(); sync();},'btn danger'));
+      stampsBox.append(card);
+    });
+  }
+  function load() {
+    const c = config();
+    mode.value = c.social_mode === 'challenge' ? 'challenge' : 'lounge';
+    instructions.value = typeof c.instructions === 'string' ? c.instructions : '';
+    prompts = Array.isArray(c.prompts) ? c.prompts.map(x => ({id:x.id || uuid(),emoji:x.emoji || '💬',title:x.title || '',description:x.description ?? x.desc ?? ''}))
+      : defaults.lounge.map(x => ({...x,id:uuid()}));
+    missions = Array.isArray(c.missions) ? c.missions.map(x => ({id:x.id || uuid(),emoji:x.emoji || '🎯',title:x.title || '',description:x.description ?? x.desc ?? '',completion_type:x.completion_type === 'response' ? 'response' : 'checkoff'}))
+      : defaults.challenge.map(x => ({...x,id:uuid()}));
+    stamps = Array.isArray(c.stamp_levels) ? c.stamp_levels.map(x => ({count:Number(x.count),emoji:x.emoji || '🏅',title:x.title || ''}))
+      : [{count:1,emoji:'💌',title:'SOCIAL SWEETHEART'},{count:2,emoji:'👑',title:'SOCIAL BUTTERFLY'}];
+    original = {mode:mode.value,prompts:prompts.map(x=>x.id),missions:missions.map(x=>[x.id,x.completion_type])};
+    render(); feedback.textContent = '💗 Customize your Reading Social. Each prompt or mission has its own permanent ID.';
+  }
+  function refresh(force=false) {
+    if (!root) return;
+    root.hidden = !selected();
+    if (!selected()) {activeKey=''; return;}
+    const key = $('activityId').value + ':' + $('activityTemplate').value;
+    if (force || activeKey !== key) {activeKey=key; load();}
+  }
+  async function validate() {
+    if (!selected()) return true;
+    const arr = data();
+    if (arr.length < 1 || arr.length > 40 ||
+        arr.some(x => !x.id || !x.emoji.trim() || !x.title.trim() || !x.description.trim()) ||
+        new Set(arr.map(x => x.id)).size !== arr.length) {
+      feedback.textContent = '⚠️ Add 1–40 complete prompts or missions, with emoji, title and instructions.';
+      return false;
+    }
+    if (mode.value === 'challenge' && stamps.some(x => !Number.isInteger(Number(x.count)) ||
+      Number(x.count) < 1 || Number(x.count) > missions.length || !x.emoji.trim() || !x.title.trim())) {
+      feedback.textContent = '⚠️ Each stamp needs a name, emoji and milestone within the mission count.';
+      return false;
+    }
+    const id = $('activityId').value;
+    if (id) {
+      const client = window.BB_CAMPUS_CLIENT;
+      if (!client) {feedback.textContent = '⚠️ Staff database connection unavailable.'; return false;}
+      const tables = ['campus_social_responses','campus_social_replies','campus_social_reactions','campus_social_completions'];
+      const results = await Promise.all(tables.map(t => client.from(t).select('id',{head:true,count:'exact'}).eq('activity_id',id)));
+      if (results.some(r=>r.error)) {
+        feedback.textContent = '⚠️ Could not verify existing participation. Saving is blocked for safety.'; return false;
+      }
+      if (results.some(r=>r.count > 0)) {
+        const now = {mode:mode.value,prompts:prompts.map(x=>x.id),missions:missions.map(x=>[x.id,x.completion_type])};
+        if (!original || JSON.stringify(now) !== JSON.stringify(original)) {
+          feedback.textContent = '🔒 Once members participate, social mode, prompt/mission IDs and completion types are locked. Wording, stamps and theme remain editable.';
+          return false;
+        }
+      }
+    }
+    sync(); feedback.textContent = '💗 Reading Social is ready to save!'; return true;
+  }
+  function init() {
+    if (initialized || !$('activityTemplateConfig')) return;
+    initialized = true;
+    root = document.createElement('section'); root.id='readingSocialVisualBuilder';
+    root.className = 'item'; root.hidden = true;
+    const title = document.createElement('h3'); title.textContent = '💌 Reading Social Design Studio';
+    const intro = document.createElement('p'); intro.className = 'mini';
+    intro.textContent = 'Choose an interactive discussion lounge or a personal social challenge. Design each activity without editing JSON.';
+    const modeField = field('Social experience', '', 50);
+    mode = document.createElement('select'); mode.id='socialMode';
+    mode.add(new Option('💬 Social Lounge — prompts, replies & reactions','lounge'));
+    mode.add(new Option('🎯 Social Challenge — missions, proof & stamps','challenge'));
+    modeField.el.replaceWith(mode);
+    mode.addEventListener('change',()=>{render();sync();});
+    const instructionField = field('Welcome message & instructions','',3000,'textarea');
+    instructions = instructionField.el;
+    instructions.placeholder = 'Welcome to our bookish social!';
+    instructions.addEventListener('input',sync);
+    itemsBox = document.createElement('div');
+    addItem = button('＋ Add Prompt',()=>{
+      if (data().length >= 40) return;
+      if (mode.value === 'lounge') prompts.push({id:uuid(),emoji:'💬',title:'',description:''});
+      else missions.push({id:uuid(),emoji:'🎯',title:'',description:'',completion_type:'checkoff'});
+      render();sync();
+    },'btn secondary');
+    stampSection = document.createElement('section');
+    const stampTitle = document.createElement('h4'); stampTitle.textContent = '🏅 Achievement Stamps';
+    const stampInfo = document.createElement('p'); stampInfo.className = 'mini';
+    stampInfo.textContent = 'Stamps unlock from personal mission completion. Written-response missions count when a response is saved.';
+    stampsBox = document.createElement('div');
+    const addStamp = button('＋ Add Stamp',()=>{stamps.push({count:1,emoji:'🎀',title:''});renderStamps();sync();});
+    stampSection.append(stampTitle,stampInfo,stampsBox,addStamp);
+    feedback = document.createElement('p'); feedback.className='mini';
+    feedback.setAttribute('role','status'); feedback.setAttribute('aria-live','polite');
+    const note = document.createElement('p'); note.className='mini';
+    note.textContent = '🔒 After the first interaction, social mode, prompt/mission identities and proof requirements are locked. Glam Studio colors are saved separately in the same activity configuration.';
+    root.append(title,intro,modeField.wrap,instructionField.wrap,itemsBox,addItem,stampSection,note,feedback);
+    $('activityTemplateConfig').closest('.field').before(root);
+    $('activityFormat').addEventListener('change',()=>refresh(true));
+    $('activityTemplate').addEventListener('change',()=>refresh(true));
+    $('activityList').addEventListener('click',e=>{
+      if (e.target.closest('button')?.textContent.includes('Edit')) setTimeout(()=>refresh(true),0);
+    });
+    $('clearActivity').addEventListener('click',()=>setTimeout(()=>refresh(true),0));
+    window.BB_READING_SOCIAL_BUILDER = {validateAndSync:validate};
+    refresh(true);
+  }
+  document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
 })();
 </script>
 </body>
