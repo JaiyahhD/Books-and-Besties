@@ -556,10 +556,54 @@ footer {
 
     </section>
 
-    <section
-      class="grid"
-      aria-label="Campus activity directory"
+    
+<!-- PHASE 8.1E — LIVE CAMPUS ACTIVITY DIRECTORY -->
+
+<section
+  class="access-section"
+  id="campusActivityDirectory"
+  aria-labelledby="campusActivityHeading"
+>
+  <h2 class="section-title" id="campusActivityHeading">
+    🎮 The Bestie Playground
+  </h2>
+
+  <p class="access-lead">
+    Your next bookish adventure is waiting!
+    Explore the activities currently available
+    to you, straight from Campus HQ. 💗
+  </p>
+
+  <div class="access-toolbar">
+    <span class="pill">
+      ✨ LIVE CAMPUS ACTIVITIES
+    </span>
+
+    <button
+      class="btn access-secondary"
+      type="button"
+      id="refreshLiveActivities"
+      aria-controls="liveActivitiesGrid"
     >
+      ↻ Refresh Activities
+    </button>
+  </div>
+
+  <p
+    id="liveActivitiesStatus"
+    role="status"
+    aria-live="polite"
+  >
+    💌 Preparing your next adventure...
+  </p>
+
+  <div
+    id="liveActivitiesGrid"
+    class="grid"
+    aria-busy="false"
+  ></div>
+</section>
+
 
      
       <!-- NOVEMBER BINGO -->
@@ -732,13 +776,22 @@ footer {
 
           <h3>New adventures every month ♡</h3>
 
+          
           <p>
-            Our admins will be able to publish new
-            activities, update instructions, announce
-            dates, and archive completed events directly
-            through Campus HQ once the activity management
-            system is connected.
+            Campus HQ is officially connected! 🎀
+            Our admins and moderators can now manage
+            activity announcements, descriptions,
+            publication dates, and custom-coded
+            activity links in one place.
           </p>
+
+          <p>
+            <strong>More magic is on the way:</strong>
+            Interactive no-code activity templates
+            and additional bookish adventures
+            are joining the campus lineup! 💗
+          </p>
+
 
           <p>
             <strong>Coming next:</strong>
@@ -991,6 +1044,447 @@ footer {
       status('⚠️ Could not initialize Bestie Access: '+errorText(error));
     }
   });
+})();
+</script>
+
+
+<script>
+/* ==========================================
+   BESTIE UNIVERSITY — PHASE 8.1E
+   LIVE MEMBER-FACING ACTIVITY DIRECTORY
+
+   Uses Supabase RLS for activity visibility.
+   Preserves Bestie Access event registration.
+   ========================================== */
+
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  let client = null;
+  let loading = false;
+  let initialized = false;
+
+  const activityStyles = {
+    bingo: {
+      emoji: "🍪",
+      art: "bingo",
+      label: "BINGO"
+    },
+    "side quest": {
+      emoji: "☕",
+      art: "quest",
+      label: "SIDE QUEST"
+    },
+    "alphabet rush": {
+      emoji: "🔤",
+      art: "alphabet",
+      label: "ALPHABET RUSH"
+    },
+    fantasy: {
+      emoji: "🪄",
+      art: "quest",
+      label: "FANTASY"
+    },
+    romance: {
+      emoji: "💌",
+      art: "bingo",
+      label: "ROMANCE"
+    },
+    mystery: {
+      emoji: "🔎",
+      art: "alphabet",
+      label: "MYSTERY"
+    },
+    other: {
+      emoji: "📚",
+      art: "bingo",
+      label: "CAMPUS ACTIVITY"
+    }
+  };
+
+  function element(tag, className = "", text = null) {
+    const node = document.createElement(tag);
+
+    if (className) {
+      node.className = className;
+    }
+
+    if (text !== null) {
+      node.textContent = text;
+    }
+
+    return node;
+  }
+
+  function setStatus(message) {
+    const node = $("liveActivitiesStatus");
+
+    if (node) {
+      node.textContent = message;
+    }
+  }
+
+  function formatDate(value) {
+    if (!value) return null;
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  function getStyle(activity) {
+    const type = String(
+      activity.activity_type || "other"
+    ).toLowerCase().trim();
+
+    return activityStyles[type] || activityStyles.other;
+  }
+
+  function safeActivityPath(value) {
+    if (typeof value !== "string") return null;
+
+    const path = value.trim();
+
+    if (
+      !path ||
+      path.startsWith("/") ||
+      path.includes("..") ||
+      path.includes("\\") ||
+      path.includes("?") ||
+      path.includes("#") ||
+      !/^[a-zA-Z0-9_/-]+\.html$/.test(path)
+    ) {
+      return null;
+    }
+
+    return path;
+  }
+
+  function makeActivityCard(activity) {
+    const style = getStyle(activity);
+
+    const card = element("article", "card");
+
+    const art = element(
+      "div",
+      "card-art " + style.art
+    );
+
+    art.setAttribute("aria-hidden", "true");
+
+    art.append(
+      element("span", "", style.emoji)
+    );
+
+    const body = element("div", "card-body");
+
+    const badge = element(
+      "span",
+      "pill",
+      "✨ " + style.label
+    );
+
+    body.append(badge);
+
+    body.append(
+      element("h3", "", activity.title || "Campus Activity")
+    );
+
+    if (activity.description) {
+      body.append(
+        element("p", "", activity.description)
+      );
+    }
+
+    const dates = [];
+
+    if (activity.starts_at) {
+      dates.push(
+        "Starts " + formatDate(activity.starts_at)
+      );
+    }
+
+    if (activity.ends_at) {
+      dates.push(
+        "Ends " + formatDate(activity.ends_at)
+      );
+    }
+
+    if (dates.length) {
+      body.append(
+        element(
+          "div",
+          "access-meta",
+          "📅 " + dates.join(" · ")
+        )
+      );
+    }
+
+    if (activity.eligibility === "honors_only") {
+      body.append(
+        element(
+          "div",
+          "access-meta",
+          "💎 Honors Society Exclusive"
+        )
+      );
+    }
+
+    if (activity.eligibility === "monthly_crown_only") {
+      body.append(
+        element(
+          "div",
+          "access-meta",
+          "👑 Monthly Crown Participants"
+        )
+      );
+    }
+
+    const isTemplate = activity.format === "template";
+
+    if (isTemplate) {
+      // Template configuration is saved in Campus HQ,
+      // but the playable template renderer is not built yet.
+      const button = element(
+        "span",
+        "btn",
+        "🎀 Interactive Activity Coming Soon"
+      );
+
+      button.style.opacity = "0.7";
+      button.style.cursor = "default";
+
+      body.append(button);
+    } else {
+      const path = safeActivityPath(
+        activity.custom_page_path
+      );
+
+      if (path) {
+        const link = element(
+          "a",
+          "btn",
+          style.emoji + " Enter Activity ↗"
+        );
+
+        link.href = path;
+        link.rel = "noopener noreferrer";
+
+        body.append(link);
+      } else {
+        const notice = element(
+          "p",
+          "access-meta",
+          "💌 This activity's page is being prepared."
+        );
+
+        body.append(notice);
+      }
+    }
+
+    card.append(art, body);
+
+    return card;
+  }
+
+  async function loadActivities() {
+    if (!client || loading) return;
+
+    loading = true;
+
+    const grid = $("liveActivitiesGrid");
+    const refresh = $("refreshLiveActivities");
+
+    refresh.disabled = true;
+    grid.setAttribute("aria-busy", "true");
+
+    setStatus("💌 Checking Campus HQ for new adventures...");
+
+    try {
+      /*
+       * Supabase RLS is authoritative:
+       *
+       * - Approved membership required
+       * - Staff can view all records
+       * - Members see eligible published/scheduled records
+       * - Honors-only activities require Honors access
+       * - Monthly Crown-only activities remain restricted
+       *   until enrollment verification is connected
+       */
+
+      const { data, error } = await client
+        .from("campus_activities")
+        .select(
+          "id,title,description,activity_type,format," +
+          "custom_page_path,eligibility,status," +
+          "starts_at,ends_at,publish_at,created_at"
+        )
+        .in("status", ["published", "scheduled"])
+        .order("created_at", {
+          ascending: false
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      const now = Date.now();
+
+      // Additional display filtering.
+      // Database RLS remains the actual security boundary.
+      const visible = (data || []).filter(activity => {
+        if (
+          activity.publish_at &&
+          new Date(activity.publish_at).getTime() > now
+        ) {
+          return false;
+        }
+
+        if (
+          activity.ends_at &&
+          new Date(activity.ends_at).getTime() <= now
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      grid.replaceChildren();
+
+      if (!visible.length) {
+        const empty = element(
+          "div",
+          "access-empty",
+          "🎀 No campus activities are open right now. " +
+          "Your next Bestie adventure is brewing!"
+        );
+
+        grid.append(empty);
+
+        setStatus(
+          "💗 No activities available right now. Check back soon!"
+        );
+
+        return;
+      }
+
+      visible.forEach(activity => {
+        grid.append(
+          makeActivityCard(activity)
+        );
+      });
+
+      const count = visible.length;
+
+      setStatus(
+        "💗 " + count + " " +
+        (count === 1 ? "activity" : "activities") +
+        " ready for your next adventure!"
+      );
+
+    } catch (error) {
+      console.error(
+        "Campus Activities live directory:",
+        error
+      );
+
+      grid.replaceChildren(
+        element(
+          "div",
+          "access-empty",
+          "💌 We couldn't load your activities. " +
+          "Please try refreshing."
+        )
+      );
+
+      setStatus(
+        "⚠️ Could not load activities: " +
+        (error?.message || "Please try again.")
+      );
+
+    } finally {
+      loading = false;
+
+      refresh.disabled = false;
+      grid.setAttribute("aria-busy", "false");
+    }
+  }
+
+  async function initialize() {
+    if (initialized) return;
+
+    initialized = true;
+
+    const refresh = $("refreshLiveActivities");
+
+    refresh.addEventListener(
+      "click",
+      loadActivities
+    );
+
+    try {
+      const config = window.BB_CONFIG;
+
+      if (
+        !config?.SUPABASE_URL ||
+        !config?.SUPABASE_ANON_KEY ||
+        !window.supabase?.createClient
+      ) {
+        throw new Error(
+          "Supabase configuration is unavailable."
+        );
+      }
+
+      client = window.supabase.createClient(
+        config.SUPABASE_URL,
+        config.SUPABASE_ANON_KEY
+      );
+
+      const { data, error } = await client.auth.getUser();
+
+      if (error || !data?.user) {
+        throw error || new Error(
+          "Please sign in to view campus activities."
+        );
+      }
+
+      await loadActivities();
+
+    } catch (error) {
+      console.error(
+        "Live Activity Manager connection:",
+        error
+      );
+
+      setStatus(
+        "⚠️ " +
+        (error?.message || "Unable to load activities.")
+      );
+    }
+  }
+
+  /*
+   * This event is dispatched only after the
+   * existing campus-guard approves the member.
+   */
+
+  document.addEventListener(
+    "bb:activities-approved",
+    initialize,
+    { once: true }
+  );
+
 })();
 </script>
 
