@@ -1212,6 +1212,13 @@
                   </form>
                 </div></div>
               </div>
+              <div class="panel"><div class="panel-head">🔐 SEASON LIFECYCLE · ACTIVATE & COMPLETE</div><div class="panel-body">
+                <p class="mini">Activation is allowed only during the season dates and after at least one team exists. Completion is allowed only on or after the end date. These actions cannot be undone here. Official scoring stays unchanged.</p>
+                <label class="field"><span>Choose season</span><select id="c83LifecycleSeason" required></select></label>
+                <p class="mini" id="c83LifecycleDetails" role="status"></p>
+                <div class="actions"><button class="btn secondary" id="c83ActivateSeason" type="button">👑 Activate Season</button><button class="btn light" id="c83CompleteSeason" type="button">🏁 Complete Season</button></div>
+                <p class="mini" id="c83LifecycleFeedback" role="status"></p>
+              </div></div>
               <div class="panel"><div class="panel-head">📋 EXISTING CROWN SEASONS</div><div class="panel-body"><div id="c83AdminSeasons" class="mini"></div><div class="actions"><button id="c83AdminReload" class="btn light" type="button">🔄 Refresh Seasons & Teams</button><button class="btn light" type="button" data-jump="crown">👑 Open Command Center</button></div></div></div>
             </div>
           </section>
@@ -2327,6 +2334,10 @@
     select('c83NewTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
     select('c83EditTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
     showSeason();populateTeams();
+    const oldLifecycle=$('c83LifecycleSeason').value;
+    select('c83LifecycleSeason',seasons,'Choose a season',s=>`${s.name} · ${s.status}`);
+    if(seasons.some(s=>s.id===oldLifecycle))$('c83LifecycleSeason').value=oldLifecycle;
+    showLifecycle();
     const box=$('c83AdminSeasons');box.replaceChildren();
     if(!seasons.length)box.textContent='No Crown seasons found.';
     for(const s of seasons){
@@ -2334,6 +2345,33 @@
       row.textContent=`👑 ${s.name} · ${s.status} · ${s.starts_on} to ${s.ends_on} · ${teams.filter(t=>t.season_id===s.id).length} team(s)`;
       box.append(row);
     }
+  }
+  function showLifecycle(){
+    const season=seasons.find(s=>s.id===$('c83LifecycleSeason').value);
+    const activate=$('c83ActivateSeason'),complete=$('c83CompleteSeason');
+    if(!season){$('c83LifecycleDetails').textContent='Select a season to see available actions.';activate.disabled=true;complete.disabled=true;return;}
+    const today=new Date();
+    const localToday=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const teamCount=teams.filter(t=>t.season_id===season.id).length;
+    activate.disabled=!(season.status==='upcoming'&&localToday>=season.starts_on&&localToday<=season.ends_on&&teamCount>0);
+    complete.disabled=!(season.status==='active'&&localToday>=season.ends_on);
+    $('c83LifecycleDetails').textContent=`${season.name} · ${season.status} · ${season.starts_on} to ${season.ends_on} · ${teamCount} team(s). ${activate.disabled?'Activation currently unavailable.':'Ready to activate.'} ${complete.disabled?'Completion currently unavailable.':'Ready to complete.'}`;
+  }
+  async function lifecycle(action){
+    const season=seasons.find(s=>s.id===$('c83LifecycleSeason').value);
+    if(!season)return;
+    const verb=action==='activate'?'ACTIVATE':'COMPLETE';
+    const note=action==='activate'?'This opens submissions for eligible members within the valid date window.':'This closes new submissions for the season. This action cannot be reversed from Campus HQ.';
+    if(!window.confirm(`${verb} ${season.name}?\n\n${note}`))return;
+    const activate=$('c83ActivateSeason'),complete=$('c83CompleteSeason');
+    activate.disabled=true;complete.disabled=true;
+    status('c83LifecycleFeedback',`${verb} request in progress...`);
+    try{
+      await call(action==='activate'?'admin_activate_crown_season':'admin_complete_crown_season',{p_season_id:season.id});
+      await reload();
+      status('c83LifecycleFeedback',`💗 ${season.name} ${action==='activate'?'activated':'completed'} successfully!`);
+    }catch(e){console.error('Crown lifecycle:',e);status('c83LifecycleFeedback','⚠️ '+err(e));}
+    finally{showLifecycle();}
   }
   function bindForm(id,feedback,fn){
     $(id).addEventListener('submit',async event=>{
@@ -2361,6 +2399,9 @@
     if(error||data!==true){status('c83AdminGate','🔒 Season administration is reserved for campus administrators.');return;}
     $('c83AdminContent').hidden=false;
     status('c83AdminGate','💗 Administrator controls ready. New seasons start as upcoming.');
+    $('c83LifecycleSeason').addEventListener('change',showLifecycle);
+    $('c83ActivateSeason').addEventListener('click',()=>lifecycle('activate'));
+    $('c83CompleteSeason').addEventListener('click',()=>lifecycle('complete'));
     $('c83EditSeasonSelect').addEventListener('change',showSeason);
     $('c83EditTeamSeason').addEventListener('change',populateTeams);
     $('c83EditTeamSelect').addEventListener('change',showTeam);
