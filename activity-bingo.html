@@ -375,8 +375,8 @@
                 </div>
                 <div class="board" id="bingoBoard" aria-label="Reading Bingo board"></div>
                 <p id="boardLegend" class="legend"></p>
-                <div class="actions"><button id="refreshBoard" type="button" class="btn secondary">↻ Refresh
-                        Progress</button><a class="btn" href="activities.html">💗 More Activities</a></div>
+                <div class="actions"><button id="refreshBoard" type="button" class="btn secondary">↻ Refresh Progress</button><button id="resetBoard" type="button" class="btn" style="background:#fff0f7;color:#a52c67;box-shadow:0 4px 0 #e7a5c6">↩ Reset My Board</button><a class="btn" href="activities.html">💗 More Activities</a></div>
+                <p id="refreshFeedback" class="legend" role="status" aria-live="polite">Your progress loads automatically when you open this page.</p>
             </section>
         </main>
         <footer>BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG</footer>
@@ -547,10 +547,81 @@
                 $('boardPanel').hidden = false;
                 $('refreshBoard').addEventListener('click', async () => {
                     if (busy) return;
-                    busy = true; $('refreshBoard').disabled = true;
-                    try { await loadProgress(); } catch (error) { console.error('Bingo refresh:', error); status('⚠️ ' + errorText(error)); }
-                    finally { busy = false; $('refreshBoard').disabled = false; render(); }
+                    const button = $('refreshBoard');
+                    const feedback = $('refreshFeedback');
+                    busy = true;
+                    button.disabled = true;
+                    button.textContent = '⏳ Refreshing…';
+                    feedback.textContent = '💌 Checking Supabase for your latest saved marks…';
+                    try {
+                        await loadProgress(false);
+                        const time = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+                        const message = `✅ Progress refreshed at ${time}. Your board is up to date!`;
+                        feedback.textContent = message;
+                        status(message);
+                        button.textContent = '✓ Refreshed!';
+                    } catch (error) {
+                        console.error('Bingo refresh:', error);
+                        feedback.textContent = '⚠️ Refresh failed: ' + errorText(error);
+                        status('⚠️ Could not refresh progress: ' + errorText(error));
+                        button.textContent = '↻ Try Again';
+                    } finally {
+                        busy = false;
+                        button.disabled = false;
+                        render();
+                    }
                 });
+                $('resetBoard').addEventListener('click', async () => {
+                    if (busy || !playable) return;
+                    const button = $('resetBoard');
+                    const refresh = $('refreshBoard');
+                    const feedback = $('refreshFeedback');
+                    if (!ownMarks.size) {
+                        feedback.textContent = '💗 You have no marked squares to reset.';
+                        return;
+                    }
+                    const warning = mode === 'community'
+                        ? 'Remove all YOUR contributions to this Community Bingo? Other Besties’ marks will stay saved, and shared squares may remain complete.'
+                        : 'Reset your personal Bingo board? All your marked squares for this activity will be removed. This cannot be undone.';
+                    if (!window.confirm(warning)) return;
+                    busy = true;
+                    button.disabled = true;
+                    refresh.disabled = true;
+                    button.textContent = '⏳ Resetting…';
+                    status('💌 Clearing your saved Bingo marks…');
+                    feedback.textContent = 'Removing only your marks from this activity…';
+                    render();
+                    try {
+                        const expected = ownMarks.size;
+                        const { data: deleted, error } = await client.from('campus_bingo_marks')
+                            .delete()
+                            .eq('activity_id', activityId)
+                            .eq('member_id', user.id)
+                            .select('square_index');
+                        if (error) throw error;
+                        if ((deleted || []).length !== expected) {
+                            throw new Error('Not all marks were removed. Please check your access permissions.');
+                        }
+                        await loadProgress(false);
+                        const message = mode === 'community'
+                            ? '💗 Your community contributions were removed. Other Besties’ progress is safe!'
+                            : '💗 Your Bingo board has been reset! Ready for a fresh start!';
+                        status(message);
+                        feedback.textContent = message;
+                    } catch (error) {
+                        console.error('Bingo reset:', error);
+                        status('⚠️ Could not reset your marks: ' + errorText(error));
+                        feedback.textContent = '⚠️ Reset failed: ' + errorText(error);
+                        try { await loadProgress(false); } catch (reloadError) { console.error('Bingo reload after reset:', reloadError); }
+                    } finally {
+                        busy = false;
+                        button.disabled = false;
+                        refresh.disabled = false;
+                        button.textContent = '↩ Reset My Board';
+                        render();
+                    }
+                });
+                $('resetBoard').disabled = !playable;
                 await loadProgress();
             } catch (error) {
                 console.error('Reading Bingo initialization:', error);
