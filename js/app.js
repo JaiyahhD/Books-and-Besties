@@ -234,13 +234,14 @@
                 </div>
                 <nav class="glam-shortcuts" aria-label="Explore Bestie University">
                     <a href="#book-pick"><span>📖</span>Book Pick</a>
-                    <a href="#crown"><span>👑</span>Monthly Crown</a>
+                    <a href="monthly-crown.html"><span>👑</span>Monthly Crown</a>
                     <a href="#about"><span>🎀</span>Our Story</a>
-                    <a href="#crown"><span>🏠</span>Campus Housing</a>
-                    <a href="#dashboard"><span>💖</span>Bestie Locker</a>
+                    <a href="housing.html"><span>🏠</span>Campus Housing</a>
+                    <a href="locker.html"><span>💖</span>Bestie Locker</a>
                     <a href="${community}" target="_blank" rel="noopener noreferrer">
                         <span>💌</span>Join the Besties
                     </a>
+                </nav>
                 </nav>
             </section>
 
