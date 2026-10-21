@@ -152,11 +152,18 @@
         );
     }
 
-    function render() {
+        function render() {
         applyTheme();
         nav();
 
         const route = location.hash.split('?')[0].replace('#', '') || 'home';
+
+        // PHASE 9.4 — RETIRE LEGACY MEMBER DASHBOARD
+        // All old dashboard links now open the official Bestie Locker.
+        if (route === 'dashboard' || route === 'locker-preview') {
+            window.location.replace('locker.html');
+            return;
+        }
 
         const routes = {
             home,
@@ -166,8 +173,7 @@
             login: () => authPage(false),
             'admin-login': () => authPage(true),
             register,
-            dashboard: () => dashboard(false),
-            'locker-preview': () => dashboard(true),
+            
             admin: adminPage,
             'reset-pin': resetPin
         };
@@ -524,9 +530,9 @@
                             ? `${date(season.starts_on)} – ${date(season.ends_on)}`
                             : 'The next competition will be announced soon.'}</p>
                         <p>${escape(season?.description || 'Join a team, read your heart out, and celebrate every chapter.')}</p>
-                        ${btn(
-                            logged() ? 'Open My Dashboard' : 'Bestie Login',
-                            '#' + (logged() ? 'dashboard' : 'login')
+                                                ${btn(
+                            logged() ? '💗 Open My Bestie Locker' : 'Bestie Login',
+                            logged() ? 'locker.html' : 'login.html'
                         )}
                     </div>
                     <div class="card">
@@ -564,9 +570,9 @@
                 'Head over to your dashboard.'
             ) + `<section class="section">
                 <div class="wrap center">
-                    ${btn(
-                        admin() ? 'Admin HQ' : 'My Dashboard',
-                        '#' + (admin() ? 'admin' : 'dashboard')
+                                        ${btn(
+                        admin() ? '🎓 Campus HQ' : '💗 My Bestie Locker',
+                        admin() ? 'campus-hq.html' : 'locker.html'
                     )}
                 </div>
             </section>`;
@@ -978,9 +984,13 @@
                 }
 
                 message('Welcome back! ♡');
-                location.hash = admin() ? '#admin' : '#dashboard';
-                render();
-                await hydrate();
+                                if (admin()) {
+                    window.location.replace('campus-hq.html');
+                    return;
+                }
+
+                window.location.replace('locker.html');
+                return;
 
             } else if (action === 'register') {
                 if (!db) throw Error('Connect Supabase before registration.');
@@ -1022,8 +1032,9 @@
 
                 if (r.error) throw r.error;
 
-                message('Your PIN has been updated.');
-                location.hash = '#dashboard';
+                                message('Your PIN has been updated.');
+                window.location.replace('locker.html');
+                return;
 
             } else if (action === 'log-book') {
                 const r = await db.rpc('submit_book', {
