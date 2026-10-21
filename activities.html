@@ -1198,6 +1198,19 @@ footer {
 
         body.append(link);
 
+      } else if (activity.template_key === "side_quest") {
+        const link = element(
+          "a",
+          "btn",
+          "☕ Enter Side Quest ↗"
+        );
+
+        link.href =
+          "activity-side-quest.html?id=" +
+          encodeURIComponent(activity.id);
+
+        body.append(link);
+
       } else {
         const notice = element(
           "p",
