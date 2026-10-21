@@ -1140,32 +1140,24 @@
             </div>
           </section>
 
-          <!-- LIVE MONTHLY CROWN LINKS -->
+          <!-- PHASE 8.3 — MONTHLY CROWN COMMAND CENTER -->
           <section class="section" id="section-crown">
-            <h2 class="section-heading">👑 Monthly Crown Management</h2>
-            <p class="section-description">Your live Monthly Crown and Campus Housing tools. Season records,
-              submissions, and teams are stored in Supabase.</p>
+            <h2 class="section-heading">👑 Monthly Crown Command Center</h2>
+            <p class="section-description">One season, one official score. Manage submissions and review eligibility here; team assignments stay connected to the existing dorm desk.</p>
+            <div class="panel"><div class="panel-head">🎀 CROWN CONTROL ROOM</div><div class="panel-body">
+              <label class="field"><span>Choose Monthly Crown Season</span><select id="c83Season"><option value="">Loading seasons...</option></select></label>
+              <p class="mini" id="c83Status" role="status" aria-live="polite">Connecting to official Crown records...</p>
+              <div class="actions"><button class="btn secondary" id="c83Refresh" type="button">🔄 Refresh Command Center</button><button class="btn light" type="button" data-jump="dorm-assignments">🏡 Team Assignments & Rosters</button><a class="btn light" href="monthly-crown.html">📚 Member Crown HQ ↗</a></div>
+            </div></div>
             <div class="grid">
-              <div class="panel">
-                <div class="panel-head">🏡 CAMPUS HOUSING</div>
-                <div class="panel-body">
-                  <p>Explore your real seasonal dorms and resident spaces.</p>
-                  <div class="actions">
-                    <a class="btn secondary" href="housing.html">🏡 View Campus Housing ↗</a>
-                    <button class="btn" type="button" data-jump="dorm-design">🎨 Customize Dorms</button>
-                  </div>
-                </div>
-              </div>
-              <div class="panel">
-                <div class="panel-head">📚 MONTHLY CROWN HQ</div>
-                <div class="panel-body">
-                  <p>Visit the live reading log, leaderboards, and staff submission review desk.</p>
-                  <div class="actions">
-                    <a class="btn secondary" href="monthly-crown.html">👑 Monthly Crown HQ ↗</a>
-                    <a class="btn light" href="crown-review.html">🛡️ Review Submissions ↗</a>
-                  </div>
-                </div>
-              </div>
+              <div class="panel"><div class="panel-head">📊 SEASON SNAPSHOT</div><div class="panel-body"><div id="c83Snapshot" class="mini">Choose a season to view the latest numbers.</div></div></div>
+              <div class="panel"><div class="panel-head">🏆 OFFICIAL TEAM LEADERBOARD</div><div class="panel-body"><p class="mini">Uses <code>get_crown_team_leaderboard</code> — never a second scoring calculation.</p><div id="c83Teams" aria-live="polite"></div></div></div>
+              <div class="panel"><div class="panel-head">✨ INDIVIDUAL STANDINGS</div><div class="panel-body"><p class="mini">Uses the existing member leaderboard function.</p><div id="c83Members" aria-live="polite"></div></div></div>
+              <div class="panel"><div class="panel-head">🛡️ ELIGIBILITY REVIEW</div><div class="panel-body"><p class="mini">Keep entries for audit history. Correct eligible pages or void ineligible books using the existing review function.</p>
+                <label class="field"><span>Filter submissions</span><select id="c83Filter"><option value="all">All submissions</option><option value="eligible">Eligible</option><option value="voided">Voided</option></select></label>
+                <p class="mini" id="c83ReviewStatus"></p><div id="c83Reviews" aria-live="polite"></div>
+                <div class="actions"><a class="btn light" href="crown-review.html">🛡️ Original Review Desk ↗</a></div>
+              </div></div>
             </div>
           </section>
 
@@ -2103,6 +2095,124 @@
 })();
 </script>
 
+
+<script>
+/* BESTIE UNIVERSITY — PHASE 8.3: MONTHLY CROWN COMMAND CENTER
+   Existing crown_* tables and official RPCs are the only sources of truth. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let client, seasonId = '', submissions = [], names = new Map(), teamNames = new Map(), busy = false, generation = 0;
+  const text = (id, value) => { const el = $(id); if (el) el.textContent = value; };
+  const errorMessage = error => error?.message || String(error);
+  const node = (tag, value, cls) => { const n = document.createElement(tag); if (value !== undefined) n.textContent = value; if (cls) n.className = cls; return n; };
+  const row = (heading, sub) => { const d=node('div',undefined,'item');d.append(node('strong',heading),node('p',sub,'mini'));return d; };
+  async function loadSeasons() {
+    const {data,error}=await client.from('crown_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false});
+    if(error) throw error;
+    const select=$('c83Season'), previous=select.value;
+    select.replaceChildren(new Option('Choose a season',''));
+    for(const s of data||[]) select.add(new Option(`${s.name} · ${s.status||'season'} · ${s.starts_on}–${s.ends_on}`,s.id));
+    select.value=(data||[]).some(s=>s.id===previous)?previous:(data?.[0]?.id||'');
+    seasonId=select.value;
+  }
+  async function load() {
+    if(!client || busy) return;
+    busy=true; const run=++generation;
+    $('c83Refresh').disabled=true; $('c83Season').disabled=true;
+    text('c83Status','👑 Refreshing official season records...');
+    try {
+      const sid=seasonId;
+      if(!sid) {text('c83Status','No Monthly Crown season selected.');return;}
+      const [teams, members, books, rosters, teamRecords]=await Promise.all([
+        client.rpc('get_crown_team_leaderboard',{p_season_id:sid}),
+        client.rpc('get_crown_member_leaderboard',{p_season_id:sid}),
+        client.from('crown_submissions').select('id,user_id,team_id,book_title,book_author,pages_read,rating,completed_on,status,staff_note,created_at').eq('season_id',sid).order('created_at',{ascending:false}).limit(500),
+        client.from('crown_enrollments').select('id,status,team_id').eq('season_id',sid).limit(2000),
+        client.from('crown_teams').select('id,name,emoji').eq('season_id',sid)
+      ]);
+      for(const result of [teams,members,books,rosters,teamRecords]) if(result.error) throw result.error;
+      if(run!==generation || sid!==seasonId) return;
+      submissions=books.data||[];
+      teamNames=new Map((teamRecords.data||[]).map(t=>[t.id,`${t.emoji||'🏡'} ${t.name}`]));
+      const ids=[...new Set(submissions.map(b=>b.user_id).filter(Boolean))];
+      names=new Map();
+      if(ids.length){
+        for(let i=0;i<ids.length;i+=100){
+          const {data,error}=await client.from('profiles').select('id,display_name').in('id',ids.slice(i,i+100));
+          if(error) throw error;
+          for(const p of data||[]) names.set(p.id,p.display_name||'Bestie');
+        }
+      }
+      const approved=(rosters.data||[]).filter(e=>e.status==='approved');
+      const eligible=submissions.filter(b=>b.status==='eligible').length;
+      const voided=submissions.filter(b=>b.status==='voided').length;
+      const truncated=submissions.length===500;
+      const rosterLimited=(rosters.data||[]).length===2000;
+      const snapshot=$('c83Snapshot');snapshot.replaceChildren();
+      snapshot.append(row('🏡 '+(teamRecords.data||[]).length+' Crown teams',approved.length+' approved enrollments'+(rosterLimited?' (roster query capped at 2,000)':'')),row('📚 '+submissions.length+' recent submissions',eligible+' eligible · '+voided+' voided'+(truncated?' · latest 500 only':'')),row('👑 Official pages','See official leaderboard totals — review counts are not used to calculate scores.'));
+      const showStandings=(id,records,team)=>{
+        const box=$(id);box.replaceChildren();
+        if(!records?.length){box.append(node('p','No standings for this season yet.','mini'));return;}
+        for(const [i,r] of records.entries()){
+          const name=team?`${r.team_emoji||'🏡'} ${r.team_name||'Team'}`:(r.display_name||'Bestie');
+          const info=team?`${r.books_logged||0} books · ${r.contributing_members||0} contributing Besties`:`${r.team_name||'Unassigned'} · ${r.books_logged||0} books`;
+          box.append(row(`${i+1}. ${name} — ${Number(r.total_pages||0).toLocaleString()} pages`,info));
+        }
+      };
+      showStandings('c83Teams',teams.data,true);
+      showStandings('c83Members',members.data,false);
+      renderReviews();
+      text('c83Status','💗 Command Center synced to existing Monthly Crown records.'+(truncated?' Showing only the 500 newest submissions.':''));
+    } catch(error){console.error('Monthly Crown Command Center:',error);text('c83Status','⚠️ Could not load Crown records: '+errorMessage(error));}
+    finally{busy=false;$('c83Refresh').disabled=false;$('c83Season').disabled=false;}
+  }
+  function renderReviews(){
+    const filter=$('c83Filter').value;
+    const list=$('c83Reviews');list.replaceChildren();
+    const visible=submissions.filter(b=>filter==='all'||b.status===filter);
+    text('c83ReviewStatus',visible.length+' shown · newest 500 submissions maximum');
+    if(!visible.length){list.append(node('p','No matching submissions.','mini'));return;}
+    for(const b of visible){
+      const card=node('div',undefined,'item');
+      card.append(node('h4',b.book_title||'Untitled book'),node('p',`${b.book_author||'Unknown author'} · ${names.get(b.user_id)||'Bestie'} · ${teamNames.get(b.team_id)||'Team'} · ${b.completed_on||'No date'} · ${b.status} · ${b.pages_read} pages`,'mini'));
+      const form=node('div',undefined,'form-grid');
+      const field=(label,control)=>{const wrap=node('label',undefined,'field');wrap.append(node('span',label),control);return wrap;};
+      const status=node('select');status.add(new Option('👑 Eligible','eligible'),new Option('🚫 Voided','voided'));status.value=b.status;
+      const pages=node('input');pages.type='number';pages.min='1';pages.max='10000';pages.step='1';pages.value=b.pages_read;
+      const note=node('textarea');note.value=b.staff_note||'';note.placeholder='Reason for correction or voiding';
+      form.append(field('Eligibility',status),field('Pages read',pages),field('Staff note',note));
+      const save=node('button','💗 Save Crown Review','btn secondary');save.type='button';
+      const feedback=node('p','','mini');feedback.setAttribute('role','status');
+      save.addEventListener('click',async()=>{
+        const count=Number(pages.value);
+        if(!Number.isInteger(count)||count<1||count>10000){feedback.textContent='⚠️ Pages must be a whole number from 1 to 10,000.';return;}
+        if(!confirm(`Save ${status.value} review for “${b.book_title}” (${count} pages)?`))return;
+        save.disabled=true;feedback.textContent='Saving to official Crown records...';
+        try{
+          const {data,error}=await client.rpc('review_crown_submission',{p_submission_id:b.id,p_status:status.value,p_pages_read:count,p_staff_note:note.value.trim()});
+          if(error)throw error;
+          if(data!==true)throw new Error('The review was not confirmed by Supabase.');
+          feedback.textContent='💗 Review saved. Refreshing official leaderboards...';
+          await load();
+        }catch(error){feedback.textContent='⚠️ '+errorMessage(error);save.disabled=false;}
+      });
+      card.append(form,save,feedback);list.append(card);
+    }
+  }
+  async function init(){
+    client=window.BB_CAMPUS_CLIENT;
+    if(!client){text('c83Status','⚠️ Campus staff database connection unavailable.');return;}
+    const {data,error}=await client.rpc('is_campus_staff');
+    if(error||data!==true){text('c83Status','🔒 Campus staff access required.');return;}
+    $('c83Season').addEventListener('change',()=>{seasonId=$('c83Season').value;generation++;load();});
+    $('c83Refresh').addEventListener('click',load);
+    $('c83Filter').addEventListener('change',renderReviews);
+    try{await loadSeasons();await load();}catch(error){text('c83Status','⚠️ '+errorMessage(error));}
+  }
+  document.addEventListener('bb:campus-hq-ready',init,{once:true});
+})();
+</script>
 
   <!-- LOAD ADMISSIONS LISTENER BEFORE AUTH GATE -->
 
