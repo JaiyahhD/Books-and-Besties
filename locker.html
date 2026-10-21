@@ -665,6 +665,10 @@
 
       <div class="top-actions">
 
+        <a class="top-link" id="lockerStaffHqLink" href="campus-hq.html" hidden>
+          🎓 Campus HQ
+        </a>
+
         <a class="top-link" href="profile.html">
           🎀 My Profile
         </a>
@@ -844,6 +848,13 @@
   <h2 class="section-title">
     🎀 MY CAMPUS DASHBOARD
   </h2>
+
+  <article class="dashboard-card staff-hq-card" id="lockerStaffHqCard" hidden>
+    <span class="dashboard-icon">🎓</span>
+    <h3>Dean's Office · Campus HQ</h3>
+    <p>Welcome back, campus staff! Return to your administrative command center whenever you need it.</p>
+    <a class="dashboard-link" href="campus-hq.html">Open Campus HQ →</a>
+  </article>
 
   <div class="dashboard-grid">
 
@@ -1156,6 +1167,22 @@
               );
             }
           }
+        }
+
+        // PHASE 8 — STAFF NAVIGATION
+        // Fail closed: regular members and failed staff checks never see HQ links.
+        try {
+          const { data: isStaff, error: staffError } =
+            await client.rpc("is_campus_staff");
+
+          if (staffError) throw staffError;
+
+          if (isStaff === true) {
+            document.getElementById("lockerStaffHqLink").hidden = false;
+            document.getElementById("lockerStaffHqCard").hidden = false;
+          }
+        } catch (staffError) {
+          console.warn("Campus HQ shortcut unavailable:", staffError);
         }
 
         // SHOW APPROVED LOCKER
