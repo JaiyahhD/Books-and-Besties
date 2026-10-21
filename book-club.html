@@ -885,14 +885,46 @@
                     <summary>✨ Book missing? Add a new book to the Campus Library</summary>
                     <p class="catalog-help">Add the book here without leaving Book Club. It will also appear in the shared Campus Library catalog, and we'll select it for your monthly pick automatically.</p>
                     <form id="addBookForm">
-                        <div class="form-grid">
-                            <label class="field"><span>Book title *</span><input id="newBookTitle" required maxlength="250" placeholder="The Witch"></label>
-                            <label class="field"><span>Author *</span><input id="newBookAuthor" required maxlength="200" placeholder="Freida McFadden"></label>
-                            <label class="field" style="grid-column:1/-1"><span>Book cover image URL (HTTPS)</span><input id="newBookCover" type="url" maxlength="2000" placeholder="https://cdn.discordapp.com/attachments/1514464262645612619/1562153757511389264/71kjuF-wL._SL1500_.jpg?ex=6ada460f&is=6ad8f48f&hm=812ae4e026320d3b0a696925949c060f21b76e04dc566e5958ac0b6c766e6ae4&"></label>
-                            <label class="field"><span>Genre (optional)</span><input id="newBookGenre" maxlength="100" placeholder="Thriller"></label>
-                            <label class="field"><span>Page count (optional)</span><input id="newBookPages" type="number" min="1" max="100000" step="1" placeholder="Enter page count"></label>
-                            <label class="field" style="grid-column:1/-1"><span>Book description / synopsis (optional)</span><textarea id="newBookDescription" maxlength="2000" placeholder="Paste the publisher's book synopsis here..."></textarea></label>
-                        </div>
+                        <<div class="form-grid">
+    <label class="field">
+        <span>Book title *</span>
+        <input id="newBookTitle" required maxlength="250" placeholder="The Witch">
+    </label>
+
+    <label class="field">
+        <span>Author *</span>
+        <input id="newBookAuthor" required maxlength="200" placeholder="Freida McFadden">
+    </label>
+
+    <label class="field" style="grid-column:1/-1">
+        <span>Book cover image URL (HTTPS)</span>
+        <input
+            id="newBookCover"
+            type="url"
+            maxlength="2000"
+            value="https://cdn.discordapp.com/attachments/1514464262645612619/1562153757511389264/71kjuF-wL._SL1500_.jpg?ex=6ada460f&amp;is=6ad8f48f&amp;hm=812ae4e026320d3b0a696925949c060f21b76e04dc566e5958ac0b6c766e6ae4&amp;"
+        >
+    </label>
+
+    <label class="field">
+        <span>Genre (optional)</span>
+        <input id="newBookGenre" maxlength="100" placeholder="Thriller">
+    </label>
+
+    <label class="field">
+        <span>Page count (optional)</span>
+        <input id="newBookPages" type="number" min="1" max="100000" step="1" placeholder="Enter page count">
+    </label>
+
+    <label class="field" style="grid-column:1/-1">
+        <span>Book description / synopsis (optional)</span>
+        <textarea
+            id="newBookDescription"
+            maxlength="2000"
+            placeholder="Paste the publisher's book synopsis here..."
+        ></textarea>
+    </label>
+</div>
                         <button class="btn secondary" id="newBookSave" type="submit">📚 Add Book to Library</button>
                         <p id="newBookStatus" class="status" role="status"></p>
                     </form>
