@@ -551,6 +551,25 @@
         padding: 15px;
       }
     }
+
+    /* Phase 8.6C: Campus HQ navigation and small-screen polish */
+    .workspace > .section { scroll-margin-top: 18px; }
+    .sidebar .nav-btn { overflow-wrap: anywhere; }
+    @media (max-width: 800px) {
+      .sidebar { align-items: stretch; }
+      .sidebar .nav-btn { flex: 1 1 190px; width: auto; margin: 0; }
+    }
+    @media (max-width: 580px) {
+      .layout { gap: 18px; }
+      .sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .sidebar h2 { grid-column: 1 / -1; margin: 4px 0 8px; }
+      .sidebar .nav-btn { width: 100%; min-width: 0; text-align: left; padding: 11px 9px; font-size: 13px; line-height: 1.35; }
+      .top nav { width: 100%; }
+      .top nav a { text-align: center; }
+    }
+    @media (max-width: 360px) {
+      .sidebar { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
