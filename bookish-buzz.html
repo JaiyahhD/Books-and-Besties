@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,95 +11,561 @@
 
   <link rel="stylesheet" href="css/styles.css">
   <style>
-  /* Bookish Buzz: Bestie University varsity scrapbook design */
-  .buzz-page{min-height:100vh;color:#19283e;font-family:'Nunito',sans-serif}
-  .buzz-page .top{background:#fff9f4;border-bottom:3px solid #e8a1c0;box-shadow:0 5px 0 #fff,0 9px 0 #b5d4d0;min-height:91px;padding:10px clamp(18px,5vw,72px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .buzz-page .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#263b51;font:700 20px 'Fredoka',sans-serif}
-  .buzz-page .brand img{width:70px;height:70px;object-fit:contain;border:3px solid #fff;border-radius:16px;box-shadow:3px 4px 0 #c78eac}
-  .buzz-page .brand small{display:block;font:12px 'Pacifico',cursive;color:#b1497e}
-  .buzz-page .links{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
-  .buzz-page .links a{font:600 13px 'Fredoka',sans-serif;text-decoration:none;color:#27394c;background:#fff7f8;border:2px solid #e8b2cb;border-radius:999px;padding:9px 13px;box-shadow:0 3px 0 #ecc8d8}
-  .buzz-page .links a:hover{background:#fce4ed;transform:translateY(-2px)}
-  .buzz-page main{width:min(1190px,94%);margin:26px auto 85px}
-  .buzz-page .leopard{height:21px;background-color:#eaa075;background-image:radial-gradient(ellipse 9px 5px at 14px 11px,#352125 65%,transparent 70%),radial-gradient(ellipse 6px 9px at 42px 6px,#41262b 65%,transparent 70%),radial-gradient(ellipse 9px 6px at 70px 15px,#4a262b 65%,transparent 70%);background-size:82px 20px;border-bottom:3px solid #f63898}
-  .buzz-page .hero{position:relative;overflow:hidden;border:4px solid #fff9f2;outline:3px solid #c779a0;border-radius:25px;background:linear-gradient(105deg,#ffe2ebef,#fff2e7e9 52%,#d8eeeeeb),url('assets/bestie-campus-hero.webp') center/cover;box-shadow:8px 10px 0 #b9d9d5,0 15px 30px #873d6222;padding:40px clamp(22px,5vw,64px) 44px}
-  .buzz-page .hero:after{content:'🎀';position:absolute;right:24px;top:20px;font-size:45px;transform:rotate(12deg)}
-  .buzz-page .eyebrow{display:inline-block;font:800 12px 'Nunito',sans-serif;letter-spacing:.13em;color:#8d2d63;background:#fff9f5;border:2px solid #d99dbd;border-radius:30px;padding:8px 15px}
-  .buzz-page .hero h1{font:700 clamp(43px,6vw,79px)/1.05 'Fredoka',sans-serif;color:#d53e83;text-shadow:3px 3px 0 #fff,6px 6px 0 #f4b6d2;margin:22px 0 15px;max-width:800px}
-  .buzz-page .hero p{font:800 clamp(15px,1.7vw,19px)/1.6 'Nunito',sans-serif;color:#4d3449;max-width:710px}
-  .buzz-page .pill{display:inline-block;background:#fff8ef;border:2px dashed #c69b53;box-shadow:3px 4px 0 #eac0d5;color:#87345f;border-radius:99px;padding:8px 15px;font:700 13px 'Fredoka',sans-serif;transform:rotate(-2deg)}
-  .buzz-page .layout{display:grid;grid-template-columns:minmax(300px,370px) minmax(0,1fr);align-items:start;gap:27px;margin-top:35px}
-  .buzz-page .panel,.buzz-page .post{position:relative;background:#fffaf7;border:3px solid #e8a6c3;border-radius:22px;box-shadow:6px 7px 0 #e2b4cc,0 15px 30px #873d6222;padding:24px}
-  .buzz-page .panel:before{content:'✦';position:absolute;right:17px;top:10px;color:#d4a54a;font-size:24px}
-  .buzz-page .panel h2,.buzz-page .feed-head h2{font:700 clamp(25px,2.7vw,35px) 'Fredoka',sans-serif;color:#a93372;margin:0 0 9px}
-  .buzz-page .muted,.buzz-page .meta,.buzz-page .count{color:#705d71;font-size:13px}
-  .buzz-page label{display:block;margin:15px 0 6px;font:700 14px 'Fredoka',sans-serif;color:#773955}
-  .buzz-page input:not([type=file]),.buzz-page textarea,.buzz-page select{width:100%;border:2px solid #e9c2d4;background:#fffaf8;border-radius:12px;padding:12px 14px;color:#19283e;font:700 14px 'Nunito',sans-serif}
-  .buzz-page textarea{min-height:118px;resize:vertical}
-  .buzz-page input:focus-visible,.buzz-page select:focus-visible,.buzz-page textarea:focus-visible,.buzz-page button:focus-visible,.buzz-page a:focus-visible{outline:3px solid #247e8a;outline-offset:3px}
-  .buzz-page .primary,.buzz-page .soft{font:700 14px 'Fredoka',sans-serif;border-radius:999px;padding:11px 17px;cursor:pointer;transition:transform .2s,box-shadow .2s}
-  .buzz-page .primary{width:100%;color:#fff;background:linear-gradient(135deg,#ed6da5,#d83f83);border:2px solid #fff;box-shadow:0 4px 0 #a92f68,0 7px 12px #ac47743a;margin-top:18px}
-  .buzz-page .soft{background:#fff8fa;color:#a73570;border:2px solid #e5afc9;box-shadow:0 3px 0 #f3c1d4}
-  .buzz-page .primary:hover,.buzz-page .soft:hover{transform:translateY(-2px)}
-  .buzz-page button:disabled{opacity:.55;cursor:wait}
-  .buzz-page .cover-picker{display:block;text-align:center;background:#fff1f7;border:2px dashed #d88aaf;border-radius:17px;padding:17px 10px;cursor:pointer;box-shadow:3px 4px 0 #f0d0df}
-  .buzz-page .cover-picker:hover{background:#ffe4f0}
-  .buzz-page .cover-picker input{position:absolute;width:1px;height:1px;opacity:0}
-  .buzz-page .cover-preview{display:none;max-width:135px;max-height:185px;object-fit:cover;border:6px solid white;box-shadow:4px 5px 0 #dca9c3;border-radius:8px;margin:13px auto}
-  .buzz-page .feed-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:2px 0 16px}
-  .buzz-page .filters{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:12px;margin-bottom:19px}
-  .buzz-page #feed{display:grid;gap:21px}
-  .buzz-page .post{border-color:#a5d3d0;box-shadow:6px 7px 0 #c3e3e0}
-  .buzz-page .post:nth-child(even){border-color:#e8a6c3;box-shadow:6px 7px 0 #e2b4cc}
-  .buzz-page .post:after{content:'';display:block;clear:both}
-  .buzz-page .post-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-  .buzz-page .genre{display:inline-block;border:2px solid #eeb3ce;border-radius:999px;background:#ffe0ed;color:#a73570;padding:5px 11px;font:700 12px 'Fredoka',sans-serif}
-  .buzz-page .post h3{font:700 26px 'Fredoka',sans-serif;color:#a93372;margin:14px 0 5px;overflow-wrap:anywhere}
-  .buzz-page .post .author{color:#705d71;margin:0 0 12px;font-size:14px}
-  .buzz-page .post p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65}
-  .buzz-page .post-cover{float:left;width:116px;max-width:34%;height:170px;object-fit:cover;margin:12px 18px 10px 0;border:6px solid #fff;outline:1px solid #edb8cf;border-radius:8px;box-shadow:5px 6px 0 #d4b1c4;transform:rotate(-2deg)}
-  .buzz-page .notes{padding:12px;background:#fff1df;border-left:4px solid #d5a244;border-radius:9px;font-size:13px}
-  .buzz-page .actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;clear:both;margin-top:19px;padding-top:15px;border-top:2px dashed #e9c2d4}
-  .buzz-page .empty{text-align:center;padding:45px 20px;background:#fffaf7;border:3px dashed #d99dbd;border-radius:20px;color:#795d70;font-weight:800}
-  .buzz-page .hidden{display:none!important}
-  .buzz-page #status{margin:24px 0;padding:13px 17px;background:#fff0f6;border:2px solid #e8a6c3;border-radius:14px;color:#86265c;font-weight:800}
-  .buzz-page #status:empty{display:none}
-  .buzz-page .footer{border-top:4px double #e3a6c2;background:#fff2f6;padding:25px;text-align:center;color:#9c3a73;font:700 14px 'Fredoka',sans-serif}
-  @media(max-width:830px){.buzz-page .layout{grid-template-columns:1fr}.buzz-page .panel{max-width:none}.buzz-page .top{justify-content:center}.buzz-page .links{justify-content:center}.buzz-page .hero{padding:30px 22px}}
-  @media(max-width:510px){.buzz-page .filters{grid-template-columns:1fr}.buzz-page .brand img{width:52px;height:52px}.buzz-page .links a{font-size:12px;padding:7px 9px}.buzz-page .post,.buzz-page .panel{padding:17px}.buzz-page .hero h1{font-size:43px}.buzz-page .hero:after{font-size:25px;right:10px}.buzz-page .post-cover{width:90px;height:135px}}
-  @media(prefers-reduced-motion:reduce){.buzz-page *{transition:none!important}}
+    /* Bookish Buzz: Bestie University varsity scrapbook design */
+    .buzz-page {
+      min-height: 100vh;
+      color: #19283e;
+      font-family: 'Nunito', sans-serif
+    }
+
+    .buzz-page .top {
+      background: #fff9f4;
+      border-bottom: 3px solid #e8a1c0;
+      box-shadow: 0 5px 0 #fff, 0 9px 0 #b5d4d0;
+      min-height: 91px;
+      padding: 10px clamp(18px, 5vw, 72px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap
+    }
+
+    .buzz-page .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #263b51;
+      font: 700 20px 'Fredoka', sans-serif
+    }
+
+    .buzz-page .brand img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border: 3px solid #fff;
+      border-radius: 16px;
+      box-shadow: 3px 4px 0 #c78eac
+    }
+
+    .buzz-page .brand small {
+      display: block;
+      font: 12px 'Pacifico', cursive;
+      color: #b1497e
+    }
+
+    .buzz-page .links {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      flex-wrap: wrap
+    }
+
+    .buzz-page .links a {
+      font: 600 13px 'Fredoka', sans-serif;
+      text-decoration: none;
+      color: #27394c;
+      background: #fff7f8;
+      border: 2px solid #e8b2cb;
+      border-radius: 999px;
+      padding: 9px 13px;
+      box-shadow: 0 3px 0 #ecc8d8
+    }
+
+    .buzz-page .links a:hover {
+      background: #fce4ed;
+      transform: translateY(-2px)
+    }
+
+    .buzz-page main {
+      width: min(1190px, 94%);
+      margin: 26px auto 85px
+    }
+
+    .buzz-page .leopard {
+      height: 21px;
+      background-color: #eaa075;
+      background-image: radial-gradient(ellipse 9px 5px at 14px 11px, #352125 65%, transparent 70%), radial-gradient(ellipse 6px 9px at 42px 6px, #41262b 65%, transparent 70%), radial-gradient(ellipse 9px 6px at 70px 15px, #4a262b 65%, transparent 70%);
+      background-size: 82px 20px;
+      border-bottom: 3px solid #f63898
+    }
+
+    .buzz-page .hero {
+      position: relative;
+      overflow: hidden;
+      border: 4px solid #fff9f2;
+      outline: 3px solid #c779a0;
+      border-radius: 25px;
+      background: linear-gradient(105deg, #ffe2ebef, #fff2e7e9 52%, #d8eeeeeb), url('assets/bestie-campus-hero.webp') center/cover;
+      box-shadow: 8px 10px 0 #b9d9d5, 0 15px 30px #873d6222;
+      padding: 40px clamp(22px, 5vw, 64px) 44px
+    }
+
+    .buzz-page .hero:after {
+      content: '🎀';
+      position: absolute;
+      right: 24px;
+      top: 20px;
+      font-size: 45px;
+      transform: rotate(12deg)
+    }
+
+    .buzz-page .eyebrow {
+      display: inline-block;
+      font: 800 12px 'Nunito', sans-serif;
+      letter-spacing: .13em;
+      color: #8d2d63;
+      background: #fff9f5;
+      border: 2px solid #d99dbd;
+      border-radius: 30px;
+      padding: 8px 15px
+    }
+
+    .buzz-page .hero h1 {
+      font: 700 clamp(43px, 6vw, 79px)/1.05 'Fredoka', sans-serif;
+      color: #d53e83;
+      text-shadow: 3px 3px 0 #fff, 6px 6px 0 #f4b6d2;
+      margin: 22px 0 15px;
+      max-width: 800px
+    }
+
+    .buzz-page .hero p {
+      font: 800 clamp(15px, 1.7vw, 19px)/1.6 'Nunito', sans-serif;
+      color: #4d3449;
+      max-width: 710px
+    }
+
+    .buzz-page .pill {
+      display: inline-block;
+      background: #fff8ef;
+      border: 2px dashed #c69b53;
+      box-shadow: 3px 4px 0 #eac0d5;
+      color: #87345f;
+      border-radius: 99px;
+      padding: 8px 15px;
+      font: 700 13px 'Fredoka', sans-serif;
+      transform: rotate(-2deg)
+    }
+
+    .buzz-page .layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
+      align-items: start;
+      gap: 27px;
+      margin-top: 35px
+    }
+
+    .buzz-page .panel,
+    .buzz-page .post {
+      position: relative;
+      background: #fffaf7;
+      border: 3px solid #e8a6c3;
+      border-radius: 22px;
+      box-shadow: 6px 7px 0 #e2b4cc, 0 15px 30px #873d6222;
+      padding: 24px
+    }
+
+    .buzz-page .panel:before {
+      content: '✦';
+      position: absolute;
+      right: 17px;
+      top: 10px;
+      color: #d4a54a;
+      font-size: 24px
+    }
+
+    .buzz-page .panel h2,
+    .buzz-page .feed-head h2 {
+      font: 700 clamp(25px, 2.7vw, 35px) 'Fredoka', sans-serif;
+      color: #a93372;
+      margin: 0 0 9px
+    }
+
+    .buzz-page .muted,
+    .buzz-page .meta,
+    .buzz-page .count {
+      color: #705d71;
+      font-size: 13px
+    }
+
+    .buzz-page label {
+      display: block;
+      margin: 15px 0 6px;
+      font: 700 14px 'Fredoka', sans-serif;
+      color: #773955
+    }
+
+    .buzz-page input:not([type=file]),
+    .buzz-page textarea,
+    .buzz-page select {
+      width: 100%;
+      border: 2px solid #e9c2d4;
+      background: #fffaf8;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #19283e;
+      font: 700 14px 'Nunito', sans-serif
+    }
+
+    .buzz-page textarea {
+      min-height: 118px;
+      resize: vertical
+    }
+
+    .buzz-page input:focus-visible,
+    .buzz-page select:focus-visible,
+    .buzz-page textarea:focus-visible,
+    .buzz-page button:focus-visible,
+    .buzz-page a:focus-visible {
+      outline: 3px solid #247e8a;
+      outline-offset: 3px
+    }
+
+    .buzz-page .primary,
+    .buzz-page .soft {
+      font: 700 14px 'Fredoka', sans-serif;
+      border-radius: 999px;
+      padding: 11px 17px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s
+    }
+
+    .buzz-page .primary {
+      width: 100%;
+      color: #fff;
+      background: linear-gradient(135deg, #ed6da5, #d83f83);
+      border: 2px solid #fff;
+      box-shadow: 0 4px 0 #a92f68, 0 7px 12px #ac47743a;
+      margin-top: 18px
+    }
+
+    .buzz-page .soft {
+      background: #fff8fa;
+      color: #a73570;
+      border: 2px solid #e5afc9;
+      box-shadow: 0 3px 0 #f3c1d4
+    }
+
+    .buzz-page .primary:hover,
+    .buzz-page .soft:hover {
+      transform: translateY(-2px)
+    }
+
+    .buzz-page button:disabled {
+      opacity: .55;
+      cursor: wait
+    }
+
+    .buzz-page .cover-picker {
+      display: block;
+      text-align: center;
+      background: #fff1f7;
+      border: 2px dashed #d88aaf;
+      border-radius: 17px;
+      padding: 17px 10px;
+      cursor: pointer;
+      box-shadow: 3px 4px 0 #f0d0df
+    }
+
+    .buzz-page .cover-picker:hover {
+      background: #ffe4f0
+    }
+
+    .buzz-page .cover-picker input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0
+    }
+
+    .buzz-page .cover-preview {
+      display: none;
+      max-width: 135px;
+      max-height: 185px;
+      object-fit: cover;
+      border: 6px solid white;
+      box-shadow: 4px 5px 0 #dca9c3;
+      border-radius: 8px;
+      margin: 13px auto
+    }
+
+    .buzz-page .feed-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 2px 0 16px
+    }
+
+    .buzz-page .filters {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 170px;
+      gap: 12px;
+      margin-bottom: 19px
+    }
+
+    .buzz-page #feed {
+      display: grid;
+      gap: 21px
+    }
+
+    .buzz-page .post {
+      border-color: #a5d3d0;
+      box-shadow: 6px 7px 0 #c3e3e0
+    }
+
+    .buzz-page .post:nth-child(even) {
+      border-color: #e8a6c3;
+      box-shadow: 6px 7px 0 #e2b4cc
+    }
+
+    .buzz-page .post:after {
+      content: '';
+      display: block;
+      clear: both
+    }
+
+    .buzz-page .post-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .buzz-page .genre {
+      display: inline-block;
+      border: 2px solid #eeb3ce;
+      border-radius: 999px;
+      background: #ffe0ed;
+      color: #a73570;
+      padding: 5px 11px;
+      font: 700 12px 'Fredoka', sans-serif
+    }
+
+    .buzz-page .post h3 {
+      font: 700 26px 'Fredoka', sans-serif;
+      color: #a93372;
+      margin: 14px 0 5px;
+      overflow-wrap: anywhere
+    }
+
+    .buzz-page .post .author {
+      color: #705d71;
+      margin: 0 0 12px;
+      font-size: 14px
+    }
+
+    .buzz-page .post p {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.65
+    }
+
+    .buzz-page .post-cover {
+      float: left;
+      width: 116px;
+      max-width: 34%;
+      height: 170px;
+      object-fit: cover;
+      margin: 12px 18px 10px 0;
+      border: 6px solid #fff;
+      outline: 1px solid #edb8cf;
+      border-radius: 8px;
+      box-shadow: 5px 6px 0 #d4b1c4;
+      transform: rotate(-2deg)
+    }
+
+    .buzz-page .notes {
+      padding: 12px;
+      background: #fff1df;
+      border-left: 4px solid #d5a244;
+      border-radius: 9px;
+      font-size: 13px
+    }
+
+    .buzz-page .actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      clear: both;
+      margin-top: 19px;
+      padding-top: 15px;
+      border-top: 2px dashed #e9c2d4
+    }
+
+    .buzz-page .empty {
+      text-align: center;
+      padding: 45px 20px;
+      background: #fffaf7;
+      border: 3px dashed #d99dbd;
+      border-radius: 20px;
+      color: #795d70;
+      font-weight: 800
+    }
+
+    .buzz-page .hidden {
+      display: none !important
+    }
+
+    .buzz-page #status {
+      margin: 24px 0;
+      padding: 13px 17px;
+      background: #fff0f6;
+      border: 2px solid #e8a6c3;
+      border-radius: 14px;
+      color: #86265c;
+      font-weight: 800
+    }
+
+    .buzz-page #status:empty {
+      display: none
+    }
+
+    .buzz-page .footer {
+      border-top: 4px double #e3a6c2;
+      background: #fff2f6;
+      padding: 25px;
+      text-align: center;
+      color: #9c3a73;
+      font: 700 14px 'Fredoka', sans-serif
+    }
+
+    @media(max-width:830px) {
+      .buzz-page .layout {
+        grid-template-columns: 1fr
+      }
+
+      .buzz-page .panel {
+        max-width: none
+      }
+
+      .buzz-page .top {
+        justify-content: center
+      }
+
+      .buzz-page .links {
+        justify-content: center
+      }
+
+      .buzz-page .hero {
+        padding: 30px 22px
+      }
+    }
+
+    @media(max-width:510px) {
+      .buzz-page .filters {
+        grid-template-columns: 1fr
+      }
+
+      .buzz-page .brand img {
+        width: 52px;
+        height: 52px
+      }
+
+      .buzz-page .links a {
+        font-size: 12px;
+        padding: 7px 9px
+      }
+
+      .buzz-page .post,
+      .buzz-page .panel {
+        padding: 17px
+      }
+
+      .buzz-page .hero h1 {
+        font-size: 43px
+      }
+
+      .buzz-page .hero:after {
+        font-size: 25px;
+        right: 10px
+      }
+
+      .buzz-page .post-cover {
+        width: 90px;
+        height: 135px
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .buzz-page * {
+        transition: none !important
+      }
+    }
   </style>
 </head>
+
 <body class="buzz-page">
   <header class="top">
-    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Books & Besties logo"><span>BOOKS &amp; BESTIES 🎀<small>read · connect · belong</small></span></a>
-    <nav class="links" aria-label="Campus navigation"><a href="index.html">Campus Quad</a><a href="locker.html">My Locker</a><a href="library.html">Campus Library</a><a href="shelves.html">My Shelves</a></nav>
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="Books & Besties logo"><span>BOOKS &amp; BESTIES
+        🎀<small>read · connect · belong</small></span></a>
+    <nav class="links" aria-label="Campus navigation"><a href="index.html">Campus Quad</a><a href="locker.html">My
+        Locker</a><a href="library.html">Campus Library</a><a href="shelves.html">My Shelves</a></nav>
   </header>
   <div class="leopard" aria-hidden="true"></div>
   <main>
-    <section class="hero"><span class="eyebrow">✦ BESTIE UNIVERSITY · CAMPUS SOCIAL ✦</span><h1>💋 The Bookish Buzz</h1><p>The books are good. The recommendations are better. Tell the Besties what they NEED to read next! 📚💗</p><span class="pill">✨ By Besties, for Besties</span></section>
+    <section class="hero"><span class="eyebrow">✦ BESTIE UNIVERSITY · CAMPUS SOCIAL ✦</span>
+      <h1>💋 The Bookish Buzz</h1>
+      <p>The books are good. The recommendations are better. Tell the Besties what they NEED to read next! 📚💗</p><span
+        class="pill">✨ By Besties, for Besties</span>
+    </section>
     <div id="status" role="status" aria-live="polite">Checking your campus membership…</div>
     <div class="layout hidden" id="content">
-      <aside class="panel"><h2>💌 Put Us On!</h2><p class="muted">Finished something unforgettable? Share the tea without spoiling the plot.</p>
+      <aside class="panel">
+        <h2>💌 Put Us On!</h2>
+        <p class="muted">Finished something unforgettable? Share the tea without spoiling the plot.</p>
         <form id="recommendForm">
           <label for="title">Book title *</label><input id="title" required maxlength="200" autocomplete="off">
           <label for="author">Author *</label><input id="author" required maxlength="160" autocomplete="off">
-          <label for="genre">Genre *</label><select id="genre" required><option value="">Choose a genre</option><option>Black Romance</option><option>Contemporary Romance</option><option>Dark Romance</option><option>Romantasy</option><option>Fantasy</option><option>Thriller</option><option>Mystery</option><option>Horror</option><option>Historical Fiction</option><option>Literary Fiction</option><option>Cozy Fiction</option><option>Young Adult</option><option>Nonfiction</option><option>Other</option></select>
+          <label for="genre">Genre *</label><select id="genre" required>
+            <option value="">Choose a genre</option>
+            <option>Black Romance</option>
+            <option>Contemporary Romance</option>
+            <option>Dark Romance</option>
+            <option>Romantasy</option>
+            <option>Fantasy</option>
+            <option>Thriller</option>
+            <option>Mystery</option>
+            <option>Urban Fiction</option>
+            <option>Horror</option>
+            <option>Historical Fiction</option>
+            <option>Literary Fiction</option>
+            <option>Cozy Fiction</option>
+            <option>Young Adult</option>
+            <option>Nonfiction</option>
+            <option>Other</option>
+          </select>
           <label for="coverFile">📸 Book cover (optional)</label>
           <label class="cover-picker" for="coverFile">📁 Click to upload a book cover from your device
             <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
             <img id="coverPreview" class="cover-preview" alt="Selected book cover preview">
-            <span id="coverFilename" class="muted" style="display:block;margin-top:6px">JPG, PNG, WEBP or GIF · up to 5 MB</span>
+            <span id="coverFilename" class="muted" style="display:block;margin-top:6px">JPG, PNG, WEBP or GIF · up to 5
+              MB</span>
           </label>
-          <label for="pitch">Why do the Besties need to read it? *</label><textarea id="pitch" required minlength="10" maxlength="1500" placeholder="The characters, the plot twists, the FEELINGS… spill! (No spoilers, please.)"></textarea>
-          <label for="notes">Content notes (optional)</label><textarea id="notes" maxlength="400" style="min-height:65px" placeholder="Share helpful content warnings, if any."></textarea>
+          <label for="pitch">Why do the Besties need to read it? *</label><textarea id="pitch" required minlength="10"
+            maxlength="1500"
+            placeholder="The characters, the plot twists, the FEELINGS… spill! (No spoilers, please.)"></textarea>
+          <label for="notes">Content notes (optional)</label><textarea id="notes" maxlength="400"
+            style="min-height:65px" placeholder="Share helpful content warnings, if any."></textarea>
           <button class="primary" id="submitBtn" type="submit">💗 Post My Recommendation</button>
         </form>
       </aside>
-      <section aria-label="Community recommendations"><div class="feed-head"><h2>☕ The Bestie Feed</h2><span class="count" id="count"></span></div>
-        <div class="filters"><input id="search" type="search" placeholder="🔎 Search books, authors, or Besties" aria-label="Search recommendations"><select id="filterGenre" aria-label="Filter by genre"><option value="">All genres</option></select></div>
-        <div id="feed" aria-live="polite"><div class="empty">Loading bookish tea…</div></div>
-        <div style="margin-top:16px;text-align:center"><button class="soft hidden" id="moreBtn" type="button">Load more recommendations ↓</button></div>
+      <section aria-label="Community recommendations">
+        <div class="feed-head">
+          <h2>☕ The Bestie Feed</h2><span class="count" id="count"></span>
+        </div>
+        <div class="filters"><input id="search" type="search" placeholder="🔎 Search books, authors, or Besties"
+            aria-label="Search recommendations"><select id="filterGenre" aria-label="Filter by genre">
+            <option value="">All genres</option>
+          </select></div>
+        <div id="feed" aria-live="polite">
+          <div class="empty">Loading bookish tea…</div>
+        </div>
+        <div style="margin-top:16px;text-align:center"><button class="soft hidden" id="moreBtn" type="button">Load more
+            recommendations ↓</button></div>
       </section>
     </div>
   </main>
@@ -106,158 +573,159 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script>
-  (() => {
-    'use strict';
-    const $ = id => document.getElementById(id);
-    const config = window.BB_CONFIG || {};
-    const status = $('status');
-    let db, user, recommendations = [], reactions = [], names = new Map(), offset = 0, exhausted = false, loading = false;
-    const PAGE_SIZE = 20;
-    const COVER_BUCKET = 'bookish-covers';
-    const coverUrls = new Map();
-    const allowedTypes = new Map([['image/jpeg','jpg'],['image/png','png'],['image/webp','webp'],['image/gif','gif']]);
-    const MAX_COVER_BYTES = 5 * 1024 * 1024;
-    const show = (msg, error = false) => { status.textContent = msg; status.style.background = error ? '#fff0e8' : '#fff0f6'; };
-    const el = (tag, cls, txt) => { const n = document.createElement(tag); if(cls)n.className=cls; if(txt!==undefined)n.textContent=txt; return n; };
-    const date = d => new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const button = (txt, cls='soft') => el('button',cls,txt);
-    async function init() {
-      if (!window.supabase || !config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) { show('Campus connection is not configured yet.',true); return; }
-      db = window.supabase.createClient(config.SUPABASE_URL,config.SUPABASE_ANON_KEY);
-      const {data:auth,error:authErr} = await db.auth.getUser();
-      user = auth?.user;
-      if(authErr || !user){ location.replace('login.html'); return; }
-      const {data:profile,error} = await db.from('profiles').select('membership_status').eq('id',user.id).maybeSingle();
-      if(error || profile?.membership_status !== 'approved'){show('💌 The Bookish Buzz is for approved campus members. Visit your Locker for admission details.',true);return;}
-      $('content').classList.remove('hidden'); status.textContent='';
-      $('recommendForm').addEventListener('submit', submit);
-      $('coverFile').addEventListener('change', previewCover);
-      $('search').addEventListener('input',render);
-      $('filterGenre').addEventListener('change',render);
-      $('moreBtn').addEventListener('click',load);
-      await load();
-    }
-    async function load(){
-      if(loading || exhausted)return;
-      loading=true; $('moreBtn').disabled=true;
-      const {data,error}=await db.from('bookish_recommendations').select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').order('created_at',{ascending:false}).range(offset,offset+PAGE_SIZE-1);
-      loading=false; $('moreBtn').disabled=false;
-      if(error){show('Could not load recommendations: '+error.message,true);render();return;}
-      const batch=data||[]; offset+=batch.length; exhausted=batch.length<PAGE_SIZE;
-      recommendations.push(...batch);
-      await loadReactions();
-      await loadNames();
-      await loadCovers();
-      render();
-    }
-    async function loadReactions(){
-      const ids=recommendations.map(r=>r.id);
-      if(!ids.length){reactions=[];return;}
-      const {data,error}=await db.from('bookish_reactions').select('recommendation_id,user_id').in('recommendation_id',ids);
-      if(error){show('Reactions could not load: '+error.message,true);return;}
-      reactions=data||[];
-    }
-    async function loadNames(){
-      const ids=[...new Set(recommendations.map(r=>r.user_id))].filter(id=>!names.has(id));
-      if(!ids.length)return;
-      const {data,error}=await db.from('profiles').select('id,display_name').in('id',ids);
-      if(error){ console.warn('Bookish Buzz: profile names unavailable',error); ids.forEach(id=>names.set(id,'Campus Bestie'));return; }
-      ids.forEach(id=>names.set(id,(data||[]).find(p=>p.id===id)?.display_name||'Campus Bestie'));
-    }
-    function previewCover(){
-      const file=$('coverFile').files?.[0], img=$('coverPreview');
-      img.style.display='none'; img.removeAttribute('src');
-      $('coverFilename').textContent=file ? file.name : 'JPG, PNG, WEBP or GIF · up to 5 MB';
-      if(!file)return;
-      if(!allowedTypes.has(file.type)||file.size>MAX_COVER_BYTES){
-        show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.',true);
-        $('coverFile').value=''; $('coverFilename').textContent='JPG, PNG, WEBP or GIF · up to 5 MB';return;
+    (() => {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const config = window.BB_CONFIG || {};
+      const status = $('status');
+      let db, user, recommendations = [], reactions = [], names = new Map(), offset = 0, exhausted = false, loading = false;
+      const PAGE_SIZE = 20;
+      const COVER_BUCKET = 'bookish-covers';
+      const coverUrls = new Map();
+      const allowedTypes = new Map([['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp'], ['image/gif', 'gif']]);
+      const MAX_COVER_BYTES = 5 * 1024 * 1024;
+      const show = (msg, error = false) => { status.textContent = msg; status.style.background = error ? '#fff0e8' : '#fff0f6'; };
+      const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt !== undefined) n.textContent = txt; return n; };
+      const date = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const button = (txt, cls = 'soft') => el('button', cls, txt);
+      async function init() {
+        if (!window.supabase || !config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) { show('Campus connection is not configured yet.', true); return; }
+        db = window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY);
+        const { data: auth, error: authErr } = await db.auth.getUser();
+        user = auth?.user;
+        if (authErr || !user) { location.replace('login.html'); return; }
+        const { data: profile, error } = await db.from('profiles').select('membership_status').eq('id', user.id).maybeSingle();
+        if (error || profile?.membership_status !== 'approved') { show('💌 The Bookish Buzz is for approved campus members. Visit your Locker for admission details.', true); return; }
+        $('content').classList.remove('hidden'); status.textContent = '';
+        $('recommendForm').addEventListener('submit', submit);
+        $('coverFile').addEventListener('change', previewCover);
+        $('search').addEventListener('input', render);
+        $('filterGenre').addEventListener('change', render);
+        $('moreBtn').addEventListener('click', load);
+        await load();
       }
-      const reader=new FileReader();
-      reader.onload=()=>{img.src=reader.result;img.style.display='block'};
-      reader.readAsDataURL(file);
-    }
-    async function loadCovers(){
-      const paths=[...new Set(recommendations.map(r=>r.cover_path).filter(Boolean))].filter(path=>!coverUrls.has(path));
-      if(!paths.length)return;
-      await Promise.all(paths.map(async path=>{
-        const {data,error}=await db.storage.from(COVER_BUCKET).createSignedUrl(path,3600);
-        if(!error&&data?.signedUrl)coverUrls.set(path,{url:data.signedUrl,expires:Date.now()+3500000});
-      }));
-    }
-    function render(){
-      const query=$('search').value.trim().toLowerCase(), genre=$('filterGenre').value;
-      const genres=[...new Set(recommendations.map(r=>r.genre))].sort();
-      const sel=$('filterGenre');
-      const current=sel.value;
-      sel.replaceChildren(el('option','', 'All genres')); sel.firstChild.value='';
-      for(const g of genres){const o=el('option','',g);o.value=g;sel.append(o)}sel.value=genres.includes(current)?current:'';
-      const filtered=recommendations.filter(r=>(!genre||r.genre===genre)&&(!query||[r.title,r.author,r.genre,r.pitch,names.get(r.user_id)||''].join(' ').toLowerCase().includes(query)));
-      $('count').textContent=`${filtered.length} shown${exhausted?'':' · more available'}`;
-      $('moreBtn').classList.toggle('hidden',exhausted);
-      const feed=$('feed');feed.replaceChildren();
-      if(!filtered.length){feed.append(el('div','empty',recommendations.length?'No matching recommendations yet. Try another search.':'No recommendations yet. Be the first to spill the bookish tea! 💗'));return;}
-      for(const r of filtered){
-        const card=el('article','post');
-        const top=el('div','post-top');const by=el('div');by.append(el('strong','',`💗 ${names.get(r.user_id)||'Campus Bestie'}`),el('div','meta',date(r.created_at)));
-        top.append(by,el('span','genre',r.genre));card.append(top);
-        const cover=coverUrls.get(r.cover_path);
-        if(cover && cover.expires>Date.now()){const img=el('img','post-cover');img.src=cover.url;img.alt=`Cover for ${r.title}`;img.loading='lazy';card.append(img);}
-        card.append(el('h3','',r.title),el('p','author',`by ${r.author}`),el('p','',r.pitch));
-        if(r.content_notes)card.append(el('div','notes',`🕯️ Content notes: ${r.content_notes}`));
-        const actions=el('div','actions');const likes=reactions.filter(x=>x.recommendation_id===r.id);const mine=likes.some(x=>x.user_id===user.id);
-        const like=button(`${mine?'💖':'🤍'} Bestie Love · ${likes.length}`);like.setAttribute('aria-pressed',String(mine));like.addEventListener('click',()=>toggleLike(r.id,mine,like));actions.append(like);
-        if(r.user_id===user.id){const del=button('🗑️ Delete mine');del.addEventListener('click',()=>remove(r.id,del));actions.append(del)}
-        card.append(actions);feed.append(card);
-      }
-    }
-    async function submit(e){
-      e.preventDefault();const btn=$('submitBtn');btn.disabled=true;
-      const file=$('coverFile').files?.[0]||null;
-      const payload={user_id:user.id,title:$('title').value.trim(),author:$('author').value.trim(),genre:$('genre').value,pitch:$('pitch').value.trim(),content_notes:$('notes').value.trim()||null,cover_path:null};
-      if(payload.pitch.length<10){show('Give the Besties a little more tea (at least 10 characters).',true);btn.disabled=false;return;}
-      if(file&&(!allowedTypes.has(file.type)||file.size>MAX_COVER_BYTES)){
-        show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.',true);btn.disabled=false;return;
-      }
-      let uploadedPath=null;
-      try{
-        if(file){
-          show('📸 Uploading your book cover…');
-          uploadedPath=`${user.id}/${crypto.randomUUID()}.${allowedTypes.get(file.type)}`;
-          const {error:uploadError}=await db.storage.from(COVER_BUCKET).upload(uploadedPath,file,{contentType:file.type,upsert:false});
-          if(uploadError)throw uploadError;
-          payload.cover_path=uploadedPath;
-        }
-        const {data,error}=await db.from('bookish_recommendations').insert(payload).select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').single();
-        if(error)throw error;
-        $('recommendForm').reset();$('coverPreview').style.display='none';$('coverPreview').removeAttribute('src');
-        $('coverFilename').textContent='JPG, PNG, WEBP or GIF · up to 5 MB';
-        recommendations.unshift(data);offset+=1;names.set(user.id,names.get(user.id)||'You');
+      async function load() {
+        if (loading || exhausted) return;
+        loading = true; $('moreBtn').disabled = true;
+        const { data, error } = await db.from('bookish_recommendations').select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
+        loading = false; $('moreBtn').disabled = false;
+        if (error) { show('Could not load recommendations: ' + error.message, true); render(); return; }
+        const batch = data || []; offset += batch.length; exhausted = batch.length < PAGE_SIZE;
+        recommendations.push(...batch);
+        await loadReactions();
+        await loadNames();
         await loadCovers();
-        $('search').value='';$('filterGenre').value='';render();show('💋 Your recommendation is live, Bestie!');
-      }catch(error){
-        if(uploadedPath){
-          const cleanup=await db.storage.from(COVER_BUCKET).remove([uploadedPath]);
-          if(cleanup.error)console.warn('Bookish cover cleanup failed:',cleanup.error);
+        render();
+      }
+      async function loadReactions() {
+        const ids = recommendations.map(r => r.id);
+        if (!ids.length) { reactions = []; return; }
+        const { data, error } = await db.from('bookish_reactions').select('recommendation_id,user_id').in('recommendation_id', ids);
+        if (error) { show('Reactions could not load: ' + error.message, true); return; }
+        reactions = data || [];
+      }
+      async function loadNames() {
+        const ids = [...new Set(recommendations.map(r => r.user_id))].filter(id => !names.has(id));
+        if (!ids.length) return;
+        const { data, error } = await db.from('profiles').select('id,display_name').in('id', ids);
+        if (error) { console.warn('Bookish Buzz: profile names unavailable', error); ids.forEach(id => names.set(id, 'Campus Bestie')); return; }
+        ids.forEach(id => names.set(id, (data || []).find(p => p.id === id)?.display_name || 'Campus Bestie'));
+      }
+      function previewCover() {
+        const file = $('coverFile').files?.[0], img = $('coverPreview');
+        img.style.display = 'none'; img.removeAttribute('src');
+        $('coverFilename').textContent = file ? file.name : 'JPG, PNG, WEBP or GIF · up to 5 MB';
+        if (!file) return;
+        if (!allowedTypes.has(file.type) || file.size > MAX_COVER_BYTES) {
+          show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.', true);
+          $('coverFile').value = ''; $('coverFilename').textContent = 'JPG, PNG, WEBP or GIF · up to 5 MB'; return;
         }
-        show('Could not post: '+error.message,true);
-      }finally{btn.disabled=false;}
-    }
-    async function toggleLike(id,mine,btn){
-      btn.disabled=true;
-      const result=mine?await db.from('bookish_reactions').delete().eq('recommendation_id',id).eq('user_id',user.id):await db.from('bookish_reactions').insert({recommendation_id:id,user_id:user.id});
-      btn.disabled=false;
-      if(result.error){show('Could not update Bestie Love: '+result.error.message,true);return;}
-      if(mine)reactions=reactions.filter(x=>!(x.recommendation_id===id&&x.user_id===user.id));else reactions.push({recommendation_id:id,user_id:user.id});render();
-    }
-    async function remove(id,btn){
-      if(!confirm('Delete your recommendation and its Bestie Love reactions?'))return;
-      btn.disabled=true;const {error}=await db.from('bookish_recommendations').delete().eq('id',id).eq('user_id',user.id);
-      if(error){show('Could not delete: '+error.message,true);btn.disabled=false;return;}
-      recommendations=recommendations.filter(r=>r.id!==id);reactions=reactions.filter(x=>x.recommendation_id!==id);offset=Math.max(0,offset-1);render();show('Recommendation deleted.');
-    }
-    init().catch(err=>{console.error(err);show('The Bookish Buzz could not start. Please refresh.',true)});
-  })();
+        const reader = new FileReader();
+        reader.onload = () => { img.src = reader.result; img.style.display = 'block' };
+        reader.readAsDataURL(file);
+      }
+      async function loadCovers() {
+        const paths = [...new Set(recommendations.map(r => r.cover_path).filter(Boolean))].filter(path => !coverUrls.has(path));
+        if (!paths.length) return;
+        await Promise.all(paths.map(async path => {
+          const { data, error } = await db.storage.from(COVER_BUCKET).createSignedUrl(path, 3600);
+          if (!error && data?.signedUrl) coverUrls.set(path, { url: data.signedUrl, expires: Date.now() + 3500000 });
+        }));
+      }
+      function render() {
+        const query = $('search').value.trim().toLowerCase(), genre = $('filterGenre').value;
+        const genres = [...new Set(recommendations.map(r => r.genre))].sort();
+        const sel = $('filterGenre');
+        const current = sel.value;
+        sel.replaceChildren(el('option', '', 'All genres')); sel.firstChild.value = '';
+        for (const g of genres) { const o = el('option', '', g); o.value = g; sel.append(o) } sel.value = genres.includes(current) ? current : '';
+        const filtered = recommendations.filter(r => (!genre || r.genre === genre) && (!query || [r.title, r.author, r.genre, r.pitch, names.get(r.user_id) || ''].join(' ').toLowerCase().includes(query)));
+        $('count').textContent = `${filtered.length} shown${exhausted ? '' : ' · more available'}`;
+        $('moreBtn').classList.toggle('hidden', exhausted);
+        const feed = $('feed'); feed.replaceChildren();
+        if (!filtered.length) { feed.append(el('div', 'empty', recommendations.length ? 'No matching recommendations yet. Try another search.' : 'No recommendations yet. Be the first to spill the bookish tea! 💗')); return; }
+        for (const r of filtered) {
+          const card = el('article', 'post');
+          const top = el('div', 'post-top'); const by = el('div'); by.append(el('strong', '', `💗 ${names.get(r.user_id) || 'Campus Bestie'}`), el('div', 'meta', date(r.created_at)));
+          top.append(by, el('span', 'genre', r.genre)); card.append(top);
+          const cover = coverUrls.get(r.cover_path);
+          if (cover && cover.expires > Date.now()) { const img = el('img', 'post-cover'); img.src = cover.url; img.alt = `Cover for ${r.title}`; img.loading = 'lazy'; card.append(img); }
+          card.append(el('h3', '', r.title), el('p', 'author', `by ${r.author}`), el('p', '', r.pitch));
+          if (r.content_notes) card.append(el('div', 'notes', `🕯️ Content notes: ${r.content_notes}`));
+          const actions = el('div', 'actions'); const likes = reactions.filter(x => x.recommendation_id === r.id); const mine = likes.some(x => x.user_id === user.id);
+          const like = button(`${mine ? '💖' : '🤍'} Bestie Love · ${likes.length}`); like.setAttribute('aria-pressed', String(mine)); like.addEventListener('click', () => toggleLike(r.id, mine, like)); actions.append(like);
+          if (r.user_id === user.id) { const del = button('🗑️ Delete mine'); del.addEventListener('click', () => remove(r.id, del)); actions.append(del) }
+          card.append(actions); feed.append(card);
+        }
+      }
+      async function submit(e) {
+        e.preventDefault(); const btn = $('submitBtn'); btn.disabled = true;
+        const file = $('coverFile').files?.[0] || null;
+        const payload = { user_id: user.id, title: $('title').value.trim(), author: $('author').value.trim(), genre: $('genre').value, pitch: $('pitch').value.trim(), content_notes: $('notes').value.trim() || null, cover_path: null };
+        if (payload.pitch.length < 10) { show('Give the Besties a little more tea (at least 10 characters).', true); btn.disabled = false; return; }
+        if (file && (!allowedTypes.has(file.type) || file.size > MAX_COVER_BYTES)) {
+          show('Choose a JPG, PNG, WEBP or GIF image no larger than 5 MB.', true); btn.disabled = false; return;
+        }
+        let uploadedPath = null;
+        try {
+          if (file) {
+            show('📸 Uploading your book cover…');
+            uploadedPath = `${user.id}/${crypto.randomUUID()}.${allowedTypes.get(file.type)}`;
+            const { error: uploadError } = await db.storage.from(COVER_BUCKET).upload(uploadedPath, file, { contentType: file.type, upsert: false });
+            if (uploadError) throw uploadError;
+            payload.cover_path = uploadedPath;
+          }
+          const { data, error } = await db.from('bookish_recommendations').insert(payload).select('id,user_id,title,author,genre,pitch,content_notes,cover_path,created_at').single();
+          if (error) throw error;
+          $('recommendForm').reset(); $('coverPreview').style.display = 'none'; $('coverPreview').removeAttribute('src');
+          $('coverFilename').textContent = 'JPG, PNG, WEBP or GIF · up to 5 MB';
+          recommendations.unshift(data); offset += 1; names.set(user.id, names.get(user.id) || 'You');
+          await loadCovers();
+          $('search').value = ''; $('filterGenre').value = ''; render(); show('💋 Your recommendation is live, Bestie!');
+        } catch (error) {
+          if (uploadedPath) {
+            const cleanup = await db.storage.from(COVER_BUCKET).remove([uploadedPath]);
+            if (cleanup.error) console.warn('Bookish cover cleanup failed:', cleanup.error);
+          }
+          show('Could not post: ' + error.message, true);
+        } finally { btn.disabled = false; }
+      }
+      async function toggleLike(id, mine, btn) {
+        btn.disabled = true;
+        const result = mine ? await db.from('bookish_reactions').delete().eq('recommendation_id', id).eq('user_id', user.id) : await db.from('bookish_reactions').insert({ recommendation_id: id, user_id: user.id });
+        btn.disabled = false;
+        if (result.error) { show('Could not update Bestie Love: ' + result.error.message, true); return; }
+        if (mine) reactions = reactions.filter(x => !(x.recommendation_id === id && x.user_id === user.id)); else reactions.push({ recommendation_id: id, user_id: user.id }); render();
+      }
+      async function remove(id, btn) {
+        if (!confirm('Delete your recommendation and its Bestie Love reactions?')) return;
+        btn.disabled = true; const { error } = await db.from('bookish_recommendations').delete().eq('id', id).eq('user_id', user.id);
+        if (error) { show('Could not delete: ' + error.message, true); btn.disabled = false; return; }
+        recommendations = recommendations.filter(r => r.id !== id); reactions = reactions.filter(x => x.recommendation_id !== id); offset = Math.max(0, offset - 1); render(); show('Recommendation deleted.');
+      }
+      init().catch(err => { console.error(err); show('The Bookish Buzz could not start. Please refresh.', true) });
+    })();
   </script>
 </body>
+
 </html>

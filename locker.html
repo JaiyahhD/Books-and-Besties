@@ -632,6 +632,14 @@
   cursor: wait;
 }
 
+    .locker-dashboard-toggle { display:flex; justify-content:center; margin:28px 0 16px; }
+    .locker-dashboard-toggle button { border:3px solid #fff; background:linear-gradient(135deg,#e95097,#b83b83); color:white; border-radius:999px; padding:15px 28px; font-weight:900; box-shadow:0 5px 0 #88365e; }
+    .locker-dashboard-toggle button:focus-visible { outline:3px solid #267f87; outline-offset:4px; }
+    .locker-mini-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin-top:15px; }
+    .locker-mini-stat { border:2px solid #edb5cf; border-radius:15px; background:#fff8fc; padding:13px; }
+    .locker-mini-stat strong { display:block; font-size:23px; color:#a92f70; }
+    .locker-mini-stat span { font-size:12px; font-weight:800; }
+    .locker-reading-detail { margin-top:12px; font-size:13px; }
   </style>
 </head>
 
@@ -839,11 +847,15 @@
       </section>
 
       
+<div class="locker-dashboard-toggle">
+  <button id="dashboardToggle" type="button" aria-expanded="false" aria-controls="lockerDashboard">📊 OPEN MY CAMPUS DASHBOARD ♡</button>
+</div>
+
 <!-- =====================================
      MY CAMPUS DASHBOARD 🎀
 ===================================== -->
 
-<section class="campus-dashboard">
+<section class="campus-dashboard" id="lockerDashboard" hidden>
 
   <h2 class="section-title">
     🎀 MY CAMPUS DASHBOARD
@@ -861,12 +873,14 @@
     <article class="dashboard-card">
       <span class="dashboard-icon">📚</span>
       <h3>My Reading Stats</h3>
-      <p id="dashboardReading">
-        Your reading journey is just getting started!
-      </p>
-      <span class="dashboard-label">
-        Monthly Crown integration coming in Phase 5
-      </span>
+      <p id="dashboardReading" role="status">Loading your Monthly Crown reading stats…</p>
+      <div class="locker-mini-stats">
+        <div class="locker-mini-stat"><strong id="crownBooks">—</strong><span>Eligible books logged</span></div>
+        <div class="locker-mini-stat"><strong id="crownPages">—</strong><span>Credited pages</span></div>
+        <div class="locker-mini-stat"><strong id="shelfBooks">—</strong><span>Books on My Shelves</span></div>
+      </div>
+      <p class="locker-reading-detail" id="crownTeam">Your Crown residence: checking…</p>
+      <a class="dashboard-link" href="monthly-crown.html">Open Monthly Crown →</a>
     </article>
 
     <article class="dashboard-card">
@@ -939,16 +953,31 @@
           </p>
         </a>
 
-        <a class="card" href="index.html#book-pick">
+        <a class="card" href="book-club.html">
           <div class="emoji">📚</div>
-          <h3>Campus Library</h3>
-          <p>
-            Monthly book picks, discussions,
-            and community voting.
-          </p>
+          <h3>Book Club</h3>
+          <p>Join our campus reads, discussions, and bookish gatherings.</p>
         </a>
 
-        <a class="card" href="index.html#crown">
+        <a class="card" href="library.html">
+          <div class="emoji">📖</div>
+          <h3>Campus Library</h3>
+          <p>Browse our shared book catalog.</p>
+        </a>
+
+        <a class="card" href="shelves.html">
+          <div class="emoji">💗</div>
+          <h3>My Shelves</h3>
+          <p>Organize your TBR, current reads, and completed books.</p>
+        </a>
+
+        <a class="card" href="bookish-buzz.html">
+          <div class="emoji">💋</div>
+          <h3>The Bookish Buzz</h3>
+          <p>Recommend your favorites and discover your next obsession.</p>
+        </a>
+
+        <a class="card" href="monthly-crown.html">
           <div class="emoji">🏆</div>
           <h3>Monthly Crown</h3>
           <p>
@@ -1184,6 +1213,84 @@
         } catch (staffError) {
           console.warn("Campus HQ shortcut unavailable:", staffError);
         }
+
+        // PHASE 9.1 — DASHBOARD VIEW AND LIVE READING COUNTS
+        const dashboardToggle = document.getElementById("dashboardToggle");
+        const dashboardPanel = document.getElementById("lockerDashboard");
+        dashboardToggle.addEventListener("click", () => {
+          const opening = dashboardPanel.hidden;
+          dashboardPanel.hidden = !opening;
+          dashboardToggle.setAttribute("aria-expanded", String(opening));
+          dashboardToggle.textContent = opening
+            ? "💗 CLOSE MY CAMPUS DASHBOARD"
+            : "📊 OPEN MY CAMPUS DASHBOARD ♡";
+          if (opening) dashboardPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        async function loadLockerReadingStats() {
+          const reading = document.getElementById("dashboardReading");
+          const books = document.getElementById("crownBooks");
+          const pages = document.getElementById("crownPages");
+          const team = document.getElementById("crownTeam");
+          const shelfBooks = document.getElementById("shelfBooks");
+
+          // Personal shelves are independent of Monthly Crown credit.
+          try {
+            const { count, error } = await client.from("library_shelves")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id);
+            if (error) throw error;
+            shelfBooks.textContent = Number(count || 0).toLocaleString();
+          } catch (error) {
+            console.warn("Locker shelves count:", error);
+            shelfBooks.textContent = "—";
+          }
+
+          try {
+            // Discover current/most recent competition, not a hardcoded month.
+            const { data: seasons, error: seasonError } = await client
+              .from("crown_seasons")
+              .select("id,name,starts_on,ends_on,status")
+              .order("starts_on", { ascending: false })
+              .limit(24);
+            if (seasonError) throw seasonError;
+            const now = new Date().toISOString().slice(0, 10);
+            const current = (seasons || []).find(s => s.starts_on <= now && s.ends_on >= now)
+              || (seasons || []).find(s => s.status === "active")
+              || (seasons || []).find(s => s.ends_on < now);
+            if (!current) {
+              reading.textContent = "No Monthly Crown season is available yet.";
+              books.textContent = "0"; pages.textContent = "0";
+              team.textContent = "Your Crown residence: no current season";
+              return;
+            }
+            reading.textContent = `👑 ${current.name} · Eligible competition totals`;
+            const [ranking, enrollment] = await Promise.all([
+              client.rpc("get_crown_member_leaderboard", { p_season_id: current.id }),
+              client.from("crown_enrollments")
+                .select("status,team_id,crown_teams(name)")
+                .eq("season_id", current.id).eq("user_id", user.id).maybeSingle()
+            ]);
+            if (ranking.error) throw ranking.error;
+            const mine = (ranking.data || []).find(entry => entry.user_id === user.id);
+            books.textContent = Number(mine?.books_logged || 0).toLocaleString();
+            pages.textContent = Number(mine?.total_pages || 0).toLocaleString();
+            if (enrollment.error) {
+              console.warn("Locker Crown enrollment:", enrollment.error);
+              team.textContent = "Your Crown residence: unavailable";
+            } else {
+              team.textContent = "Your Crown residence: " +
+                (enrollment.data?.crown_teams?.name || mine?.team_name || "Not assigned for this season");
+            }
+          } catch (error) {
+            console.warn("Locker Crown stats:", error);
+            reading.textContent = "Monthly Crown stats couldn't load right now. Open Monthly Crown to view your standings.";
+            books.textContent = "—"; pages.textContent = "—";
+            team.textContent = "Your Crown residence: unavailable";
+          }
+        }
+
+        loadLockerReadingStats();
 
         // SHOW APPROVED LOCKER
 
