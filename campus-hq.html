@@ -2522,10 +2522,27 @@
         finally { setBusy(false); }
       }
       async function mutate(rpc, params, success) {
-        if (busy) return; setBusy(true); status("Saving to Supabase...");
-        try { const { error } = await client.rpc(rpc, params); if (error) throw error; setBusy(false); await load(); status("💗 " + success); }
-        catch (e) { status("Could not save: " + err(e)); }
-        finally { setBusy(false); }
+        if (busy) return;
+        setBusy(true);
+        status("Saving to Supabase...");
+        try {
+          const { data, error } = await client.rpc(rpc, params);
+          if (error) throw error;
+          // Revocation RPCs return false when no matching current-season record changed.
+          if ((rpc === "honors_revoke_invitation" || rpc === "honors_revoke_membership") && data !== true) {
+            setBusy(false);
+            await load();
+            status("💌 No record was revoked. It may already be revoked or belong to another season.");
+            return;
+          }
+          setBusy(false);
+          await load();
+          status("💗 " + success);
+        } catch (e) {
+          status("Could not save: " + err(e));
+        } finally {
+          setBusy(false);
+        }
       }
       async function seasonAction(rpc, params, success) {
         if (busy) return; setBusy(true); seasonStatus("Saving season...");
