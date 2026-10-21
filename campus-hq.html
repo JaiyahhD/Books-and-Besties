@@ -1995,6 +1995,52 @@
     message("💗 Activity updated successfully!");
   }
 
+    // PHASE 9.4 — ADMIN-ONLY PROTECTED ACTIVITY DELETION
+  async function deleteActivity(activity) {
+    if (busy) return;
+
+    const staff = window.BB_CAMPUS_STAFF;
+
+    if (staff?.role !== "admin") {
+      message("🔒 Only administrators can delete activities.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      '🗑️ DELETE ACTIVITY\n\n' +
+      'Activity: "' + activity.title + '"\n\n' +
+      'This permanently removes the activity from Bestie University.\n\n' +
+      'If any member participation or saved progress exists, ' +
+      'Supabase will BLOCK deletion.\n\n' +
+      'This action cannot be undone.\n\n' +
+      'Delete this activity?'
+    );
+
+    if (!confirmed) return;
+
+    busy = true;
+    message("🗑️ Checking participation and deleting activity...");
+
+    try {
+      const { data, error } = await client.rpc(
+        "admin_delete_campus_activity",
+        { p_activity_id: activity.id }
+      );
+
+      if (error) throw error;
+      if (data !== true) {
+        throw new Error("Activity deletion was not confirmed.");
+      }
+
+      await loadActivities();
+      message("💗 Activity deleted successfully!");
+    } catch (error) {
+      message("⚠️ " + errorText(error));
+    } finally {
+      busy = false;
+    }
+  }
+
   function action(parent, label, callback, style = "light") {
     const button = make("button", label, "btn " + style);
     button.type = "button";
@@ -2093,11 +2139,21 @@
         );
       }
 
-      if (activity.status !== "archived") {
+            if (activity.status !== "archived") {
         action(
           actions,
           "📦 Archive",
           () => changeStatus(activity, "archived")
+        );
+      }
+
+      // Only administrators see permanent deletion controls.
+      if (window.BB_CAMPUS_STAFF?.role === "admin") {
+        action(
+          actions,
+          "🗑️ Delete Activity",
+          () => deleteActivity(activity),
+          "danger"
         );
       }
 
