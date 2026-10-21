@@ -1185,6 +1185,19 @@ footer {
 
         body.append(link);
 
+      } else if (activity.template_key === "alphabet_rush") {
+        const link = element(
+          "a",
+          "btn",
+          "🔤 Play Alphabet Rush ↗"
+        );
+
+        link.href =
+          "activity-alphabet.html?id=" +
+          encodeURIComponent(activity.id);
+
+        body.append(link);
+
       } else {
         const notice = element(
           "p",

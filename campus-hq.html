@@ -1692,6 +1692,12 @@
       return;
     }
 
+    if (window.BB_ALPHABET_BUILDER &&
+        !window.BB_ALPHABET_BUILDER.validateAndSync()) {
+      message("⚠️ Check the Alphabet Rush Design Studio.");
+      return;
+    }
+
     const id = $("activityId").value || null;
     const existing = activities.find(a => a.id === id);
 
@@ -3410,6 +3416,153 @@
     { once: true }
   );
 
+})();
+</script>
+
+
+<!-- PHASE 8.1H — ALPHABET RUSH DESIGN STUDIO (ADDITIVE) -->
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  let studio, instructions, preview, feedback, lastSelection = "";
+
+  function isAlphabet() {
+    const format = $("activityFormat");
+    const select = $("activityTemplate");
+    if (!format || !select || format.value !== "template") return false;
+    const option = select.selectedOptions[0];
+    return !!option && /alphabet\s*rush/i.test(option.textContent);
+  }
+
+  function parseConfig() {
+    try {
+      const value = JSON.parse($("activityTemplateConfig").value || "{}");
+      return value && typeof value === "object" && !Array.isArray(value)
+        ? value : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function sync() {
+    if (!isAlphabet()) return;
+    // Keep any future/unknown config properties when editing.
+    const config = parseConfig();
+    config.instructions = instructions.value.trim();
+    $("activityTemplateConfig").value = JSON.stringify(config, null, 2);
+    feedback.textContent = "💗 Your shared A–Z board is ready! Each letter requires a matching book title and author.";
+  }
+
+  function load() {
+    const config = parseConfig();
+    instructions.value = typeof config.instructions === "string"
+      ? config.instructions : "";
+    feedback.textContent = "💗 26 letters · 1 community board · 1 claim per letter.";
+  }
+
+  function refresh(force = false) {
+    if (!studio) return;
+    const active = isAlphabet();
+    studio.hidden = !active;
+
+    const rawField = $("activityTemplateConfig").closest(".field");
+    if (active) rawField.hidden = true;
+    else if (!$("bingoVisualBuilder") || $("bingoVisualBuilder").hidden) {
+      rawField.hidden = $("activityFormat").value !== "template";
+    }
+
+    if (active) {
+      const key = $("activityId").value + ":" + $("activityTemplate").value;
+      if (force || key !== lastSelection) {
+        lastSelection = key;
+        load();
+      }
+    } else {
+      lastSelection = "";
+    }
+  }
+
+  function initialize() {
+    if (!$("activityForm") || !$("activityTemplateConfig") || $("alphabetVisualBuilder")) return;
+    studio = document.createElement("section");
+    studio.id = "alphabetVisualBuilder";
+    studio.className = "item";
+    studio.hidden = true;
+
+    const heading = document.createElement("h3");
+    heading.textContent = "🔤 The Alphabet Rush Design Studio";
+
+    const intro = document.createElement("p");
+    intro.className = "mini";
+    intro.textContent = "Create a new shared team Alphabet Rush. All 26 letters are included automatically. Activity name, description, eligibility, and dates come from the main Activity Manager fields above.";
+
+    const rulebook = document.createElement("p");
+    rulebook.className = "mini";
+    rulebook.textContent = "📚 Every claim requires a book title and author. The title must begin with the chosen letter (ignoring A, An, or The). One claim per letter; multiple letters per Bestie. Members can release only their own claims while the activity is open.";
+
+    const label = document.createElement("label");
+    label.className = "field";
+    const labelText = document.createElement("span");
+    labelText.textContent = "💌 Challenge Instructions / Seasonal Rulebook";
+    instructions = document.createElement("textarea");
+    instructions.id = "alphabetBuilderInstructions";
+    instructions.rows = 5;
+    instructions.maxLength = 3000;
+    instructions.placeholder = "Example: Choose an available letter, read a book whose title starts with that letter, and submit the title and author. Let's complete A–Z together!";
+    label.append(labelText, instructions);
+
+    const previewTitle = document.createElement("h4");
+    previewTitle.textContent = "✨ Shared Alphabet Preview";
+    preview = document.createElement("div");
+    preview.id = "alphabetBuilderPreview";
+    preview.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(43px,1fr));gap:7px;max-width:540px;margin:12px auto 20px";
+    for (const letter of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+      const tile = document.createElement("div");
+      tile.textContent = letter;
+      tile.style.cssText = "padding:12px 4px;text-align:center;border:2px solid #e7a7c6;border-radius:11px;background:#fff0f7;color:#286e70;font-weight:900";
+      preview.append(tile);
+    }
+
+    feedback = document.createElement("p");
+    feedback.className = "mini";
+    feedback.setAttribute("role", "status");
+
+    const note = document.createElement("p");
+    note.className = "mini";
+    note.textContent = "🎀 Each newly created Alphabet Rush activity gets a fresh board in Supabase. Do not change an activity's template after members begin submitting.";
+
+    studio.append(heading, intro, rulebook, label, previewTitle, preview, feedback, note);
+    $("activityTemplateConfig").closest(".field").before(studio);
+
+    instructions.addEventListener("input", sync);
+    $("activityFormat").addEventListener("change", () => refresh(true));
+    $("activityTemplate").addEventListener("change", () => refresh(true));
+
+    // The existing Activity Manager fills the edit form synchronously.
+    $("activityList").addEventListener("click", event => {
+      if (event.target.closest("button")?.textContent.includes("Edit")) {
+        setTimeout(() => refresh(true), 0);
+      }
+    });
+    $("clearActivity").addEventListener("click", () => setTimeout(() => refresh(true), 0));
+
+    // The Activity Manager remains the sole form-submit owner.
+    // Alphabet settings are synced as the user types.
+    window.BB_ALPHABET_BUILDER = {
+      validateAndSync() {
+        if (!isAlphabet()) return true;
+        sync();
+        return true;
+      }
+    };
+    refresh(true);
+  }
+
+  document.addEventListener("bb:campus-hq-ready", () => {
+    // Run after the existing Activity Manager creates its dynamic fields.
+    setTimeout(initialize, 0);
+  }, { once: true });
 })();
 </script>
 
