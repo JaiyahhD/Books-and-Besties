@@ -3735,7 +3735,21 @@
         for (let i = 0; i < userIds.length; i += 100) { const { data, error } = await client.from('profiles').select('id,display_name').in('id', userIds.slice(i, i + 100)); if (!error) profiles.push(...(data || [])); }
         const names = new Map(profiles.map(p => [p.id, p.display_name || 'Bestie']));
         for (const e of events) {
-          const confirmed = registrations.filter(r => r.event_id === e.id && r.status === 'confirmed');
+          const eventRegistrations = registrations.filter(
+            r => r.event_id === e.id
+          );
+
+          const confirmed = eventRegistrations.filter(
+            r => r.status === 'confirmed'
+          );
+
+          const offered = eventRegistrations.filter(
+            r => r.status === 'offered'
+          );
+
+          const waiting = eventRegistrations.filter(
+            r => r.status === 'waiting'
+          );
           const card = make('article', undefined, 'item');
           card.append(make('h4', '💌 ' + e.title));
           card.append(make('span', e.status.toUpperCase(), 'tag ' + (e.status === 'published' ? 'green' : 'gray')));
