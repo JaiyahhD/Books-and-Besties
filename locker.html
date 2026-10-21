@@ -873,11 +873,25 @@
     <article class="dashboard-card">
       <span class="dashboard-icon">📚</span>
       <h3>My Reading Stats</h3>
-      <p id="dashboardReading" role="status">Loading your Monthly Crown reading stats…</p>
+      <p id="dashboardReading" role="status">Loading your personal Bookshelf stats…</p>
+      <div class="locker-mini-stats">
+        <div class="locker-mini-stat"><strong id="shelfBooks">—</strong><span>Total Books</span></div>
+        <div class="locker-mini-stat"><strong id="shelfWant">—</strong><span>💌 Want to Read</span></div>
+        <div class="locker-mini-stat"><strong id="shelfCurrent">—</strong><span>📖 Currently Reading</span></div>
+        <div class="locker-mini-stat"><strong id="shelfCompleted">—</strong><span>💅 Finished</span></div>
+        <div class="locker-mini-stat"><strong id="shelfDnf">—</strong><span>🥀 DNF</span></div>
+      </div>
+      <p class="locker-reading-detail">Your personal reading journey updates when you save changes on My Bookshelves. ♡</p>
+      <a class="dashboard-link" href="shelves.html">💗 Manage My Bookshelves →</a>
+    </article>
+
+    <article class="dashboard-card">
+      <span class="dashboard-icon">👑</span>
+      <h3>Monthly Crown</h3>
+      <p id="dashboardCrown" role="status">Loading your competition stats…</p>
       <div class="locker-mini-stats">
         <div class="locker-mini-stat"><strong id="crownBooks">—</strong><span>Eligible books logged</span></div>
         <div class="locker-mini-stat"><strong id="crownPages">—</strong><span>Credited pages</span></div>
-        <div class="locker-mini-stat"><strong id="shelfBooks">—</strong><span>Books on My Shelves</span></div>
       </div>
       <p class="locker-reading-detail" id="crownTeam">Your Crown residence: checking…</p>
       <a class="dashboard-link" href="monthly-crown.html">Open Monthly Crown →</a>
@@ -1229,25 +1243,52 @@
 
         async function loadLockerReadingStats() {
           const reading = document.getElementById("dashboardReading");
+          const crownStatus = document.getElementById("dashboardCrown");
           const books = document.getElementById("crownBooks");
           const pages = document.getElementById("crownPages");
           const team = document.getElementById("crownTeam");
-          const shelfBooks = document.getElementById("shelfBooks");
+          const shelfIds = {
+            total: "shelfBooks",
+            want_to_read: "shelfWant",
+            currently_reading: "shelfCurrent",
+            completed: "shelfCompleted",
+            dnf: "shelfDnf"
+          };
 
-          // Personal shelves are independent of Monthly Crown credit.
+          // Personal reading counts use the SAME statuses as shelves.html.
+          // Fetch in batches to avoid Supabase's default 1,000-row response cap.
           try {
-            const { count, error } = await client.from("library_shelves")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", user.id);
-            if (error) throw error;
-            shelfBooks.textContent = Number(count || 0).toLocaleString();
+            const totals = { total: 0, want_to_read: 0, currently_reading: 0, completed: 0, dnf: 0 };
+            const batchSize = 500;
+            for (let offset = 0; ; offset += batchSize) {
+              const { data, error } = await client.from("library_shelves")
+                .select("shelf_status")
+                .eq("user_id", user.id)
+                .range(offset, offset + batchSize - 1);
+              if (error) throw error;
+              const batch = data || [];
+              for (const row of batch) {
+                totals.total++;
+                if (Object.prototype.hasOwnProperty.call(totals, row.shelf_status)) {
+                  totals[row.shelf_status]++;
+                }
+              }
+              if (batch.length < batchSize) break;
+            }
+            for (const [key, id] of Object.entries(shelfIds)) {
+              document.getElementById(id).textContent = totals[key].toLocaleString();
+            }
+            reading.textContent = "💗 Your personal Bookshelf · updated from saved reading statuses";
           } catch (error) {
-            console.warn("Locker shelves count:", error);
-            shelfBooks.textContent = "—";
+            console.warn("Locker Bookshelf stats:", error);
+            reading.textContent = "Your Bookshelf stats couldn't load right now. Try opening My Bookshelves.";
+            for (const id of Object.values(shelfIds)) {
+              document.getElementById(id).textContent = "—";
+            }
           }
 
+          // Crown competition is independent of personal Bookshelf statuses.
           try {
-            // Discover current/most recent competition, not a hardcoded month.
             const { data: seasons, error: seasonError } = await client
               .from("crown_seasons")
               .select("id,name,starts_on,ends_on,status")
@@ -1259,12 +1300,12 @@
               || (seasons || []).find(s => s.status === "active")
               || (seasons || []).find(s => s.ends_on < now);
             if (!current) {
-              reading.textContent = "No Monthly Crown season is available yet.";
+              crownStatus.textContent = "No Monthly Crown season is available yet.";
               books.textContent = "0"; pages.textContent = "0";
               team.textContent = "Your Crown residence: no current season";
               return;
             }
-            reading.textContent = `👑 ${current.name} · Eligible competition totals`;
+            crownStatus.textContent = `👑 ${current.name} · Eligible competition totals`;
             const [ranking, enrollment] = await Promise.all([
               client.rpc("get_crown_member_leaderboard", { p_season_id: current.id }),
               client.from("crown_enrollments")
@@ -1284,13 +1325,17 @@
             }
           } catch (error) {
             console.warn("Locker Crown stats:", error);
-            reading.textContent = "Monthly Crown stats couldn't load right now. Open Monthly Crown to view your standings.";
+            crownStatus.textContent = "Monthly Crown stats couldn't load right now. Open Monthly Crown to view your standings.";
             books.textContent = "—"; pages.textContent = "—";
             team.textContent = "Your Crown residence: unavailable";
           }
         }
 
         loadLockerReadingStats();
+        // Refresh after returning from My Bookshelves (including browser back/forward cache).
+        window.addEventListener("pageshow", event => {
+          if (event.persisted) loadLockerReadingStats();
+        });
 
         // SHOW APPROVED LOCKER
 
