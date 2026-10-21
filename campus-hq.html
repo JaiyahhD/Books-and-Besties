@@ -1559,9 +1559,17 @@
     return node;
   }
 
-  function message(text) {
-    const node = $("activityLiveStatus");
-    if (node) node.textContent = text;
+    function message(text) {
+    const editorStatus = $("activityLiveStatus");
+    const registryStatus = $("activityRegistryStatus");
+
+    if (editorStatus) {
+      editorStatus.textContent = text;
+    }
+
+    if (registryStatus) {
+      registryStatus.textContent = text;
+    }
   }
 
   function errorText(error) {
@@ -1679,9 +1687,28 @@
     status.setAttribute("aria-live", "polite");
     form.before(status);
 
-    const refresh = make("button", "🔄 Refresh Live Activities", "btn light");
+        // PHASE 9.4 — ACTIVITY REGISTRY FEEDBACK
+    const registryStatus = make(
+      "p",
+      "💗 Activity Registry ready!",
+      "notice"
+    );
+
+    registryStatus.id = "activityRegistryStatus";
+    registryStatus.setAttribute("role", "status");
+    registryStatus.setAttribute("aria-live", "polite");
+
+    $("activityList").before(registryStatus);
+
+    const refresh = make(
+      "button",
+      "🔄 Refresh Live Activities",
+      "btn light"
+    );
+
     refresh.type = "button";
     refresh.id = "activityRefresh";
+
     $("activityList").before(refresh);
 
     form.querySelector('button[type="submit"]').textContent =
