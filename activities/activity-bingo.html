@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f64fa1">
+<meta name="description" content="Play Reading Bingo at Bestie University.">
+<title>Reading Bingo | Bestie University</title>
+<link rel="icon" href="assets/logo.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+:root{--pink:#f64fa1;--hot:#d92c82;--teal:#176e78;--ink:#382336;--cream:#fff8f5}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{margin:0;font-family:Nunito,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 10%,#ffd1e6,transparent 35%),radial-gradient(circle at 90% 70%,#cbeae7,transparent 35%),#fff5fa}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}button:disabled{cursor:wait;opacity:.65}a:focus-visible,button:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px max(20px,calc((100% - 1100px)/2));background:#23383d;color:#fff;border-bottom:6px solid var(--pink)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900}.brand img{width:48px;height:48px;object-fit:contain}.top nav{display:flex;flex-wrap:wrap;gap:10px}.top nav a{padding:10px 14px;background:#ffffff20;border-radius:30px;font-weight:900}
+.hero{text-align:center;padding:42px 16px;background:linear-gradient(135deg,#ffd0e5,#f6a4ce 55%,#cdebe8);border-bottom:7px solid #23383d}.eyebrow{display:inline-block;padding:8px 16px;border:2px solid white;border-radius:25px;background:#ffffffb0;font-weight:900;color:var(--teal)}
+h1{font:clamp(28px,6vw,55px)/1.2 Bungee,sans-serif;color:#f64fa1;-webkit-text-stroke:1px white;text-shadow:3px 4px #224b53;margin:20px auto 10px;overflow-wrap:anywhere}.script{font:clamp(18px,3vw,25px) Pacifico,cursive;color:var(--teal)}
+.wrap{max-width:1050px;margin:30px auto 65px;padding:0 18px}.panel{background:#fff;border:3px solid #e7a5c6;border-radius:24px;box-shadow:6px 7px 0 #e5acc6;padding:25px;margin-bottom:23px}.panel h2{font:clamp(18px,3vw,25px) Bungee,sans-serif;color:var(--teal);margin:0 0 12px}.panel p{line-height:1.7;white-space:pre-wrap}.status{padding:13px 16px;border-radius:14px;background:#fff0f7;font-weight:900;line-height:1.6;margin:15px 0}.meta{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}.pill{display:inline-block;border-radius:25px;background:#e2f5f2;color:#14565d;font-size:12px;font-weight:900;padding:9px 14px}.btn{display:inline-block;background:linear-gradient(#ff83be,#e93288);color:#fff;border:0;border-radius:28px;padding:12px 19px;font-weight:900;box-shadow:0 4px 0 #a52c67}.btn.secondary{background:#176e78;box-shadow:0 4px 0 #0c5058}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.progress-track{height:17px;border-radius:20px;background:#f9d9e9;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#f64fa1,#176e78);transition:width .25s}.progress-label{font-weight:900;margin:12px 0}.board{display:grid;grid-template-columns:repeat(var(--size,3),minmax(0,1fr));gap:11px;margin:23px 0}.square{min-width:0;min-height:135px;border:3px solid #edb3d0;border-radius:17px;background:#fff5fa;color:#57334d;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-weight:900;line-height:1.35;overflow-wrap:anywhere;white-space:pre-wrap}.square .mark{font-size:23px}.square.checked{background:linear-gradient(140deg,#f8b2d4,#c5eae4);border-color:var(--teal);color:#234b50}.square.community-done:not(.checked){background:#e5f5f2;border-color:#76bcb7}.square:disabled{cursor:not-allowed;opacity:.75}.square .count{font-size:11px;color:#176e78}.legend{font-size:13px;font-weight:800;line-height:1.7;color:#6b5265}.gate{min-height:70vh;display:grid;place-items:center;padding:22px}.gate .panel{max-width:540px;text-align:center}footer{text-align:center;background:#23383d;color:white;padding:30px 18px;font-weight:900}
+@media(max-width:620px){.panel{padding:16px}.board{gap:6px}.square{min-height:100px;padding:7px 4px;border-width:2px;border-radius:10px;font-size:clamp(10px,2.7vw,13px)}.square .mark{font-size:17px}.square .count{font-size:10px}.top{justify-content:center}.top nav{justify-content:center}}
+@media(prefers-reduced-motion:reduce){.progress-fill{transition:none}}
+</style>
+</head>
+<body>
+<div id="campusGate" class="gate">
+ <div class="panel"><h2>🎓 Bestie University</h2><p id="campusGateMessage" role="status">Verifying your campus membership…</p><div class="actions" style="justify-content:center"><a class="btn" href="login.html">Campus Login</a><a class="btn secondary" href="activities.html">Back to Activities</a></div></div>
+</div>
+<div id="campusContent" hidden>
+<header class="top"><a class="brand" href="index.html#home"><img src="assets/logo.png" alt="Books & Besties logo"><span>BESTIE UNIVERSITY 🎓</span></a><nav><a href="activities.html">← Campus Activities</a><a href="locker.html">💗 Bestie Locker</a></nav></header>
+<section class="hero"><span class="eyebrow">✦ THE BESTIE PLAYGROUND ✦</span><h1 id="activityTitle">READING BINGO</h1><div class="script">Mark those squares, Bestie! ♡</div></section>
+<main class="wrap">
+ <section class="panel"><h2>🎀 Your Bingo Adventure</h2><p id="activityDescription">Loading your activity…</p><div id="activityMeta" class="meta"></div><p id="activityInstructions" hidden></p><p id="activityStatus" class="status" role="status" aria-live="polite">💌 Loading your Bingo board…</p></section>
+ <section class="panel" id="boardPanel" hidden><h2 id="boardHeading">🍪 Reading Bingo</h2><p id="boardExplainer"></p><div class="progress-label" id="progressLabel">0 squares complete</div><div class="progress-track" role="progressbar" aria-label="Bingo progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div><div class="board" id="bingoBoard" aria-label="Reading Bingo board"></div><p id="boardLegend" class="legend"></p><div class="actions"><button id="refreshBoard" type="button" class="btn secondary">↻ Refresh Progress</button><a class="btn" href="activities.html">💗 More Activities</a></div></section>
+</main><footer>BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/campus-guard.js"></script>
+<script>
+(async () => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const activityId = params.get('id');
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const guard = window.BB_CAMPUS_GUARD;
+  let client, user, activity, config, size, mode, prompts, ownMarks = new Set(), counts = [], busy = false, playable = false;
+  const errorText = error => error?.message || 'Please try again.';
+  const status = message => { $('activityStatus').textContent = message; };
+  const prettyDate = value => value ? new Date(value).toLocaleDateString(undefined,{dateStyle:'medium'}) : '';
+
+  function parseConfig(value) {
+    const cfg = typeof value === 'string' ? JSON.parse(value) : value;
+    if (!cfg || typeof cfg !== 'object') throw new Error('This Bingo has no board configuration.');
+    const n = Number(cfg.board_size);
+    if (![3,4,5].includes(n)) throw new Error('This Bingo has an unsupported board size.');
+    if (!Array.isArray(cfg.prompts) || cfg.prompts.length !== n*n || cfg.prompts.some(p => typeof p !== 'string' || !p.trim())) {
+      throw new Error('This Bingo needs '+(n*n)+' valid square prompts. Please ask campus staff to check its design.');
+    }
+    const m = String(cfg.mode || 'personal').toLowerCase();
+    if (!['personal','community'].includes(m)) throw new Error('This Bingo has an unsupported play mode.');
+    return {...cfg, board_size:n, mode:m};
+  }
+
+  function readCommunityCounts(value) {
+    const rows = Array.isArray(value) ? value : Array.isArray(value?.progress) ? value.progress : Array.isArray(value?.squares) ? value.squares : [];
+    const result = Array(size*size).fill(0);
+    if (rows.length && rows.every(x => typeof x === 'number')) return result.map((_,i) => Math.max(0,Number(rows[i] || 0)));
+    for (const row of rows) {
+      const index = Number(row.square_index ?? row.index);
+      const count = Number(row.mark_count ?? row.marked_count ?? row.member_count ?? row.count ?? row.total ?? 0);
+      if (Number.isInteger(index) && index >= 0 && index < result.length) result[index] = Math.max(0,count);
+    }
+    return result;
+  }
+
+  function render() {
+    const board = $('bingoBoard');
+    board.style.setProperty('--size',String(size));
+    board.replaceChildren();
+    const complete = mode === 'community' ? counts.filter(x => x > 0).length : ownMarks.size;
+    const total = size*size;
+    $('progressLabel').textContent = mode === 'community'
+      ? `${complete} of ${total} community squares completed`
+      : `${complete} of ${total} squares completed`;
+    const percent = Math.round(100*complete/total);
+    $('progressFill').style.width = percent+'%';
+    $('progressTrack').setAttribute('aria-valuenow',String(percent));
+    for (let index=0;index<total;index++) {
+      const mine = ownMarks.has(index);
+      const communityDone = mode === 'community' && counts[index] > 0;
+      const square = document.createElement('button');
+      square.type = 'button';
+      square.className = 'square'+(mine?' checked':'')+(communityDone?' community-done':'');
+      square.disabled = busy || !playable;
+      square.setAttribute('aria-pressed',String(mine));
+      square.setAttribute('aria-label',`Square ${index+1}: ${prompts[index]}. ${mine?'Marked by you':communityDone?'Completed by the community':'Not marked by you'}`);
+      const mark = document.createElement('span');
+      mark.className = 'mark';
+      mark.setAttribute('aria-hidden','true');
+      mark.textContent = mine?'💗':communityDone?'✨':'📖';
+      const label = document.createElement('span');
+      label.textContent = prompts[index];
+      square.append(mark,label);
+      if (mode === 'community') {
+        const count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = `${counts[index]} ${counts[index]===1?'Bestie':'Besties'}`;
+        square.append(count);
+      }
+      square.addEventListener('click',() => toggleSquare(index));
+      board.append(square);
+    }
+    $('boardLegend').textContent = mode === 'community'
+      ? '💗 Pink heart = you marked it · ✨ Sparkle = another Bestie contributed · Only totals are displayed. Tap your square again to remove your own mark.'
+      : '💗 Pink heart = your completed square. Tap again to undo a mark. Your board is private.';
+    if (complete === total) status(mode === 'community' ? '👑 COMMUNITY BINGO COMPLETE! The Besties did that!' : '👑 BINGO COMPLETE! You ate that, Bestie!');
+  }
+
+  async function loadProgress(showMessage=true) {
+    if (showMessage) status('💌 Refreshing your Bingo progress…');
+    const {data:marks,error} = await client.from('campus_bingo_marks')
+      .select('square_index').eq('activity_id',activityId).eq('member_id',user.id);
+    if (error) throw error;
+    ownMarks = new Set((marks||[]).map(row=>Number(row.square_index)).filter(n=>Number.isInteger(n)&&n>=0&&n<size*size));
+    if (mode === 'community') {
+      const response = await client.rpc('get_campus_bingo_progress',{p_activity_id:activityId});
+      if (response.error) throw response.error;
+      counts = readCommunityCounts(response.data);
+    } else counts = Array(size*size).fill(0);
+    render();
+    if (showMessage) status(playable?'💗 Progress is up to date!':'🔒 This activity is currently closed for new marks.');
+  }
+
+  async function toggleSquare(index) {
+    if (busy || !playable) return;
+    busy = true;
+    render();
+    const alreadyMarked = ownMarks.has(index);
+    status(alreadyMarked?'💌 Removing your mark…':'💗 Saving your square…');
+    try {
+      if (alreadyMarked) {
+        const {error} = await client.from('campus_bingo_marks').delete()
+          .eq('activity_id',activityId).eq('member_id',user.id).eq('square_index',index);
+        if (error) throw error;
+      } else {
+        const {error} = await client.from('campus_bingo_marks').insert({activity_id:activityId,member_id:user.id,square_index:index});
+        if (error) throw error;
+      }
+      await loadProgress(false);
+      status('💗 Your Bingo progress is saved!');
+    } catch(error) {
+      console.error('Bingo square save:',error);
+      status('⚠️ Could not save this square: '+errorText(error));
+      try {await loadProgress(false);} catch(refreshError) {console.error('Bingo reload:',refreshError);}
+    } finally {busy=false;render();}
+  }
+
+  try {
+    if (!uuidPattern.test(activityId||'')) throw new Error('This Bingo link is missing a valid activity ID. Open it from Campus Activities.');
+    if (!guard?.protectPage || !guard?.getClient) throw new Error('Campus membership verification is unavailable.');
+    const access = await guard.protectPage({level:'approved',gateId:'campusGate',contentId:'campusContent',messageId:'campusGateMessage'});
+    if (!access.allowed) return;
+    client = guard.getClient();
+    const auth = await client.auth.getUser();
+    if (auth.error || !auth.data?.user) throw auth.error || new Error('Please sign in again.');
+    user = auth.data.user;
+    const {data:activityRow,error:activityError} = await client.from('campus_activities')
+      .select('id,title,description,format,template_id,template_config,status,eligibility,starts_at,ends_at,publish_at')
+      .eq('id',activityId).single();
+    if (activityError) throw activityError;
+    activity = activityRow;
+    if (activity.format !== 'template' || !activity.template_id) throw new Error('This activity is not a reusable Bingo template.');
+    const {data:template,error:templateError} = await client.from('campus_activity_templates')
+      .select('template_key,is_active').eq('id',activity.template_id).single();
+    if (templateError) throw templateError;
+    if (template.template_key !== 'reading_bingo' || !template.is_active) throw new Error('This activity is not an active Reading Bingo template.');
+    config = parseConfig(activity.template_config);
+    size = config.board_size;
+    mode = config.mode;
+    prompts = config.prompts.map(p=>p.trim());
+    $('activityTitle').textContent = activity.title || 'Reading Bingo';
+    document.title = (activity.title || 'Reading Bingo')+' | Bestie University';
+    $('activityDescription').textContent = activity.description || 'Complete the reading prompts to fill your Bingo board!';
+    if (config.instructions) {$('activityInstructions').hidden=false;$('activityInstructions').textContent='📜 HOW TO PLAY\n'+String(config.instructions);}
+    const meta = $('activityMeta');
+    for (const label of [mode==='community'?'🤝 Community Board':'💗 Personal Board',`${size}×${size} Bingo`,activity.starts_at?'📅 Starts '+prettyDate(activity.starts_at):null,activity.ends_at?'🏁 Ends '+prettyDate(activity.ends_at):null,activity.eligibility==='honors_only'?'💎 Honors Society Only':null].filter(Boolean)) {
+      const pill=document.createElement('span');pill.className='pill';pill.textContent=label;meta.append(pill);
+    }
+    const now = Date.now();
+    playable = ['published','scheduled'].includes(activity.status)
+      && (!activity.publish_at || new Date(activity.publish_at).getTime()<=now)
+      && (!activity.starts_at || new Date(activity.starts_at).getTime()<=now)
+      && (!activity.ends_at || new Date(activity.ends_at).getTime()>now);
+    $('boardHeading').textContent=mode==='community'?'🤝 Community Reading Bingo':'🍪 My Reading Bingo';
+    $('boardExplainer').textContent=mode==='community'
+      ? 'One shared board! Each Bestie can contribute marks, and every square with at least one mark counts toward community progress.'
+      : 'This board belongs to you! Mark each reading prompt as you complete it. Your marks are saved to your account.';
+    $('boardPanel').hidden=false;
+    $('refreshBoard').addEventListener('click',async()=>{
+      if(busy)return;
+      busy=true;$('refreshBoard').disabled=true;
+      try{await loadProgress();}catch(error){console.error('Bingo refresh:',error);status('⚠️ '+errorText(error));}
+      finally{busy=false;$('refreshBoard').disabled=false;render();}
+    });
+    await loadProgress();
+  } catch(error) {
+    console.error('Reading Bingo initialization:',error);
+    const message='⚠️ '+errorText(error);
+    if (!$('campusContent').hidden) status(message);
+    else $('campusGateMessage').textContent=message;
+  }
+})();
+</script>
+</body>
+</html>

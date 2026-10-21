@@ -609,7 +609,7 @@
       <div class="notice">
         🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
         Member Admissions, Campus Overview, Campus Mail, Monthly Crown,
-        Dorm Design Studio, and Dorm Assignments are live. The Activity Manager remains a browser-local preview. Honors
+        Dorm Design Studio, and Dorm Assignments and the Supabase Activity Manager are live. Honors
         Society, Pink Ballot, and Bestie Access event management are live.
       </div>
 
@@ -1401,7 +1401,7 @@
 
   </div>
 
-  <!-- DEMO MANAGERS: INITIALIZE ONLY AFTER STAFF ACCESS -->
+  <!-- LIVE CAMPUS MANAGERS: INITIALIZE ONLY AFTER STAFF ACCESS -->
 
   
 <script>
@@ -1683,6 +1683,14 @@
   async function saveActivity(event) {
     event.preventDefault();
     if (busy || !client) return;
+
+    // Validate and synchronize the no-code Bingo board BEFORE saving.
+    // The Bingo editor never intercepts the form submit itself.
+    if (window.BB_BINGO_BUILDER &&
+        !window.BB_BINGO_BUILDER.validateAndSync()) {
+      message("⚠️ Complete every Bingo square before saving.");
+      return;
+    }
 
     const id = $("activityId").value || null;
     const existing = activities.find(a => a.id === id);
@@ -2986,6 +2994,424 @@
       document.addEventListener('bb:campus-hq-ready', init, { once: true });
     })();
   </script>
+
+
+<script>
+/* ============================================
+   BESTIE UNIVERSITY 🎀
+   PHASE 8.1F — NO-CODE BINGO BUILDER
+
+   Adds a visual editor to the existing
+   Supabase Activity Manager.
+
+   Does not replace existing activity logic.
+============================================ */
+
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  let builder = null;
+  let promptContainer = null;
+  let modeSelect = null;
+  let sizeSelect = null;
+  let instructionsInput = null;
+  let preview = null;
+  let feedback = null;
+  let lastKey = "";
+
+  function templateKey() {
+    const id = $("activityTemplate")?.value;
+
+    const option = [...(
+      $("activityTemplate")?.options || []
+    )].find(option => option.value === id);
+
+    if (!option) return "";
+
+    const name = option.textContent.toLowerCase();
+
+    return name.includes("bingo")
+      ? "reading_bingo"
+      : "";
+  }
+
+  function isBingo() {
+    return $("activityFormat")?.value === "template"
+      && templateKey() === "reading_bingo";
+  }
+
+  function field(label, input) {
+    const wrapper = document.createElement("label");
+    wrapper.className = "field";
+
+    const heading = document.createElement("span");
+    heading.textContent = label;
+
+    wrapper.append(heading, input);
+
+    return wrapper;
+  }
+
+  function select(options) {
+    const node = document.createElement("select");
+
+    options.forEach(([value, label]) => {
+      node.add(new Option(label, value));
+    });
+
+    return node;
+  }
+
+  function getPrompts() {
+    return [...promptContainer.querySelectorAll(
+      "textarea[data-bingo-prompt]"
+    )].map(input => input.value.trim());
+  }
+
+  function getConfig() {
+    return {
+      mode: modeSelect.value,
+      board_size: Number(sizeSelect.value),
+      prompts: getPrompts(),
+      instructions: instructionsInput.value.trim()
+    };
+  }
+
+  function syncConfig() {
+    if (!isBingo()) return;
+
+    $("activityTemplateConfig").value =
+      JSON.stringify(getConfig(), null, 2);
+  }
+
+  function renderPreview() {
+    if (!isBingo()) return;
+
+    const size = Number(sizeSelect.value);
+    const prompts = getPrompts();
+
+    preview.replaceChildren();
+
+    preview.style.display = "grid";
+    preview.style.gridTemplateColumns =
+      `repeat(${size}, minmax(0, 1fr))`;
+    preview.style.gap = "6px";
+
+    prompts.forEach((prompt, index) => {
+      const square = document.createElement("div");
+
+      square.textContent =
+        prompt || `Square ${index + 1}`;
+
+      square.style.cssText = `
+        aspect-ratio: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        border: 2px solid #edabc9;
+        border-radius: 10px;
+        background: #fff0f7;
+        text-align: center;
+        overflow-wrap: anywhere;
+        font-size: clamp(9px, 1.5vw, 13px);
+        font-weight: 900;
+      `;
+
+      preview.append(square);
+    });
+
+    const complete = prompts.filter(Boolean).length;
+
+    feedback.textContent =
+      `💗 ${complete}/${size * size} squares ready! ` +
+      (
+        complete === size * size
+          ? "Your Bingo board is complete."
+          : "Fill in every square before publishing."
+      );
+  }
+
+  function renderPromptInputs(values = []) {
+    const size = Number(sizeSelect.value);
+    const total = size * size;
+
+    promptContainer.replaceChildren();
+
+    const grid = document.createElement("div");
+    grid.className = "form-grid";
+
+    for (let index = 0; index < total; index++) {
+      const input = document.createElement("textarea");
+
+      input.dataset.bingoPrompt = String(index);
+      input.rows = 2;
+      input.maxLength = 300;
+      input.value = values[index] || "";
+      input.placeholder =
+        `Reading prompt for square ${index + 1}`;
+
+      input.addEventListener("input", () => {
+        syncConfig();
+        renderPreview();
+      });
+
+      grid.append(
+        field(`Square ${index + 1}`, input)
+      );
+    }
+
+    promptContainer.append(grid);
+
+    syncConfig();
+    renderPreview();
+  }
+
+  function loadBuilderFromConfig() {
+    let config = {};
+
+    try {
+      config = JSON.parse(
+        $("activityTemplateConfig").value || "{}"
+      );
+    } catch {
+      config = {};
+    }
+
+    modeSelect.value =
+      ["personal", "community"].includes(config.mode)
+        ? config.mode
+        : "personal";
+
+    sizeSelect.value =
+      [3, 4, 5].includes(Number(config.board_size))
+        ? String(config.board_size)
+        : "5";
+
+    instructionsInput.value =
+      typeof config.instructions === "string"
+        ? config.instructions
+        : "";
+
+    renderPromptInputs(
+      Array.isArray(config.prompts)
+        ? config.prompts
+        : []
+    );
+  }
+
+  function refreshVisibility(forceLoad = false) {
+    if (!builder) return;
+
+    const active = isBingo();
+
+    builder.hidden = !active;
+
+    const rawConfig =
+      $("activityTemplateConfig").closest(".field");
+
+    if (rawConfig) {
+      rawConfig.hidden =
+        $("activityFormat").value !== "template" ||
+        active;
+    }
+
+    if (!active) {
+      lastKey = "";
+      return;
+    }
+
+    const key = [
+      $("activityId").value,
+      $("activityTemplate").value
+    ].join(":");
+
+    if (forceLoad || key !== lastKey) {
+      lastKey = key;
+      loadBuilderFromConfig();
+    }
+  }
+
+  function buildUI() {
+    const form = $("activityForm");
+    const rawConfig = $("activityTemplateConfig");
+
+    builder = document.createElement("section");
+    builder.id = "bingoVisualBuilder";
+    builder.className = "item";
+    builder.hidden = true;
+
+    const title = document.createElement("h3");
+    title.textContent =
+      "🍪 The Reading Bingo Design Studio";
+
+    const intro = document.createElement("p");
+    intro.className = "mini";
+    intro.textContent =
+      "Create a Bingo board without writing JSON. " +
+      "Choose the mode, board size, and reading prompts.";
+
+    modeSelect = select([
+      ["personal", "🎀 Personal Bingo — each Bestie has their own board"],
+      ["community", "👑 Community Bingo — Besties complete one shared board"]
+    ]);
+    modeSelect.id = "bingoBuilderMode";
+
+    sizeSelect = select([
+      ["3", "3 × 3 — 9 squares"],
+      ["4", "4 × 4 — 16 squares"],
+      ["5", "5 × 5 — 25 squares"]
+    ]);
+    sizeSelect.id = "bingoBuilderSize";
+
+    instructionsInput =
+      document.createElement("textarea");
+
+    instructionsInput.id = "bingoBuilderInstructions";
+    instructionsInput.rows = 4;
+    instructionsInput.maxLength = 3000;
+    instructionsInput.placeholder =
+      "Tell the Besties how to play!";
+
+    promptContainer = document.createElement("div");
+    promptContainer.id = "bingoBuilderPrompts";
+
+    preview = document.createElement("div");
+    preview.id = "bingoBuilderPreview";
+    preview.style.maxWidth = "520px";
+    preview.style.margin = "15px auto";
+
+    feedback = document.createElement("p");
+    feedback.className = "mini";
+    feedback.setAttribute("role", "status");
+
+    const previewTitle = document.createElement("h4");
+    previewTitle.textContent = "✨ Board Preview";
+
+    const note = document.createElement("p");
+    note.className = "mini";
+    note.textContent =
+      "Every square needs a prompt. Once members " +
+      "start playing, avoid changing the board size " +
+      "or rearranging prompts because their saved " +
+      "marks are tied to square positions.";
+
+    builder.append(
+      title,
+      intro,
+      field("Bingo Mode", modeSelect),
+      field("Board Size", sizeSelect),
+      field("Instructions", instructionsInput),
+      promptContainer,
+      previewTitle,
+      preview,
+      feedback,
+      note
+    );
+
+    rawConfig.closest(".field").before(builder);
+
+    modeSelect.addEventListener("change", syncConfig);
+
+    instructionsInput.addEventListener(
+      "input",
+      syncConfig
+    );
+
+    sizeSelect.addEventListener("change", () => {
+      const previous = getPrompts();
+      renderPromptInputs(previous);
+    });
+
+    $("activityFormat").addEventListener(
+      "change",
+      () => refreshVisibility(true)
+    );
+
+    $("activityTemplate").addEventListener(
+      "change",
+      () => refreshVisibility(true)
+    );
+
+    // Existing manager fills form values when
+    // Edit is clicked. Read them afterward.
+    $("activityList").addEventListener(
+      "click",
+      event => {
+        if (
+          event.target.closest("button")
+            ?.textContent.includes("Edit")
+        ) {
+          setTimeout(
+            () => refreshVisibility(true),
+            0
+          );
+        }
+      }
+    );
+
+    $("clearActivity").addEventListener(
+      "click",
+      () => {
+        setTimeout(
+          () => refreshVisibility(true),
+          0
+        );
+      }
+    );
+
+    // The existing Activity Manager owns the form submit event.
+    // Expose a synchronous validation method to that save handler.
+    window.BB_BINGO_BUILDER = {
+      validateAndSync() {
+        if (!isBingo()) return true;
+
+        const prompts = getPrompts();
+        const total = Number(sizeSelect.value) ** 2;
+
+        if (prompts.length !== total || prompts.some(prompt => !prompt)) {
+          feedback.textContent =
+            "⚠️ Please fill in all " + total +
+            " Bingo squares before saving.";
+          feedback.scrollIntoView({ behavior: "smooth", block: "center" });
+          return false;
+        }
+
+        syncConfig();
+        return true;
+      }
+    };
+
+    refreshVisibility(true);
+  }
+
+  function initialize() {
+    if (
+      !$("activityForm") ||
+      !$("activityTemplateConfig") ||
+      $("bingoVisualBuilder")
+    ) {
+      return;
+    }
+
+    buildUI();
+  }
+
+  document.addEventListener(
+    "bb:campus-hq-ready",
+    () => {
+      // The existing Activity Manager initializes
+      // on this same event.
+      setTimeout(initialize, 0);
+    },
+    { once: true }
+  );
+
+})();
+</script>
 
 </body>
 
