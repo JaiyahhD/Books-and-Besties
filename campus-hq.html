@@ -1698,6 +1698,8 @@
       return;
     }
 
+    if (window.BB_GLAM_STUDIO) window.BB_GLAM_STUDIO.validateAndSync();
+
     const id = $("activityId").value || null;
     const existing = activities.find(a => a.id === id);
 
@@ -3566,6 +3568,28 @@
 })();
 </script>
 
+<script>
+/* PHASE 8.1I — SHARED ACTIVITY GLAM STUDIO */
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const defaults = {primary:'#f64fa1',secondary:'#176e78',accent:'#d92c82',text:'#382336',surface:'#ffffff',background:'#fff5fa',gradientStart:'#ffd0e5',gradientEnd:'#cdebe8',angle:135,emoji:'🎀',completeEmoji:'👑',availableEmoji:'✨'};
+const fields = [['primary','Primary / button color'],['secondary','Secondary / heading color'],['accent','Accent color'],['text','Text color'],['surface','Card background'],['background','Page background'],['gradientStart','Gradient start'],['gradientEnd','Gradient end']];
+let root, preview, status, currentKey='', ready=false;
+function active(){return $('activityFormat')?.value==='template' && !!$('activityTemplate')?.value;}
+function getConfig(){try{const o=JSON.parse($('activityTemplateConfig').value||'{}');return o&&typeof o==='object'&&!Array.isArray(o)?o:{};}catch{return {};}}
+function color(v,fallback){return /^#[0-9a-f]{6}$/i.test(v||'')?v:fallback;}
+function emoji(v,fallback){return typeof v==='string'&&v.trim()?Array.from(v.trim()).slice(0,8).join(''):fallback;}
+function load(){const theme=getConfig().theme||{};for(const [key] of fields) $('glam_'+key).value=color(theme[key],defaults[key]);$('glam_angle').value=Number.isFinite(Number(theme.angle))?Math.max(0,Math.min(360,Number(theme.angle))):135;for(const key of ['emoji','completeEmoji','availableEmoji'])$('glam_'+key).value=emoji(theme[key],defaults[key]);paint();}
+function values(){const t={};for(const [key] of fields)t[key]=$('glam_'+key).value;t.angle=Number($('glam_angle').value)||0;for(const key of ['emoji','completeEmoji','availableEmoji'])t[key]=emoji($('glam_'+key).value,defaults[key]);return t;}
+function paint(){const t=values();preview.style.background=`linear-gradient(${t.angle}deg,${t.gradientStart},${t.gradientEnd})`;preview.style.color=t.text;preview.querySelector('[data-preview-card]').style.background=t.surface;preview.querySelector('[data-preview-card]').style.color=t.text;preview.querySelector('[data-preview-title]').style.color=t.secondary;preview.querySelector('[data-preview-button]').style.background=t.primary;preview.querySelector('[data-preview-button]').style.color='#fff';preview.querySelector('[data-preview-emoji]').textContent=t.emoji;preview.querySelector('[data-preview-complete]').textContent=t.completeEmoji;preview.querySelector('[data-preview-available]').textContent=t.availableEmoji;}
+function sync(){if(!active())return true;const cfg=getConfig();cfg.theme=values();$('activityTemplateConfig').value=JSON.stringify(cfg,null,2);status.textContent='💗 Theme saved into this activity’s configuration when you save the activity.';return true;}
+function refresh(force=false){if(!root)return;root.hidden=!active();if(!active()){currentKey='';return;}const key=$('activityId').value+':'+$('activityTemplate').value;if(force||currentKey!==key){currentKey=key;load();}}
+function field(label,el){const wrap=document.createElement('label');wrap.className='field';const title=document.createElement('span');title.textContent=label;wrap.append(title,el);return wrap;}
+function init(){if(ready||!$('activityTemplateConfig'))return;ready=true;root=document.createElement('div');root.id='activityGlamStudio';root.className='item';root.hidden=true;const title=document.createElement('h3');title.textContent='🎨 Activity Glam Studio™';const intro=document.createElement('p');intro.className='mini';intro.textContent='Customize THIS activity only. Each Bingo, Alphabet Rush or future Side Quest can have its own colors, gradient and emojis. No database changes needed.';const grid=document.createElement('div');grid.className='form-grid';for(const [key,label] of fields){const input=document.createElement('input');input.type='color';input.id='glam_'+key;input.value=defaults[key];input.addEventListener('input',()=>{paint();sync();});grid.append(field(label,input));}const angle=document.createElement('input');angle.type='range';angle.id='glam_angle';angle.min='0';angle.max='360';angle.step='15';angle.value='135';angle.addEventListener('input',()=>{paint();sync();});grid.append(field('Gradient angle',angle));for(const [key,label] of [['emoji','Activity emoji'],['availableEmoji','Available / unmarked emoji'],['completeEmoji','Completed / celebration emoji']]){const input=document.createElement('input');input.type='text';input.id='glam_'+key;input.maxLength=16;input.value=defaults[key];input.addEventListener('input',()=>{paint();sync();});grid.append(field(label,input));}const heading=document.createElement('h4');heading.textContent='✨ Live Lookbook Preview';preview=document.createElement('div');preview.style.cssText='border-radius:18px;padding:24px;margin:12px 0;border:2px solid #fff';preview.innerHTML='<div data-preview-card style="padding:22px;border-radius:16px;max-width:380px;margin:auto;box-shadow:0 4px 12px #0002"><div data-preview-emoji style="font-size:36px"></div><h3 data-preview-title>YOUR NEXT BESTIE ADVENTURE</h3><p><span data-preview-available></span> Pick your challenge · <span data-preview-complete></span> Celebrate your wins!</p><span data-preview-button style="display:inline-block;padding:10px 18px;border-radius:22px;font-weight:900">Let’s Play!</span></div>';status=document.createElement('p');status.className='mini';status.setAttribute('role','status');const reset=document.createElement('button');reset.type='button';reset.className='btn light';reset.textContent='↩️ Restore Default Theme';reset.addEventListener('click',()=>{for(const [key] of fields)$('glam_'+key).value=defaults[key];$('glam_angle').value=defaults.angle;for(const key of ['emoji','completeEmoji','availableEmoji'])$('glam_'+key).value=defaults[key];paint();sync();});root.append(title,intro,grid,heading,preview,reset,status);$('activityTemplateConfig').closest('.field').before(root);$('activityFormat').addEventListener('change',()=>refresh(true));$('activityTemplate').addEventListener('change',()=>refresh(true));$('activityList').addEventListener('click',e=>{if(e.target.closest('button')?.textContent.includes('Edit'))setTimeout(()=>refresh(true),0);});$('clearActivity').addEventListener('click',()=>setTimeout(()=>refresh(true),0));window.BB_GLAM_STUDIO={validateAndSync:sync};refresh(true);}
+document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
+})();
+</script>
 </body>
 
 </html>
