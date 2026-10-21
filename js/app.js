@@ -157,6 +157,11 @@
         nav();
 
         const route = location.hash.split('?')[0].replace('#', '') || 'home';
+                // PHASE 9.4 — REDIRECT OLD DASHBOARD TO OFFICIAL BESTIE LOCKER
+        if (route === 'dashboard') {
+            window.location.replace('/locker');
+            return;
+        }
 
         // PHASE 9.4 — RETIRE LEGACY MEMBER DASHBOARD
         // All old dashboard links now open the official Bestie Locker.
@@ -173,7 +178,7 @@
             login: () => authPage(false),
             'admin-login': () => authPage(true),
             register,
-            
+
             admin: adminPage,
             'reset-pin': resetPin
         };
