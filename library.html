@@ -467,9 +467,9 @@
                         remove.disabled = true;
                         remove.textContent = 'Checking book...';
                         try {
-                            const { data, error } = await client.rpc('campus_remove_library_book', { p_book_id: book.id });
+                            const { data, error } = await client.rpc('admin_remove_library_book', { p_book_id: book.id, p_confirm_title: typed.trim() });
                             if (error) throw error;
-                            if (!data?.removed) throw new Error(data?.message || 'Book was not removed.');
+                            if (!data?.success) throw new Error(data?.message || 'Book was not removed.');
                             await load(true);
                             status('catalogStatus', '💗 ' + book.title + ' was removed from the shared catalog.', 'success');
                         } catch (error) {
@@ -485,7 +485,7 @@
             let searchTimer; $('searchBooks').addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => load(true), 350); }); $('sortBooks').addEventListener('change', () => load(true)); $('refreshBooks').addEventListener('click', () => load(true)); $('loadMore').addEventListener('click', () => { if (more) load(false); });
             $('addBookForm').addEventListener('submit', async e => { e.preventDefault(); const btn = $('addBookButton'); if (btn.disabled) return; const title = $('bookTitle').value.trim(), author = $('bookAuthor').value.trim(), isbn = $('bookIsbn').value.trim(), genre = $('bookGenre').value.trim(), description = $('bookDescription').value.trim(), cover = $('bookCover').value.trim(), pages = $('bookPages').value ? Number($('bookPages').value) : null; if (!title || !author) { status('addBookStatus', 'Title and author are required.', 'error'); return; } if (isbn && !/^\d{13}$/.test(isbn)) { status('addBookStatus', 'ISBN must contain exactly 13 digits.', 'error'); return; } if (cover && !coverOk(cover)) { status('addBookStatus', 'Cover URLs must start with https://', 'error'); return; } btn.disabled = true; status('addBookStatus', 'Adding your book...'); try { const { data, error } = await client.from('library_books').insert({ title, author, isbn_13: isbn || null, page_count: pages, genre: genre || null, description: description || null, cover_url: cover || null, created_by: result.user.id }).select('id').single(); if (error) throw error; if (!data?.id) throw new Error('Book was not returned by the catalog.'); $('addBookForm').reset(); status('addBookStatus', '💗 Book added! Welcome to the stacks.', 'success'); await load(true); } catch (error) { status('addBookStatus', 'Could not add book: ' + error.message, 'error'); } finally { btn.disabled = false; } });
             const adminCheck = await client.rpc('is_campus_admin');
-            if (adminCheck.error) console.warn('Could not check Campus HQ access:', adminCheck.error);
+            if (adminCheck.error) { console.warn('Could not check Campus HQ access:', adminCheck.error); status('catalogStatus', 'Admin check failed: ' + adminCheck.error.message, 'error'); }
             isAdmin = !adminCheck.error && adminCheck.data === true;
             await load(true);
         })().catch(error => { console.error(error); const n = document.getElementById('campusGateMessage'); if (n) n.textContent = 'Unable to open Campus Library: ' + error.message; });
