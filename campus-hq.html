@@ -649,6 +649,11 @@
             🎓 Member Admissions
           </button>
 
+          <button class="nav-btn" data-section="staff-management"
+            id="staffManagementNav" hidden>
+            👑 Staff Management
+          </button>
+
           <button class="nav-btn" data-section="honors">
             💎 Honors Society
           </button>
@@ -770,6 +775,56 @@
 
             </div>
           </section>
+
+          <!-- PHASE 9.5 — STAFF MANAGEMENT -->
+<section class="section" id="section-staff-management">
+
+  <h2 class="section-heading">👑 Staff Management</h2>
+
+  <p class="section-description">
+    Your Dean's Office staff directory! Promote approved
+    Besties to Administrator or Moderator, update roles,
+    and remove staff permissions.
+  </p>
+
+  <div class="panel">
+    <div class="panel-head">
+      💗 THE CAMPUS STAFF DIRECTORY
+    </div>
+
+    <div class="panel-body">
+      <p class="mini">
+        Only administrators can manage staff.
+        Members must register and receive membership
+        approval before staff permissions can be assigned.
+      </p>
+
+      <label class="field">
+        <span>🔎 Find a Bestie</span>
+        <input
+          id="staffManagementSearch"
+          type="search"
+          placeholder="Search approved Besties..."
+          autocomplete="off">
+      </label>
+
+      <div class="actions">
+        <button class="btn light" id="staffManagementRefresh"
+          type="button">
+          🔄 Refresh Directory
+        </button>
+      </div>
+
+      <p class="mini" id="staffManagementStatus"
+        role="status" aria-live="polite"></p>
+
+      <div id="staffManagementList">
+        <p class="empty">Loading staff directory...</p>
+      </div>
+    </div>
+  </div>
+
+</section>
 
           <!-- ACTIVITY MANAGER -->
 
@@ -4620,6 +4675,216 @@ document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true
     refresh(true);
   }
   document.addEventListener('bb:campus-hq-ready',()=>setTimeout(init,0),{once:true});
+})();
+</script>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  let client = null;
+  let directory = [];
+  let currentUserId = null;
+  let busy = false;
+
+  const status = message => {
+    $("staffManagementStatus").textContent = message;
+  };
+
+  function makeElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+
+  function roleLabel(role) {
+    if (role === "admin") return "👑 Administrator";
+    if (role === "moderator") return "💎 Moderator";
+    return "🎓 Approved Bestie";
+  }
+
+  function render() {
+    const list = $("staffManagementList");
+    const search = $("staffManagementSearch").value
+      .trim()
+      .toLowerCase();
+
+    list.replaceChildren();
+
+    const matches = directory.filter(member =>
+      (member.display_name || "").toLowerCase().includes(search)
+    );
+
+    if (!matches.length) {
+      list.append(
+        makeElement("p", "empty", "No matching Besties found. 💗")
+      );
+      return;
+    }
+
+    for (const member of matches) {
+      const card = makeElement("div", "item");
+
+      const heading = makeElement(
+        "h4",
+        "",
+        member.display_name || "Bestie"
+      );
+
+      const badge = makeElement(
+        "p",
+        "mini",
+        roleLabel(member.staff_role)
+      );
+
+      const membership = makeElement(
+        "p",
+        "mini",
+        "Membership: " + member.membership_status
+      );
+
+      const field = makeElement("label", "field");
+      const fieldTitle = makeElement("span", "", "Staff permissions");
+
+      const select = document.createElement("select");
+
+      const choices = [
+        ["", "🎓 No Staff Access"],
+        ["moderator", "💎 Moderator"],
+        ["admin", "👑 Administrator"]
+      ];
+
+      for (const [value, label] of choices) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        select.append(option);
+      }
+
+      select.value = member.staff_role || "";
+      select.disabled = busy || member.membership_status !== "approved";
+
+      field.append(fieldTitle, select);
+
+      const actions = makeElement("div", "actions");
+      const save = makeElement("button", "btn secondary", "💗 Save Permissions");
+
+      save.type = "button";
+      save.disabled = busy || member.membership_status !== "approved";
+
+      save.addEventListener("click", async () => {
+        if (busy) return;
+
+        const newRole = select.value || null;
+        const previousRole = member.staff_role || null;
+
+        if (newRole === previousRole) {
+          status("No changes to save.");
+          return;
+        }
+
+        const description = newRole
+          ? `assign ${roleLabel(newRole)} permissions to ${member.display_name}`
+          : `remove staff access from ${member.display_name}`;
+
+        if (!window.confirm(`Are you sure you want to ${description}?`)) {
+          select.value = previousRole || "";
+          return;
+        }
+
+        busy = true;
+        save.disabled = true;
+        status("Saving staff permissions...");
+
+        try {
+          const { error } = await client.rpc("hq_manage_staff", {
+            p_user_id: member.user_id,
+            p_role: newRole
+          });
+
+          if (error) throw error;
+
+          status("💗 Staff permissions updated successfully!");
+
+          await loadDirectory();
+
+          if (member.user_id === currentUserId) {
+            const { data: stillAdmin } =
+              await client.rpc("is_campus_admin");
+
+            if (stillAdmin !== true) {
+              $("staffManagementNav").hidden = true;
+              window.location.hash = "#hq-overview";
+              window.location.reload();
+            }
+          }
+
+        } catch (error) {
+          status("⚠️ " + (error.message || "Unable to save permissions."));
+          select.value = previousRole || "";
+        } finally {
+          busy = false;
+          save.disabled = false;
+        }
+      });
+
+      actions.append(save);
+      card.append(heading, badge, membership, field, actions);
+      list.append(card);
+    }
+  }
+
+  async function loadDirectory() {
+    status("Loading approved Besties and staff...");
+
+    const { data, error } = await client.rpc("hq_staff_directory");
+
+    if (error) {
+      status("⚠️ " + error.message);
+      return;
+    }
+
+    directory = data || [];
+    render();
+
+    status(
+      `💗 ${directory.length} Bestie account(s) available for review.`
+    );
+  }
+
+  async function initialize() {
+    client = window.BB_CAMPUS_CLIENT;
+
+    if (!client) return;
+
+    const { data: isAdmin, error } =
+      await client.rpc("is_campus_admin");
+
+    if (error || isAdmin !== true) return;
+
+    const { data: authData } = await client.auth.getUser();
+    currentUserId = authData?.user?.id || null;
+
+    $("staffManagementNav").hidden = false;
+
+    $("staffManagementSearch").addEventListener("input", render);
+
+    $("staffManagementRefresh").addEventListener(
+      "click",
+      loadDirectory
+    );
+
+    await loadDirectory();
+  }
+
+  document.addEventListener(
+    "bb:campus-hq-ready",
+    initialize,
+    { once: true }
+  );
 })();
 </script>
 </body>
