@@ -757,11 +757,15 @@
               🎮 Activity Manager
             </h2>
 
-            <p class="section-description">
-              Create, edit, publish, and archive activities
-              in your browser-local planning registry.
-              These changes are not live.
-            </p>
+            
+          <div class="notice">
+            🗝️ <strong>CAMPUS STAFF WORKSPACE:</strong>
+            Welcome to your live Bestie University command center!
+            Manage admissions, activities, Honors Society, Monthly
+            Crown, campus housing, announcements, and moderation
+            from one fabulous place. 🎀💗
+          </div>
+
 
             <div class="panel">
               <div class="panel-head">
@@ -1399,135 +1403,606 @@
 
   <!-- DEMO MANAGERS: INITIALIZE ONLY AFTER STAFF ACCESS -->
 
-  <script>
-    (() => {
-      "use strict";
+  
+<script>
+(() => {
+  "use strict";
 
-      const KEY = "bb_campus_hq_demo_v1";
+  // BESTIE UNIVERSITY — PHASE 8.1D
+  // LIVE SUPABASE ACTIVITY MANAGER
+  // Admins + moderators have equal access.
 
-      const defaults = {
-        activities: [
-          {
-            id: "a1",
-            name: "Espresso Your ABCs",
-            type: "Alphabet Rush",
-            start: "2026-11-01",
-            end: "2026-11-30",
-            eligibility: "All Besties",
-            status: "Draft",
-            description: "A collaborative A–Z reading challenge."
-          },
-          {
-            id: "a2",
-            name: "Bestie Bingo",
-            type: "Bingo",
-            start: "",
-            end: "",
-            eligibility: "All Besties",
-            status: "Draft",
-            description: "Digital reading Bingo adventures."
-          }
-        ],
-        vips: [],
-        polls: [],
-        events: []
-      };
+  const $ = id => document.getElementById(id);
 
-      const $ = id => document.getElementById(id);
+  let client = null;
+  let activities = [];
+  let templates = [];
+  let busy = false;
+  let initialized = false;
 
-      const clone = value =>
-        JSON.parse(JSON.stringify(value));
+  const eligibilityMap = {
+    "All Besties": "all_besties",
+    "Honors Society Only": "honors_only",
+    "Monthly Crown Only": "monthly_crown_only"
+  };
 
-      let state = clone(defaults);
-      let initialized = false;
-      let toastTimeout;
+  const statusMap = {
+    Draft: "draft",
+    Scheduled: "scheduled",
+    Published: "published",
+    Archived: "archived"
+  };
 
-      function makeId() {
-        return crypto.randomUUID();
+  function make(tag, content, className = "") {
+    const node = document.createElement(tag);
+    if (content !== undefined) node.textContent = content;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function message(text) {
+    const node = $("activityLiveStatus");
+    if (node) node.textContent = text;
+  }
+
+  function errorText(error) {
+    return error?.message || "Unknown database error";
+  }
+
+  function slugify(value) {
+    return value.toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 90) || "activity";
+  }
+
+  function localDate(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+
+  function toISO(value) {
+    return value ? new Date(value).toISOString() : null;
+  }
+
+  function dateOnlyToISO(value, endOfDay = false) {
+    if (!value) return null;
+    return new Date(
+      value + (endOfDay ? "T23:59:59" : "T00:00:00")
+    ).toISOString();
+  }
+
+  function addField(label, id, type = "text", placeholder = "") {
+    const wrapper = make("label", undefined, "field");
+    wrapper.append(make("span", label));
+    const input = make("input");
+    input.id = id;
+    input.type = type;
+    input.placeholder = placeholder;
+    wrapper.append(input);
+    return wrapper;
+  }
+
+  function addSelect(label, id, options) {
+    const wrapper = make("label", undefined, "field");
+    wrapper.append(make("span", label));
+    const select = make("select");
+    select.id = id;
+    options.forEach(([value, title]) => {
+      select.add(new Option(title, value));
+    });
+    wrapper.append(select);
+    return wrapper;
+  }
+
+  function installEditor() {
+    const form = $("activityForm");
+    const grid = form.querySelector(".form-grid");
+
+    // Preserve existing fields; extend them.
+    grid.prepend(
+      addSelect("Activity Format", "activityFormat", [
+        ["custom_page", "💻 Custom-Coded Activity Page"],
+        ["template", "🎀 No-Code Template"]
+      ])
+    );
+
+    grid.append(
+      addField(
+        "Activity Slug",
+        "activitySlug",
+        "text",
+        "espresso-your-abcs"
+      ),
+      addField(
+        "Custom Page Path",
+        "activityPage",
+        "text",
+        "activities/espresso-abcs.html"
+      ),
+      addSelect(
+        "No-Code Template",
+        "activityTemplate",
+        [["", "Choose a template"]]
+      ),
+      addField(
+        "Publish Date & Time",
+        "activityPublishAt",
+        "datetime-local"
+      )
+    );
+
+    const configField = make("label", undefined, "field");
+    configField.append(
+      make("span", "Template Configuration (JSON)")
+    );
+
+    const configInput = make("textarea");
+    configInput.id = "activityTemplateConfig";
+    configInput.value = "{}";
+    configInput.placeholder = '{"prompts":[]}';
+    configField.append(configInput);
+
+    form.querySelector(".actions").before(configField);
+
+    const note = make("p", "", "mini");
+    note.id = "activityFormatNote";
+    configField.after(note);
+
+    const status = make("p", "Connecting to Supabase...", "mini");
+    status.id = "activityLiveStatus";
+    status.setAttribute("role", "status");
+    status.setAttribute("aria-live", "polite");
+    form.before(status);
+
+    const refresh = make("button", "🔄 Refresh Live Activities", "btn light");
+    refresh.type = "button";
+    refresh.id = "activityRefresh";
+    $("activityList").before(refresh);
+
+    form.querySelector('button[type="submit"]').textContent =
+      "💗 Save Live Activity";
+
+    $("activityFormat").addEventListener("change", updateFormat);
+    $("activityName").addEventListener("input", () => {
+      if (!$("activityId").value) {
+        $("activitySlug").value = slugify($("activityName").value);
+      }
+    });
+
+    refresh.addEventListener("click", loadActivities);
+    $("clearActivity").addEventListener("click", clearForm);
+    form.addEventListener("submit", saveActivity);
+
+    updateFormat();
+  }
+
+  function updateFormat() {
+    const isTemplate = $("activityFormat").value === "template";
+
+    $("activityTemplate").closest(".field").hidden = !isTemplate;
+    $("activityTemplateConfig").closest(".field").hidden = !isTemplate;
+    $("activityPage").closest(".field").hidden = isTemplate;
+
+    $("activityPage").required = !isTemplate;
+    $("activityTemplate").required = isTemplate;
+
+    $("activityFormatNote").textContent = isTemplate
+      ? "🎀 Choose a reusable template and configure its JSON settings. The member-facing template renderer will be connected next."
+      : "💻 Enter the relative path of an existing custom-coded HTML page. Saving this activity does not create or modify that HTML file.";
+  }
+
+  async function loadTemplates() {
+    const { data, error } = await client
+      .from("campus_activity_templates")
+      .select("id,template_key,name,description,is_active")
+      .order("name");
+
+    if (error) throw error;
+
+    templates = data || [];
+
+    const select = $("activityTemplate");
+    select.replaceChildren(new Option("Choose a template", ""));
+
+    templates.forEach(template => {
+      if (template.is_active) {
+        select.add(new Option(
+          "🎀 " + template.name,
+          template.id
+        ));
+      }
+    });
+  }
+
+  function clearForm() {
+    $("activityForm").reset();
+    $("activityId").value = "";
+    $("activitySlug").value = "";
+    $("activityPage").value = "";
+    $("activityPublishAt").value = "";
+    $("activityTemplateConfig").value = "{}";
+    $("activityFormat").value = "custom_page";
+    $("activityStatus").value = "Draft";
+    updateFormat();
+    message("💗 Ready to create a new activity.");
+  }
+
+  function fillForm(activity) {
+    $("activityId").value = activity.id;
+    $("activityName").value = activity.title || "";
+    $("activitySlug").value = activity.slug || "";
+    $("activityType").value = activity.activity_type || "Other";
+
+    // Keep legacy dates editable in the existing date fields.
+    $("activityStart").value = activity.starts_at
+      ? localDate(activity.starts_at).slice(0, 10)
+      : "";
+
+    $("activityEnd").value = activity.ends_at
+      ? localDate(activity.ends_at).slice(0, 10)
+      : "";
+
+    $("activityEligibility").value =
+      Object.keys(eligibilityMap).find(
+        key => eligibilityMap[key] === activity.eligibility
+      ) || "All Besties";
+
+    $("activityStatus").value =
+      Object.keys(statusMap).find(
+        key => statusMap[key] === activity.status
+      ) || "Draft";
+
+    $("activityDescription").value = activity.description || "";
+
+    $("activityFormat").value = activity.format || "custom_page";
+    $("activityPage").value = activity.custom_page_path || "";
+    $("activityTemplate").value = activity.template_id || "";
+    $("activityPublishAt").value = localDate(activity.publish_at);
+    $("activityTemplateConfig").value = JSON.stringify(
+      activity.template_config || {},
+      null,
+      2
+    );
+
+    updateFormat();
+
+    $("activityForm").scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    message("✏️ Editing " + activity.title);
+  }
+
+  async function saveActivity(event) {
+    event.preventDefault();
+    if (busy || !client) return;
+
+    const id = $("activityId").value || null;
+    const existing = activities.find(a => a.id === id);
+
+    const title = $("activityName").value.trim();
+    const slug = slugify($("activitySlug").value || title);
+    const format = $("activityFormat").value;
+    const status = statusMap[$("activityStatus").value];
+    const start = $("activityStart").value;
+    const end = $("activityEnd").value;
+
+    if (title.length < 3) {
+      message("⚠️ Activity names need at least 3 characters.");
+      return;
+    }
+
+    if (start && end && end < start) {
+      message("⚠️ End date cannot be before start date.");
+      return;
+    }
+
+    let config;
+
+    try {
+      config = JSON.parse($("activityTemplateConfig").value || "{}");
+
+      if (!config || Array.isArray(config) ||
+          typeof config !== "object") {
+        throw new Error("Configuration must be a JSON object.");
+      }
+    } catch (error) {
+      message("⚠️ Invalid template JSON: " + error.message);
+      return;
+    }
+
+    const templateId = $("activityTemplate").value || null;
+    const pagePath = $("activityPage").value.trim();
+
+    if (format === "template" && !templateId) {
+      message("⚠️ Choose a no-code template.");
+      return;
+    }
+
+    if (format === "custom_page" &&
+        !/^[a-zA-Z0-9_/-]+\.html(#[a-zA-Z0-9_-]+)?$/.test(pagePath)) {
+      message("⚠️ Enter a valid relative HTML page path.");
+      return;
+    }
+
+    if (pagePath.includes("..") || pagePath.startsWith("/")) {
+      message("⚠️ Custom page paths must stay within your website.");
+      return;
+    }
+
+    const publishAt = toISO($("activityPublishAt").value);
+
+    if (status === "scheduled" && !publishAt) {
+      message("⚠️ Scheduled activities need a publish date and time.");
+      return;
+    }
+
+    const payload = {
+      title,
+      slug,
+      activity_type: $("activityType").value,
+      description: $("activityDescription").value.trim(),
+      format,
+      template_id: format === "template" ? templateId : null,
+      template_config: format === "template" ? config : {},
+      custom_page_path: format === "custom_page" ? pagePath : null,
+      eligibility: eligibilityMap[$("activityEligibility").value],
+      status,
+      starts_at: dateOnlyToISO(start),
+      ends_at: dateOnlyToISO(end, true),
+      publish_at: publishAt,
+
+      // Keep the existing legacy catalog compatible.
+      is_active: status === "published"
+    };
+
+    // Existing instructions is JSONB, not text.
+    // Preserve existing structured instructions when editing.
+    if (!existing) {
+      payload.instructions = {};
+      payload.activity_key =
+        slug + "-" + crypto.randomUUID().slice(0, 8);
+    }
+
+    busy = true;
+    const submit = $("activityForm").querySelector(
+      'button[type="submit"]'
+    );
+    submit.disabled = true;
+    message("💌 Saving your activity to Supabase...");
+
+    try {
+      let result;
+
+      if (id) {
+        result = await client
+          .from("campus_activities")
+          .update(payload)
+          .eq("id", id)
+          .select("id")
+          .single();
+      } else {
+        result = await client
+          .from("campus_activities")
+          .insert(payload)
+          .select("id")
+          .single();
       }
 
-      function el(tag, text, className) {
-        const node = document.createElement(tag);
+      if (result.error) throw result.error;
 
-        if (text !== undefined) {
-          node.textContent = text;
-        }
+      clearForm();
+      await loadActivities();
+      message("💗 Activity saved successfully in Supabase!");
+    } catch (error) {
+      message("⚠️ Save failed: " + errorText(error));
+    } finally {
+      busy = false;
+      submit.disabled = false;
+    }
+  }
 
-        if (className) {
-          node.className = className;
-        }
+  async function changeStatus(activity, nextStatus) {
+    if (busy) return;
 
-        return node;
+    if (nextStatus === "scheduled" && !activity.publish_at) {
+      fillForm(activity);
+      $("activityStatus").value = "Scheduled";
+      message("📅 Add a publish date before scheduling.");
+      return;
+    }
+
+    const action = nextStatus === "archived"
+      ? "Archive"
+      : "Publish";
+
+    if (!confirm(action + ' "' + activity.title + '"?')) {
+      return;
+    }
+
+    busy = true;
+    message("Updating activity status...");
+
+    const { error } = await client
+      .from("campus_activities")
+      .update({
+        status: nextStatus,
+        is_active: nextStatus === "published"
+      })
+      .eq("id", activity.id);
+
+    busy = false;
+
+    if (error) {
+      message("⚠️ " + errorText(error));
+      return;
+    }
+
+    await loadActivities();
+    message("💗 Activity updated successfully!");
+  }
+
+  function action(parent, label, callback, style = "light") {
+    const button = make("button", label, "btn " + style);
+    button.type = "button";
+    button.addEventListener("click", callback);
+    parent.append(button);
+  }
+
+  function renderActivities() {
+    const list = $("activityList");
+    list.replaceChildren();
+
+    $("statActivities").textContent =
+      activities.filter(a => a.status === "published").length;
+
+    if (!activities.length) {
+      list.append(make(
+        "p",
+        "🎀 No activities yet! Create your first live activity above.",
+        "empty"
+      ));
+      return;
+    }
+
+    activities.forEach(activity => {
+      const card = make("article", undefined, "item");
+
+      card.append(make("h4", "🎮 " + activity.title));
+
+      card.append(make(
+        "span",
+        (activity.status || "draft").toUpperCase(),
+        "tag " + (activity.status === "published" ? "green" : "gray")
+      ));
+
+      const details = [
+        activity.activity_type || "Other",
+        activity.format === "template"
+          ? "🎀 No-Code Template"
+          : "💻 Custom Page",
+        activity.eligibility || "all_besties"
+      ];
+
+      card.append(make("p", details.join(" · "), "mini"));
+
+      if (activity.description) {
+        card.append(make("p", activity.description));
       }
 
-      function button(text, handler, style = "light") {
-        const node = el("button", text, "btn " + style);
-        node.type = "button";
-        node.addEventListener("click", handler);
-        return node;
+      if (activity.starts_at || activity.ends_at) {
+        card.append(make(
+          "p",
+          "📅 " +
+          (activity.starts_at
+            ? new Date(activity.starts_at).toLocaleDateString()
+            : "Open") +
+          " – " +
+          (activity.ends_at
+            ? new Date(activity.ends_at).toLocaleDateString()
+            : "Ongoing"),
+          "mini"
+        ));
       }
 
-      function item(title, details, tagText, tagClass) {
-        const node = el("div", undefined, "item");
-
-        node.append(el("h4", title));
-
-        if (details) {
-          node.append(el("p", details));
-        }
-
-        if (tagText) {
-          node.append(
-            el(
-              "span",
-              tagText,
-              "tag " + (tagClass || "")
-            )
-          );
-        }
-
-        return node;
+      if (activity.publish_at) {
+        card.append(make(
+          "p",
+          "🕒 Publish time: " +
+          new Date(activity.publish_at).toLocaleString(),
+          "mini"
+        ));
       }
 
-      function toast(text) {
-        const node = $("toast");
-
-        node.textContent = text;
-        node.classList.remove("hidden");
-
-        clearTimeout(toastTimeout);
-
-        toastTimeout = setTimeout(() => {
-          node.classList.add("hidden");
-        }, 3500);
+      if (activity.format === "custom_page" &&
+          activity.custom_page_path) {
+        const link = make(
+          "a",
+          "🔗 Open Custom Activity ↗",
+          "btn light"
+        );
+        link.href = activity.custom_page_path;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        card.append(link);
       }
 
-      function save() {
-        try {
-          localStorage.setItem(KEY, JSON.stringify(state));
-          return true;
-        } catch (error) {
-          console.error(error);
-          toast("Unable to save this browser-local change.");
-          return false;
-        }
+      const actions = make("div", undefined, "actions");
+
+      action(actions, "✏️ Edit", () => fillForm(activity));
+
+      if (activity.status !== "published") {
+        action(
+          actions,
+          "💗 Publish",
+          () => changeStatus(activity, "published"),
+          "secondary"
+        );
       }
 
-      function update(mutator) {
-        const previous = clone(state);
-
-        mutator();
-
-        if (!save()) {
-          state = previous;
-          return false;
-        }
-
-        renderDemo();
-        return true;
+      if (activity.status !== "archived") {
+        action(
+          actions,
+          "📦 Archive",
+          () => changeStatus(activity, "archived")
+        );
       }
 
-      function showSection(name) {
+      card.append(actions);
+      list.append(card);
+    });
+  }
+
+  async function loadActivities() {
+    message("💌 Loading live activities...");
+
+    const { data, error } = await client
+      .from("campus_activities")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      message("⚠️ Could not load activities: " + errorText(error));
+      return;
+    }
+
+    activities = data || [];
+    renderActivities();
+
+    const todo = $("todoList");
+    todo.querySelectorAll("[data-activity-task]")
+      .forEach(node => node.remove());
+
+    const draftCount = activities.filter(
+      a => a.status === "draft"
+    ).length;
+
+    const task = make(
+      "div",
+      "🎮 " + draftCount + " live activity draft(s) awaiting publication.",
+      "item"
+    );
+    task.dataset.activityTask = "true";
+    todo.append(task);
+
+    message(
+      "💗 " + activities.length +
+      " live activities loaded from Supabase."
+    );
+  }
+
+  function installNavigation() {
+    document.querySelectorAll("[data-section]").forEach(node => {
+      node.addEventListener("click", () => {
+        const name = node.dataset.section;
+
         document.querySelectorAll(".section").forEach(section => {
           section.classList.toggle(
             "active",
@@ -1535,294 +2010,72 @@
           );
         });
 
-        document.querySelectorAll(".nav-btn[data-section]").forEach(node => {
-          const selected = node.dataset.section === name;
-          node.classList.toggle("active", selected);
-          node.setAttribute("aria-current", selected ? "true" : "false");
-        });
-      }
-
-      function renderDemoOverview() {
-        // Live Campus Overview handles activity and VIP statistics.
-        // Demo records must not overwrite the live counters.
-
-
-
-        const list = $("todoList");
-
-        // Live admissions inserts its own separate task.
-        // Never overwrite the Supabase admissions task.
-        list.querySelectorAll(
-          "[data-demo-task]"
-        ).forEach(node => node.remove());
-
-        const tasks = [
-          [
-            "🎮 Activity Drafts",
-            state.activities.filter(
-              activity => activity.status === "Draft"
-            ).length + " browser-local activity drafts."
-          ],
-          [
-            "🗳️ Pink Ballots",
-            "Live polls are managed in the Pink Ballot Studio."
-          ],
-          [
-            "💌 Early Access",
-            "Live events are managed in the Bestie Access Studio."
-          ]
-        ];
-
-        tasks.forEach(([title, description]) => {
-          const node = item(title, description);
-          node.dataset.demoTask = "true";
-          list.append(node);
-        });
-      }
-
-      function renderActivities() {
-        const list = $("activityList");
-        list.replaceChildren();
-
-        if (!state.activities.length) {
-          list.append(
-            el("p", "No demo activities yet, Dean!", "empty")
-          );
-          return;
-        }
-
-        state.activities.forEach(activity => {
-          const node = item(
-            "🎮 " + activity.name,
-            activity.type + " · " + activity.eligibility +
-            (activity.start ? " · " + activity.start : "") +
-            (activity.end ? " to " + activity.end : ""),
-            activity.status,
-            activity.status === "Published" ? "green" : "gray"
-          );
-
-          if (activity.description) {
-            node.append(
-              el("p", activity.description, "mini")
+        document.querySelectorAll(".nav-btn[data-section]")
+          .forEach(button => {
+            const active = button.dataset.section === name;
+            button.classList.toggle("active", active);
+            button.setAttribute(
+              "aria-current",
+              active ? "true" : "false"
             );
-          }
-
-          const actions = el("div", undefined, "actions");
-
-          actions.append(
-            button("✏️ Edit", () => {
-              $("activityId").value = activity.id;
-              $("activityName").value = activity.name;
-              $("activityType").value = activity.type;
-              $("activityStart").value = activity.start || "";
-              $("activityEnd").value = activity.end || "";
-              $("activityEligibility").value =
-                activity.eligibility;
-              $("activityStatus").value = activity.status;
-              $("activityDescription").value =
-                activity.description || "";
-
-              $("activityForm").scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-              });
-            })
-          );
-
-          if (activity.status !== "Published") {
-            actions.append(
-              button("💗 Publish", () => {
-                if (update(() => {
-                  activity.status = "Published";
-                })) {
-                  toast("Published in demo registry only.");
-                }
-              }, "secondary")
-            );
-          }
-
-          if (activity.status !== "Archived") {
-            actions.append(
-              button("📦 Archive", () => {
-                if (update(() => {
-                  activity.status = "Archived";
-                })) {
-                  toast("Demo activity archived.");
-                }
-              })
-            );
-          }
-
-          actions.append(
-            button("Delete", () => {
-              if (!confirm("Delete this demo activity?")) {
-                return;
-              }
-
-              if (update(() => {
-                state.activities = state.activities.filter(
-                  entry => entry.id !== activity.id
-                );
-              })) {
-                toast("Demo activity deleted.");
-              }
-            }, "danger")
-          );
-
-          node.append(actions);
-          list.append(node);
-        });
-      }
-
-      function renderEvents() {
-        const list = $("eventList");
-        list.replaceChildren();
-
-        if (!state.events.length) {
-          list.append(
-            el("p", "No demo early access events yet.", "empty")
-          );
-          return;
-        }
-
-        state.events.forEach(event => {
-          const node = item(
-            "💌 " + event.name,
-            "Capacity: " + event.capacity +
-            (event.date ? " · Early access: " + event.date : ""),
-            event.status,
-            event.status === "Published" ? "green" : "gray"
-          );
-
-          const actions = el("div", undefined, "actions");
-
-          if (event.status !== "Published") {
-            actions.append(
-              button("Publish", () => {
-                if (update(() => {
-                  event.status = "Published";
-                })) {
-                  toast("Published in demo registry only.");
-                }
-              }, "secondary")
-            );
-          }
-
-          actions.append(
-            button("Delete", () => {
-              if (update(() => {
-                state.events = state.events.filter(
-                  entry => entry.id !== event.id
-                );
-              })) {
-                toast("Demo event deleted.");
-              }
-            }, "danger")
-          );
-
-          node.append(actions);
-          list.append(node);
-        });
-      }
-
-      function renderDemo() {
-        renderDemoOverview();
-        renderActivities();
-        // Bestie Access is now Supabase-managed; do not render browser-local events.
-      }
-
-      function initializeDemo() {
-        if (initialized) return;
-        initialized = true;
-
-        try {
-          const stored = JSON.parse(
-            localStorage.getItem(KEY)
-          );
-
-          if (stored && typeof stored === "object") {
-            for (const key of Object.keys(defaults)) {
-              if (Array.isArray(stored[key])) {
-                state[key] = stored[key];
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(
-            "Could not restore demo records:",
-            error
-          );
-        }
-
-        document.querySelectorAll("[data-section]").forEach(node => {
-          node.addEventListener("click", () => {
-            showSection(node.dataset.section);
           });
-        });
+      });
+    });
 
-        document.querySelectorAll("[data-jump]").forEach(node => {
-          node.addEventListener("click", () => {
-            showSection(node.dataset.jump);
-          });
-        });
+    document.querySelectorAll("[data-jump]").forEach(node => {
+      node.addEventListener("click", () => {
+        const target = document.querySelector(
+          '.nav-btn[data-section="' +
+          node.dataset.jump + '"]'
+        );
+        if (target) target.click();
+      });
+    });
+  }
 
-        $("activityForm").addEventListener("submit", event => {
-          event.preventDefault();
+  async function initialize() {
+    if (initialized) return;
+    initialized = true;
 
-          const activity = {
-            id: $("activityId").value || makeId(),
-            name: $("activityName").value.trim(),
-            type: $("activityType").value,
-            start: $("activityStart").value,
-            end: $("activityEnd").value,
-            eligibility: $("activityEligibility").value,
-            status: $("activityStatus").value,
-            description: $("activityDescription").value.trim()
-          };
+    installNavigation();
+    installEditor();
 
-          if (
-            activity.start &&
-            activity.end &&
-            activity.end < activity.start
-          ) {
-            toast("End date must be on or after start date.");
-            return;
-          }
+    $("year").textContent = new Date().getFullYear();
 
-          if (update(() => {
-            const index = state.activities.findIndex(
-              entry => entry.id === activity.id
-            );
+    client = window.BB_CAMPUS_CLIENT;
 
-            if (index >= 0) {
-              state.activities[index] = activity;
-            } else {
-              state.activities.push(activity);
-            }
-          })) {
-            event.target.reset();
-            $("activityId").value = "";
-            toast("Demo activity saved!");
-          }
-        });
+    if (!client) {
+      message("⚠️ Campus HQ Supabase connection unavailable.");
+      return;
+    }
 
-        $("clearActivity").addEventListener("click", () => {
-          $("activityForm").reset();
-          $("activityId").value = "";
-        });
+    const { data: isStaff, error } =
+      await client.rpc("is_campus_staff");
 
+    if (error || isStaff !== true) {
+      message("🔒 Campus staff authorization required.");
+      $("activityForm").hidden = true;
+      return;
+    }
 
-        $("year").textContent = new Date().getFullYear();
+    try {
+      await loadTemplates();
+      await loadActivities();
+    } catch (error) {
+      message("⚠️ Initialization failed: " + errorText(error));
+    }
+  }
 
-        renderDemo();
-      }
+  // Existing campus-hq-auth.js dispatches this event
+  // after staff authentication succeeds.
+  document.addEventListener(
+    "bb:campus-hq-ready",
+    initialize,
+    { once: true }
+  );
+})();
+</script>
 
-      document.addEventListener(
-        "bb:campus-hq-ready",
-        initializeDemo
-      );
-    })();
-  </script>
 
   <!-- LOAD ADMISSIONS LISTENER BEFORE AUTH GATE -->
 
