@@ -2124,53 +2124,68 @@
   }
 
   function installNavigation() {
-    document.querySelectorAll("[data-section]").forEach(node => {
-      node.addEventListener("click", () => {
-        const name = node.dataset.section;
+    const dashboard = document.getElementById("campusDashboard");
+    if (!dashboard || dashboard.dataset.navigationInstalled === "true") return;
+    dashboard.dataset.navigationInstalled = "true";
 
-        document.querySelectorAll(".section").forEach(section => {
-          section.classList.toggle(
-            "active",
-            section.id === "section-" + name
-          );
+    const sections = Array.from(dashboard.querySelectorAll(".workspace > .section"));
+    const buttons = Array.from(dashboard.querySelectorAll(".sidebar [data-section]"));
+    const names = new Set(sections.map(section => section.id.slice("section-".length)));
+
+    function sectionFromHash() {
+      const match = /^#hq-(.+)$/.exec(window.location.hash);
+      if (!match) return null;
+      const name = decodeURIComponent(match[1]);
+      return names.has(name) ? name : null;
+    }
+
+    function openSection(name, options = {}) {
+      if (!names.has(name)) return false;
+      const { history = true, scroll = true } = options;
+      sections.forEach(section => {
+        const active = section.id === "section-" + name;
+        section.classList.toggle("active", active);
+      });
+      buttons.forEach(button => {
+        const active = button.dataset.section === name;
+        button.classList.toggle("active", active);
+        if (active) button.setAttribute("aria-current", "page");
+        else button.removeAttribute("aria-current");
+      });
+      if (history && window.location.hash !== "#hq-" + name) {
+        window.history.pushState({ campusSection: name }, "", "#hq-" + name);
+      }
+      if (scroll) {
+        const target = document.getElementById("section-" + name);
+        if (target) target.scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start"
         });
+      }
+      return true;
+    }
 
-        document.querySelectorAll(".nav-btn[data-section]")
-          .forEach(button => {
-            const active = button.dataset.section === name;
-            button.classList.toggle("active", active);
-            button.setAttribute(
-              "aria-current",
-              active ? "true" : "false"
-            );
-          });
-      });
+    dashboard.addEventListener("click", event => {
+      const control = event.target.closest("[data-section], [data-jump]");
+      if (!control || !dashboard.contains(control)) return;
+      const name = control.dataset.section || control.dataset.jump;
+      if (!names.has(name)) return;
+      event.preventDefault();
+      openSection(name);
     });
 
-    document.querySelectorAll("[data-jump]").forEach(node => {
-      node.addEventListener("click", () => {
-        const target = document.querySelector(
-          '.nav-btn[data-section="' +
-          node.dataset.jump + '"]'
-        );
-        if (target) {
-          target.click();
-        } else {
-          // Some sub-pages are reached by an in-page shortcut rather
-          // than a dedicated sidebar button (e.g. Crown Season Studio).
-          const section = document.getElementById("section-" + node.dataset.jump);
-          if (!section) return;
-          document.querySelectorAll(".section").forEach(item => {
-            item.classList.toggle("active", item === section);
-          });
-          document.querySelectorAll(".nav-btn[data-section]").forEach(button => {
-            button.classList.remove("active");
-            button.setAttribute("aria-current", "false");
-          });
-          section.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      });
-    });
+    function restoreSection() {
+      openSection(sectionFromHash() || "overview", { history: false, scroll: false });
+    }
+    window.addEventListener("popstate", restoreSection);
+    window.addEventListener("hashchange", restoreSection);
+
+    const initial = sectionFromHash();
+    if (!initial) {
+      // Replace only the current HQ entry, keeping prior pages in browser history.
+      window.history.replaceState({ campusSection: "overview" }, "", "#hq-overview");
+    }
+    openSection(initial || "overview", { history: false, scroll: false });
   }
 
   async function initialize() {
