@@ -1,41 +1,493 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f64fa1"><title>Side Quest | Bestie University</title><link rel="icon" href="assets/logo.png"><style>
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
-:root{--pink:#f64fa1;--teal:#176e78;--accent:#d92c82;--ink:#382336;--surface:#fff;--background:#fff5fa;--grad-start:#ffd0e5;--grad-end:#cdebe8;--angle:135deg}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--background);color:var(--ink);font-family:Nunito,sans-serif}a{color:inherit;text-decoration:none}button,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}.gate{min-height:100vh;display:grid;place-items:center;padding:20px}.gate-card,.panel,.notice{background:var(--surface);border:2px solid var(--pink);border-radius:20px;box-shadow:5px 6px 0 #0001}.gate-card{max-width:520px;padding:35px;text-align:center}.top{background:#2c3036;color:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;padding:15px max(18px,calc((100% - 1200px)/2));border-bottom:5px solid var(--pink)}.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand img{width:45px;height:45px;object-fit:contain}nav{display:flex;flex-wrap:wrap;gap:12px}nav a{font-weight:900}.hero{text-align:center;padding:45px 18px;background:linear-gradient(var(--angle),var(--grad-start),var(--grad-end));border-bottom:6px solid var(--teal)}.hero h1{font:clamp(27px,5vw,59px)/1.15 Bungee,sans-serif;color:var(--teal);margin:15px 0}.hero .script{font:clamp(18px,3vw,26px) Pacifico,cursive}.hero p{font-weight:800;max-width:680px;margin:16px auto}.wrap{max-width:1200px;margin:auto;padding:28px 18px 70px}.notice{padding:17px 20px;margin-bottom:22px;font-weight:800;line-height:1.65}.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:22px}.panel{overflow:hidden;margin-bottom:22px}.panel-head{background:linear-gradient(110deg,var(--pink),var(--accent));color:white;padding:16px 20px;font-weight:900}.panel-body{padding:21px}h2,h3{color:var(--teal)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:17px 0}.stat{text-align:center;background:var(--background);padding:14px 5px;border-radius:13px}.stat strong{display:block;font:clamp(18px,3vw,26px) Bungee,sans-serif;color:var(--teal)}.stat span{font-size:11px;font-weight:900}.track{height:16px;border-radius:20px;overflow:hidden;background:#ddd;margin:14px 0 20px}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--teal));transition:width .25s}.missions{display:grid;gap:13px}.mission{display:flex;align-items:flex-start;gap:12px;background:var(--background);border:2px solid var(--pink);border-radius:16px;padding:15px}.mission.done{border-color:var(--teal)}.mission-icon{font-size:27px;min-width:40px}.mission-info{flex:1;min-width:0}.mission-info strong{display:block}.mission-info p{font-size:14px;line-height:1.55;margin:5px 0}.stamp{font-size:12px;font-weight:900;color:var(--teal)}.btn{background:var(--pink);color:white;border:0;border-radius:25px;padding:10px 14px;font-weight:900}.btn.secondary{background:var(--teal)}.btn.light{background:var(--background);border:2px solid var(--pink);color:var(--ink)}.stamps{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:9px}.stamp-card{text-align:center;border:2px dashed var(--pink);border-radius:14px;padding:12px 7px;opacity:.45}.stamp-card.earned{opacity:1;background:var(--background);border-color:var(--teal)}.stamp-card span{font-size:29px;display:block}.stamp-card strong{font-size:11px}.journal{width:100%;min-height:175px;resize:vertical;border:2px solid var(--pink);border-radius:13px;padding:13px;background:var(--background);color:var(--ink);line-height:1.6}.small{font-size:13px;line-height:1.55}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.celebrate{background:var(--background);border:2px dashed var(--teal);border-radius:14px;padding:18px;text-align:center;font-weight:900;margin-top:18px}footer{text-align:center;background:#2c3036;color:white;padding:25px}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid var(--teal);outline-offset:3px}@media(max-width:800px){.layout{grid-template-columns:1fr}}@media(max-width:550px){.top,nav{justify-content:center}.mission{flex-wrap:wrap}.mission .btn{margin-left:48px}.panel-body{padding:15px}}
-</style></head><body>
-<div class="gate" id="campusGate"><div class="gate-card"><h2>☕ THE SIDE QUEST LOUNGE</h2><p id="campusGateMessage" role="status">🎓 Verifying your campus membership...</p><p><a href="login.html">Campus Login</a> · <a href="activities.html">Campus Activities</a></p></div></div>
-<div id="campusContent" hidden><header class="top"><a class="brand" href="index.html#home"><img src="assets/logo.png" alt="Books & Besties logo"> BESTIE UNIVERSITY 🎓</a><nav><a href="index.html#home">Campus Quad</a><a href="activities.html">Campus Activities</a><a href="locker.html">Bestie Locker</a></nav></header>
-<section class="hero"><span id="heroEmoji" style="font-size:37px">☕</span><h1 id="activityTitle">SIDE QUEST</h1><div class="script" id="heroSubtitle">Your next bookish adventure ♡</div><p id="activityDescription"></p></section>
-<main class="wrap"><div class="notice" id="notice">💌 Loading your quest...</div><div class="layout"><section class="panel"><div class="panel-head" id="boardHeader">🎮 THE QUEST BOARD</div><div class="panel-body"><h2 id="boardTitle">Your Adventure</h2><p id="instructions"></p><div class="stats"><div class="stat"><strong id="doneCount">0</strong><span>COMPLETED</span></div><div class="stat"><strong id="totalCount">0</strong><span>MISSIONS</span></div><div class="stat"><strong id="percent">0%</strong><span>PROGRESS</span></div></div><div class="track" role="progressbar" aria-label="Quest progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><div class="fill" id="progressFill"></div></div><div class="missions" id="missionList"></div><div class="celebrate" id="celebrate" hidden></div><div class="actions"><button class="btn light" id="refresh" type="button">↻ Refresh Progress</button></div><p id="boardStatus" class="small" role="status" aria-live="polite"></p></div></section>
-<aside><section class="panel"><div class="panel-head">🏅 ACHIEVEMENT STAMPS</div><div class="panel-body"><h3>Collect Your Little Wins!</h3><div class="stamps" id="stamps"></div><p class="small">These stamps are activity achievements, not automatic prizes.</p></div></section><section class="panel"><div class="panel-head">📓 YOUR PRIVATE QUEST DIARY</div><div class="panel-body"><p class="small">Your journal is private to your Bestie account, even during a community adventure.</p><label for="journal"><strong>Dear Diary...</strong></label><textarea class="journal" id="journal" maxlength="10000" placeholder="Today was a bookish adventure..."></textarea><p id="saveStatus" class="small" role="status" aria-live="polite"></p><div class="actions"><button class="btn" id="saveDiary" type="button">💌 Save My Diary</button><a class="btn secondary" href="activities.html">← Activities</a></div></div></section></aside></div></main><footer>BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG</footer></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script><script src="js/config.js"></script><script src="js/campus-guard.js"></script>
-<script>
-(async()=>{'use strict';
-const $=id=>document.getElementById(id), uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const id=new URLSearchParams(location.search).get('id');if(!id||!uuid.test(id)){$('campusGateMessage').textContent='💌 This Side Quest link is invalid.';return;}
-const guard=window.BB_CAMPUS_GUARD;if(!guard){$('campusGateMessage').textContent='Campus verification is unavailable.';return;}
-try{
-const access=await guard.protectPage({level:'approved',gateId:'campusGate',contentId:'campusContent',messageId:'campusGateMessage'});if(!access.allowed)return;
-const db=guard.getClient();const {data:auth,error:ae}=await db.auth.getUser();if(ae||!auth?.user)throw ae||new Error('Please log in again.');const userId=auth.user.id;
-const {data:activity,error:err}=await db.from('campus_activities').select('id,title,description,format,status,starts_at,ends_at,publish_at,template_config,template_id,eligibility').eq('id',id).single();if(err||!activity)throw err||new Error('Quest not available.');
-const {data:template,error:te}=await db.from('campus_activity_templates').select('template_key').eq('id',activity.template_id).single();if(te||template?.template_key!=='side_quest'||activity.format!=='template')throw new Error('This is not a Side Quest activity.');
-const cfg=activity.template_config&&typeof activity.template_config==='object'?activity.template_config:{};
-const missions=Array.isArray(cfg.missions)?cfg.missions.filter(m=>uuid.test(m.id)&&m.title&&m.desc):[];if(!missions.length)throw new Error('This quest has no missions configured yet.');
-const mode=cfg.participation_mode==='community'?'community':'individual';const stamps=Array.isArray(cfg.stamp_levels)?cfg.stamp_levels:[];
-const theme=cfg.theme||{};const color=(v,f)=>/^#[0-9a-f]{6}$/i.test(v||'')?v:f;const root=document.documentElement;for(const [key,css,fallback] of [['primary','--pink','#f64fa1'],['secondary','--teal','#176e78'],['accent','--accent','#d92c82'],['text','--ink','#382336'],['surface','--surface','#ffffff'],['background','--background','#fff5fa'],['gradientStart','--grad-start','#ffd0e5'],['gradientEnd','--grad-end','#cdebe8']])root.style.setProperty(css,color(theme[key],fallback));root.style.setProperty('--angle',`${Number.isFinite(Number(theme.angle))?Math.max(0,Math.min(360,Number(theme.angle))):135}deg`);
-const emoji=(v,f)=>typeof v==='string'&&v.trim()?Array.from(v.trim()).slice(0,8).join(''):f;
-$('heroEmoji').textContent=emoji(theme.emoji,'☕');$('activityTitle').textContent=activity.title;$('activityDescription').textContent=activity.description||'Pick a quest, collect stamps and make bookish memories.';$('boardTitle').textContent=mode==='community'?'👑 Our Shared Adventure':'🎀 My Little Adventure';$('boardHeader').textContent=mode==='community'?'👑 COMMUNITY QUEST BOARD':'🎮 MY QUEST BOARD';$('instructions').textContent=cfg.instructions||'Complete missions and collect stamps along the way.';$('totalCount').textContent=missions.length;
-const isOpen=()=>{const now=Date.now();return activity.status==='published'&&(!activity.publish_at||now>=Date.parse(activity.publish_at))&&(!activity.starts_at||now>=Date.parse(activity.starts_at))&&(!activity.ends_at||now<=Date.parse(activity.ends_at));};
-let completed=[],busy=false,diarySaved='';const missionIds=new Set(missions.map(m=>m.id));
-async function loadProgress(){const {data,error}=await db.from('campus_side_quest_completions').select('id,mission_id,member_id,completed_at').eq('activity_id',id);if(error)throw error;completed=(data||[]).filter(r=>missionIds.has(r.mission_id));render();}
-function status(s){$('boardStatus').textContent=s;}
-function render(){const owned=new Map(completed.map(r=>[r.mission_id,r]));const count=owned.size,pct=Math.round(count/missions.length*100);$('doneCount').textContent=count;$('percent').textContent=pct+'%';$('progressFill').style.width=pct+'%';$('progressTrack').setAttribute('aria-valuenow',String(pct));const list=$('missionList');list.replaceChildren();missions.forEach(m=>{const entry=owned.get(m.id),done=!!entry,canRelease=done&&entry.member_id===userId;const card=document.createElement('div');card.className='mission'+(done?' done':'');const ico=document.createElement('span');ico.className='mission-icon';ico.textContent=emoji(m.icon,'✨');const info=document.createElement('div');info.className='mission-info';const strong=document.createElement('strong');strong.textContent=m.title;const desc=document.createElement('p');desc.textContent=m.desc;const stamp=document.createElement('span');stamp.className='stamp';stamp.textContent=done?(mode==='community'?'✓ COMPLETED FOR THE COMMUNITY':'✓ MISSION COMPLETE'):'✧ READY FOR ADVENTURE';info.append(strong,desc,stamp);const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=done?(canRelease?'↻ Undo':'✓ Claimed'):'✓ Complete';b.disabled=busy||!isOpen()||(done&&!canRelease);b.setAttribute('aria-label',(done?'Release ':'Complete ')+m.title);b.addEventListener('click',()=>toggle(m,entry));card.append(ico,info,b);list.append(card);});const stampBox=$('stamps');stampBox.replaceChildren();stamps.forEach(s=>{const earned=count>=Number(s.count);const card=document.createElement('div');card.className='stamp-card'+(earned?' earned':'');const icon=document.createElement('span');icon.textContent=emoji(s.emoji,'🏅');const name=document.createElement('strong');name.textContent=s.title||'QUEST STAMP';card.append(icon,name);card.setAttribute('aria-label',`${name.textContent}: ${earned?'earned':'locked'}`);stampBox.append(card);});$('celebrate').hidden=count!==missions.length;$('celebrate').textContent=emoji(theme.completeEmoji,'👑')+' ALL QUESTS COMPLETE! Main-character behavior, Besties!';$('journal').disabled=busy||!isOpen();$('saveDiary').disabled=busy||!isOpen();}
-async function toggle(m,entry){if(busy||!isOpen())return;busy=true;render();try{if(entry){if(entry.member_id!==userId)throw new Error('Only the Bestie who completed this mission can release it.');if(!confirm('Release your completed mission?'))return;const {error}=await db.from('campus_side_quest_completions').delete().eq('id',entry.id).eq('member_id',userId);if(error)throw error;}else{const {error}=await db.from('campus_side_quest_completions').insert({activity_id:id,mission_id:m.id,member_id:userId,participation_mode:mode});if(error)throw error;}await loadProgress();status('💗 Quest progress saved!');}catch(e){console.error(e);status('💌 '+(e.code==='23505'?'Another Bestie just completed that mission! Refreshing...':e.message));await loadProgress().catch(console.error);}finally{busy=false;render();}}
-const {data:diary,error:de}=await db.from('campus_side_quest_diaries').select('journal').eq('activity_id',id).eq('member_id',userId).maybeSingle();if(de)throw de;diarySaved=diary?.journal||'';$('journal').value=diarySaved;$('saveStatus').textContent=isOpen()?'📓 Your diary is private to your account.':'📓 Quest closed; saved diary is read-only.';
-$('journal').addEventListener('input',()=>{$('saveStatus').textContent='✍🏽 Unsaved diary changes.';});$('saveDiary').addEventListener('click',async()=>{if(busy||!isOpen())return;busy=true;render();const draft=$('journal').value;try{const {error}=await db.from('campus_side_quest_diaries').upsert({activity_id:id,member_id:userId,journal:draft,updated_at:new Date().toISOString()},{onConflict:'activity_id,member_id'});if(error)throw error;diarySaved=draft;$('saveStatus').textContent='💗 Diary saved to your Bestie account!';}catch(e){console.error(e);$('saveStatus').textContent='❌ Diary could not be saved: '+e.message;}finally{busy=false;render();}});
-$('refresh').addEventListener('click',async()=>{try{await loadProgress();status('✨ Progress refreshed.');}catch(e){status('Could not refresh: '+e.message);}});
-$('notice').textContent=(mode==='community'?'👑 COMMUNITY ADVENTURE — One shared board. Each completed mission belongs to the Bestie who claimed it.':'🎀 INDIVIDUAL ADVENTURE — Your missions are yours to complete.')+' Your private diary stays personal. '+(isOpen()?'The quest is open!':'This quest is not currently open for changes.');
-await loadProgress();if(mode==='community'){setInterval(()=>{if(!busy&&document.visibilityState==='visible')loadProgress().catch(console.error);},15000);}window.addEventListener('focus',()=>{render();if(mode==='community'&&!busy)loadProgress().catch(console.error);});
-}catch(e){console.error('Side Quest:',e);$('campusContent').hidden=true;$('campusGate').hidden=false;$('campusGateMessage').textContent='💌 '+(e.message||'We could not load this quest.');}
-})();
-</script></body></html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#f64fa1">
+    <title>Side Quest | Bestie University</title>
+    <link rel="icon" href="assets/logo.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap');
+
+        :root {
+            --pink: #f64fa1;
+            --teal: #176e78;
+            --accent: #d92c82;
+            --ink: #382336;
+            --surface: #fff;
+            --background: #fff5fa;
+            --grad-start: #ffd0e5;
+            --grad-end: #cdebe8;
+            --angle: 135deg
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        [hidden] {
+            display: none !important
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--ink);
+            font-family: Nunito, sans-serif
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        button,
+        textarea {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed
+        }
+
+        .gate {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px
+        }
+
+        .gate-card,
+        .panel,
+        .notice {
+            background: var(--surface);
+            border: 2px solid var(--pink);
+            border-radius: 20px;
+            box-shadow: 5px 6px 0 #0001
+        }
+
+        .gate-card {
+            max-width: 520px;
+            padding: 35px;
+            text-align: center
+        }
+
+        .top {
+            background: #2c3036;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px max(18px, calc((100% - 1200px)/2));
+            border-bottom: 5px solid var(--pink)
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900
+        }
+
+        .brand img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px
+        }
+
+        nav a {
+            font-weight: 900
+        }
+
+        .hero {
+            text-align: center;
+            padding: 45px 18px;
+            background: linear-gradient(var(--angle), var(--grad-start), var(--grad-end));
+            border-bottom: 6px solid var(--teal)
+        }
+
+        .hero h1 {
+            font: clamp(27px, 5vw, 59px)/1.15 Bungee, sans-serif;
+            color: var(--teal);
+            margin: 15px 0
+        }
+
+        .hero .script {
+            font: clamp(18px, 3vw, 26px) Pacifico, cursive
+        }
+
+        .hero p {
+            font-weight: 800;
+            max-width: 680px;
+            margin: 16px auto
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: auto;
+            padding: 28px 18px 70px
+        }
+
+        .notice {
+            padding: 17px 20px;
+            margin-bottom: 22px;
+            font-weight: 800;
+            line-height: 1.65
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+            gap: 22px
+        }
+
+        .panel {
+            overflow: hidden;
+            margin-bottom: 22px
+        }
+
+        .panel-head {
+            background: linear-gradient(110deg, var(--pink), var(--accent));
+            color: white;
+            padding: 16px 20px;
+            font-weight: 900
+        }
+
+        .panel-body {
+            padding: 21px
+        }
+
+        h2,
+        h3 {
+            color: var(--teal)
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 17px 0
+        }
+
+        .stat {
+            text-align: center;
+            background: var(--background);
+            padding: 14px 5px;
+            border-radius: 13px
+        }
+
+        .stat strong {
+            display: block;
+            font: clamp(18px, 3vw, 26px) Bungee, sans-serif;
+            color: var(--teal)
+        }
+
+        .stat span {
+            font-size: 11px;
+            font-weight: 900
+        }
+
+        .track {
+            height: 16px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #ddd;
+            margin: 14px 0 20px
+        }
+
+        .fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--pink), var(--teal));
+            transition: width .25s
+        }
+
+        .missions {
+            display: grid;
+            gap: 13px
+        }
+
+        .mission {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--background);
+            border: 2px solid var(--pink);
+            border-radius: 16px;
+            padding: 15px
+        }
+
+        .mission.done {
+            border-color: var(--teal)
+        }
+
+        .mission-icon {
+            font-size: 27px;
+            min-width: 40px
+        }
+
+        .mission-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .mission-info strong {
+            display: block
+        }
+
+        .mission-info p {
+            font-size: 14px;
+            line-height: 1.55;
+            margin: 5px 0
+        }
+
+        .stamp {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--teal)
+        }
+
+        .btn {
+            background: var(--pink);
+            color: white;
+            border: 0;
+            border-radius: 25px;
+            padding: 10px 14px;
+            font-weight: 900
+        }
+
+        .btn.secondary {
+            background: var(--teal)
+        }
+
+        .btn.light {
+            background: var(--background);
+            border: 2px solid var(--pink);
+            color: var(--ink)
+        }
+
+        .stamps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 9px
+        }
+
+        .stamp-card {
+            text-align: center;
+            border: 2px dashed var(--pink);
+            border-radius: 14px;
+            padding: 12px 7px;
+            opacity: .45
+        }
+
+        .stamp-card.earned {
+            opacity: 1;
+            background: var(--background);
+            border-color: var(--teal)
+        }
+
+        .stamp-card span {
+            font-size: 29px;
+            display: block
+        }
+
+        .stamp-card strong {
+            font-size: 11px
+        }
+
+        .journal {
+            width: 100%;
+            min-height: 175px;
+            resize: vertical;
+            border: 2px solid var(--pink);
+            border-radius: 13px;
+            padding: 13px;
+            background: var(--background);
+            color: var(--ink);
+            line-height: 1.6
+        }
+
+        .small {
+            font-size: 13px;
+            line-height: 1.55
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px
+        }
+
+        .celebrate {
+            background: var(--background);
+            border: 2px dashed var(--teal);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            font-weight: 900;
+            margin-top: 18px
+        }
+
+        footer {
+            text-align: center;
+            background: #2c3036;
+            color: white;
+            padding: 25px
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid var(--teal);
+            outline-offset: 3px
+        }
+
+        @media(max-width:800px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:550px) {
+
+            .top,
+            nav {
+                justify-content: center
+            }
+
+            .mission {
+                flex-wrap: wrap
+            }
+
+            .mission .btn {
+                margin-left: 48px
+            }
+
+            .panel-body {
+                padding: 15px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gate" id="campusGate">
+        <div class="gate-card">
+            <h2>☕ THE SIDE QUEST LOUNGE</h2>
+            <p id="campusGateMessage" role="status">🎓 Verifying your campus membership...</p>
+            <p><a href="login.html">Campus Login</a> · <a href="activities.html">Campus Activities</a></p>
+        </div>
+    </div>
+    <div id="campusContent" hidden>
+        <header class="top"><a class="brand" href="index.html#home"><img src="assets/logo.png"
+                    alt="Books & Besties logo"> BESTIE UNIVERSITY 🎓</a>
+            <nav><a href="index.html#home">Campus Quad</a><a href="activities.html">Campus Activities</a><a
+                    href="locker.html">Bestie Locker</a></nav>
+        </header>
+        <section class="hero"><span id="heroEmoji" style="font-size:37px">☕</span>
+            <h1 id="activityTitle">SIDE QUEST</h1>
+            <div class="script" id="heroSubtitle">Your next bookish adventure ♡</div>
+            <p id="activityDescription"></p>
+        </section>
+        <main class="wrap">
+            <div class="notice" id="notice">💌 Loading your quest...</div>
+            <div class="layout">
+                <section class="panel">
+                    <div class="panel-head" id="boardHeader">🎮 THE QUEST BOARD</div>
+                    <div class="panel-body">
+                        <h2 id="boardTitle">Your Adventure</h2>
+                        <p id="instructions"></p>
+                        <div class="stats">
+                            <div class="stat"><strong id="doneCount">0</strong><span>COMPLETED</span></div>
+                            <div class="stat"><strong id="totalCount">0</strong><span>MISSIONS</span></div>
+                            <div class="stat"><strong id="percent">0%</strong><span>PROGRESS</span></div>
+                        </div>
+                        <div class="track" role="progressbar" aria-label="Quest progress" aria-valuemin="0"
+                            aria-valuemax="100" aria-valuenow="0" id="progressTrack">
+                            <div class="fill" id="progressFill"></div>
+                        </div>
+                        <div class="missions" id="missionList"></div>
+                        <div class="celebrate" id="celebrate" hidden></div>
+                        <div class="actions"><button class="btn light" id="refresh" type="button">↻ Refresh
+                                Progress</button></div>
+                        <p id="boardStatus" class="small" role="status" aria-live="polite"></p>
+                    </div>
+                </section>
+                <aside>
+                    <section class="panel">
+                        <div class="panel-head">🏅 ACHIEVEMENT STAMPS</div>
+                        <div class="panel-body">
+                            <h3>Collect Your Little Wins!</h3>
+                            <div class="stamps" id="stamps"></div>
+                            <p class="small">These stamps are activity achievements, not automatic prizes.</p>
+                        </div>
+                    </section>
+                    <section class="panel">
+                        <div class="panel-head">📓 YOUR PRIVATE QUEST DIARY</div>
+                        <div class="panel-body">
+                            <p class="small">Your journal is private to your Bestie account, even during a community
+                                adventure.</p><label for="journal"><strong>Dear Diary...</strong></label><textarea
+                                class="journal" id="journal" maxlength="10000"
+                                placeholder="Today was a bookish adventure..."></textarea>
+                            <p id="saveStatus" class="small" role="status" aria-live="polite"></p>
+                            <div class="actions"><button class="btn" id="saveDiary" type="button">💌 Save My
+                                    Diary</button><a class="btn secondary" href="activities.html">← Activities</a></div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </main>
+        <footer>BOOKS &amp; BESTIES ♡ READ · CONNECT · BELONG</footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/campus-guard.js"></script>
+    <script>
+        (async () => {
+            'use strict';
+            const $ = id => document.getElementById(id), uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            const id = new URLSearchParams(location.search).get('id'); if (!id || !uuid.test(id)) { $('campusGateMessage').textContent = '💌 This Side Quest link is invalid.'; return; }
+            const guard = window.BB_CAMPUS_GUARD; if (!guard) { $('campusGateMessage').textContent = 'Campus verification is unavailable.'; return; }
+            try {
+                const access = await guard.protectPage({ level: 'approved', gateId: 'campusGate', contentId: 'campusContent', messageId: 'campusGateMessage' }); if (!access.allowed) return;
+                const db = guard.getClient(); const { data: auth, error: ae } = await db.auth.getUser(); if (ae || !auth?.user) throw ae || new Error('Please log in again.'); const userId = auth.user.id;
+                const { data: activity, error: err } = await db.from('campus_activities').select('id,title,description,format,status,starts_at,ends_at,publish_at,template_config,template_id,eligibility').eq('id', id).single(); if (err || !activity) throw err || new Error('Quest not available.');
+                const { data: template, error: te } = await db.from('campus_activity_templates').select('template_key').eq('id', activity.template_id).single(); if (te || template?.template_key !== 'side_quest' || activity.format !== 'template') throw new Error('This is not a Side Quest activity.');
+                const cfg = activity.template_config && typeof activity.template_config === 'object' ? activity.template_config : {};
+                const missions = Array.isArray(cfg.missions) ? cfg.missions.filter(m => uuid.test(m.id) && m.title && m.desc) : []; if (!missions.length) throw new Error('This quest has no missions configured yet.');
+                const mode = cfg.participation_mode === 'community' ? 'community' : 'individual'; const stamps = Array.isArray(cfg.stamp_levels) ? cfg.stamp_levels : [];
+                const theme = cfg.theme || {}; const color = (v, f) => /^#[0-9a-f]{6}$/i.test(v || '') ? v : f; const root = document.documentElement; for (const [key, css, fallback] of [['primary', '--pink', '#f64fa1'], ['secondary', '--teal', '#176e78'], ['accent', '--accent', '#d92c82'], ['text', '--ink', '#382336'], ['surface', '--surface', '#ffffff'], ['background', '--background', '#fff5fa'], ['gradientStart', '--grad-start', '#ffd0e5'], ['gradientEnd', '--grad-end', '#cdebe8']]) root.style.setProperty(css, color(theme[key], fallback)); root.style.setProperty('--angle', `${Number.isFinite(Number(theme.angle)) ? Math.max(0, Math.min(360, Number(theme.angle))) : 135}deg`);
+                const emoji = (v, f) => typeof v === 'string' && v.trim() ? Array.from(v.trim()).slice(0, 8).join('') : f;
+                $('heroEmoji').textContent = emoji(theme.emoji, '☕'); $('activityTitle').textContent = activity.title; $('activityDescription').textContent = activity.description || 'Pick a quest, collect stamps and make bookish memories.'; $('boardTitle').textContent = mode === 'community' ? '👑 Our Shared Adventure' : '🎀 My Little Adventure'; $('boardHeader').textContent = mode === 'community' ? '👑 COMMUNITY QUEST BOARD' : '🎮 MY QUEST BOARD'; $('instructions').textContent = cfg.instructions || 'Complete missions and collect stamps along the way.'; $('totalCount').textContent = missions.length;
+                const isOpen = () => { const now = Date.now(); return activity.status === 'published' && (!activity.publish_at || now >= Date.parse(activity.publish_at)) && (!activity.starts_at || now >= Date.parse(activity.starts_at)) && (!activity.ends_at || now <= Date.parse(activity.ends_at)); };
+                let completed = [], busy = false, diarySaved = ''; const missionIds = new Set(missions.map(m => m.id));
+                async function loadProgress() { const { data, error } = await db.from('campus_side_quest_completions').select('id,mission_id,member_id,completed_at').eq('activity_id', id); if (error) throw error; completed = (data || []).filter(r => missionIds.has(r.mission_id)); render(); }
+                function status(s) { $('boardStatus').textContent = s; }
+                function render() { const owned = new Map(completed.map(r => [r.mission_id, r])); const count = owned.size, pct = Math.round(count / missions.length * 100); $('doneCount').textContent = count; $('percent').textContent = pct + '%'; $('progressFill').style.width = pct + '%'; $('progressTrack').setAttribute('aria-valuenow', String(pct)); const list = $('missionList'); list.replaceChildren(); missions.forEach(m => { const entry = owned.get(m.id), done = !!entry, canRelease = done && entry.member_id === userId; const card = document.createElement('div'); card.className = 'mission' + (done ? ' done' : ''); const ico = document.createElement('span'); ico.className = 'mission-icon'; ico.textContent = emoji(m.icon, '✨'); const info = document.createElement('div'); info.className = 'mission-info'; const strong = document.createElement('strong'); strong.textContent = m.title; const desc = document.createElement('p'); desc.textContent = m.desc; const stamp = document.createElement('span'); stamp.className = 'stamp'; stamp.textContent = done ? (mode === 'community' ? '✓ COMPLETED FOR THE COMMUNITY' : '✓ MISSION COMPLETE') : '✧ READY FOR ADVENTURE'; info.append(strong, desc, stamp); const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = done ? (canRelease ? '↻ Undo' : '✓ Claimed') : '✓ Complete'; b.disabled = busy || !isOpen() || (done && !canRelease); b.setAttribute('aria-label', (done ? 'Release ' : 'Complete ') + m.title); b.addEventListener('click', () => toggle(m, entry)); card.append(ico, info, b); list.append(card); }); const stampBox = $('stamps'); stampBox.replaceChildren(); stamps.forEach(s => { const earned = count >= Number(s.count); const card = document.createElement('div'); card.className = 'stamp-card' + (earned ? ' earned' : ''); const icon = document.createElement('span'); icon.textContent = emoji(s.emoji, '🏅'); const name = document.createElement('strong'); name.textContent = s.title || 'QUEST STAMP'; card.append(icon, name); card.setAttribute('aria-label', `${name.textContent}: ${earned ? 'earned' : 'locked'}`); stampBox.append(card); }); $('celebrate').hidden = count !== missions.length; $('celebrate').textContent = emoji(theme.completeEmoji, '👑') + ' ALL QUESTS COMPLETE! Main-character behavior, Besties!'; $('journal').disabled = busy || !isOpen(); $('saveDiary').disabled = busy || !isOpen(); }
+                async function toggle(m, entry) { if (busy || !isOpen()) return; busy = true; render(); try { if (entry) { if (entry.member_id !== userId) throw new Error('Only the Bestie who completed this mission can release it.'); if (!confirm('Release your completed mission?')) return; const { error } = await db.from('campus_side_quest_completions').delete().eq('id', entry.id).eq('member_id', userId); if (error) throw error; } else { const { error } = await db.from('campus_side_quest_completions').insert({ activity_id: id, mission_id: m.id, member_id: userId, participation_mode: mode }); if (error) throw error; } await loadProgress(); status('💗 Quest progress saved!'); } catch (e) { console.error(e); status('💌 ' + (e.code === '23505' ? 'Another Bestie just completed that mission! Refreshing...' : e.message)); await loadProgress().catch(console.error); } finally { busy = false; render(); } }
+                const { data: diary, error: de } = await db.from('campus_side_quest_diaries').select('journal').eq('activity_id', id).eq('member_id', userId).maybeSingle(); if (de) throw de; diarySaved = diary?.journal || ''; $('journal').value = diarySaved; $('saveStatus').textContent = isOpen() ? '📓 Your diary is private to your account.' : '📓 Quest closed; saved diary is read-only.';
+                $('journal').addEventListener('input', () => { $('saveStatus').textContent = '✍🏽 Unsaved diary changes.'; }); $('saveDiary').addEventListener('click', async () => { if (busy || !isOpen()) return; busy = true; render(); const draft = $('journal').value; try { const { error } = await db.from('campus_side_quest_diaries').upsert({ activity_id: id, member_id: userId, journal: draft, updated_at: new Date().toISOString() }, { onConflict: 'activity_id,member_id' }); if (error) throw error; diarySaved = draft; $('saveStatus').textContent = '💗 Diary saved to your Bestie account!'; } catch (e) { console.error(e); $('saveStatus').textContent = '❌ Diary could not be saved: ' + e.message; } finally { busy = false; render(); } });
+                $('refresh').addEventListener('click', async () => { try { await loadProgress(); status('✨ Progress refreshed.'); } catch (e) { status('Could not refresh: ' + e.message); } });
+                $('notice').textContent = (mode === 'community' ? '👑 COMMUNITY ADVENTURE — One shared board. Each completed mission belongs to the Bestie who claimed it.' : '🎀 INDIVIDUAL ADVENTURE — Your missions are yours to complete.') + ' Your private diary stays personal. ' + (isOpen() ? 'The quest is open!' : 'This quest is not currently open for changes.');
+                await loadProgress(); if (mode === 'community') { setInterval(() => { if (!busy && document.visibilityState === 'visible') loadProgress().catch(console.error); }, 15000); } window.addEventListener('focus', () => { render(); if (mode === 'community' && !busy) loadProgress().catch(console.error); });
+            } catch (e) { console.error('Side Quest:', e); $('campusContent').hidden = true; $('campusGate').hidden = false; $('campusGateMessage').textContent = '💌 ' + (e.message || 'We could not load this quest.'); }
+        })();
+    </script>
+</body>
+
+</html>
