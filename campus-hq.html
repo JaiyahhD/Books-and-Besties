@@ -3426,7 +3426,11 @@
           if (p.status === "draft") actions.append(button("💗 Publish", () => setStatus(p, "published"), "secondary"));
           if (p.status === "published") actions.append(button("🔒 Close Voting", () => setStatus(p, "closed")));
           if (p.status !== "archived") actions.append(button("📦 Archive", () => setStatus(p, "archived")));
-          if (p.status === "draft") actions.append(button("🗑️ Delete Draft", () => deleteDraft(p), "danger"));
+          if (window.BB_CAMPUS_STAFF?.role === "admin") {
+            actions.append(
+              button("🗑️ Delete Ballot", () => deleteBallot(p), "danger")
+            );
+    }
           box.append(actions); list.append(box);
         }
       }
@@ -3448,15 +3452,60 @@
         if ($("pinkLiveId").value === p.id) reset();
         await load(); say("💗 Ballot status updated!");
       }
-      async function deleteDraft(p) {
-        if (busy || !confirm(`Permanently delete draft “${p.question}”?`)) return;
-        lock(true);
-        const { error } = await client.from(dbTable).delete().eq("id", p.id).eq("status", "draft");
-        lock(false);
-        if (error) { say("Could not delete draft: " + errorMessage(error)); return; }
-        if ($("pinkLiveId").value === p.id) reset();
-        await load(); say("Draft deleted.");
+      async function deleteBallot(p) {
+  if (busy || !client) return;
+
+  if (window.BB_CAMPUS_STAFF?.role !== "admin") {
+    say("🔒 Only campus administrators can permanently delete ballots.");
+    return;
+  }
+
+  const confirmed = confirm(
+    `🗑️ PERMANENTLY DELETE PINK BALLOT?\n\n` +
+    `Ballot: ${p.question}\n` +
+    `Status: ${p.status}\n\n` +
+    `This will permanently delete:\n` +
+    `• The Pink Ballot\n` +
+    `• All ballot choices\n` +
+    `• All votes submitted by Besties\n\n` +
+    `This action CANNOT be undone.\n\n` +
+    `Are you absolutely sure?`
+  );
+
+  if (!confirmed) return;
+
+  lock(true);
+
+  try {
+    say("🗑️ Permanently deleting Pink Ballot...");
+
+    const { data, error } = await client.rpc(
+      "admin_delete_honors_poll",
+      {
+        p_poll_id: p.id
       }
+    );
+
+    if (error) throw error;
+
+    if (data !== true) {
+      throw new Error("The database did not confirm deletion.");
+    }
+
+    if ($("pinkLiveId").value === p.id) {
+      reset();
+    }
+
+    lock(false);
+    await load();
+
+    say("💗 Pink Ballot and associated voting records permanently deleted!");
+  } catch (error) {
+    say("❌ Could not delete ballot: " + errorMessage(error));
+  } finally {
+    lock(false);
+  }
+}
       async function save(e) {
         e.preventDefault(); if (busy || !client) return;
         const id = $("pinkLiveId").value;
