@@ -63,8 +63,7 @@
         theme_accent: '#b96e8d',
         theme_hero_color: '#f4e3e9',
         facebook_url: C.FACEBOOK_URL || '',
-        about_text: 'Books & Besties is a welcoming community of readers who connect through books, group conversations, monthly reads, and friendly reading competitions.',
-        announcement: 'Welcome to Books & Besties! Read • Connect • Belong.'
+        about_text: 'Books & Besties is a welcoming community of readers who connect through books, group conversations, monthly reads, and friendly reading competitions.'
     };
 
     const val = id => $('#' + id)?.value?.trim() || '';
@@ -902,6 +901,7 @@
             return `<div class="card">
                 <h3>Seasonal Homepage Manager</h3>
                 <p class="muted">Update the public homepage. Colors must be valid hex codes; optional hero image must be an HTTPS URL.</p>
+                <p class="hint">📣 Campus announcements are now managed through Communications Studio in Campus HQ.</p>
                 <form data-action="save-site">
                     <div class="two-col">
                         ${field('Current theme', 'siteCurrent', 'text', settings.current_theme, 'required')}
@@ -916,10 +916,6 @@
                     <div class="form-row">
                         <label for="siteAbout">About the group</label>
                         <textarea id="siteAbout">${escape(settings.about_text)}</textarea>
-                    </div>
-                    <div class="form-row">
-                        <label for="siteAnnouncement">Homepage announcement</label>
-                        <textarea id="siteAnnouncement">${escape(settings.announcement)}</textarea>
                     </div>
                     <button class="btn">Save & Publish Changes</button>
                 </form>
@@ -1053,8 +1049,7 @@
                     theme_hero_color: val('siteHeroColor'),
                     theme_hero: val('siteHero') || null,
                     facebook_url: val('siteFb'),
-                    about_text: val('siteAbout'),
-                    announcement: val('siteAnnouncement')
+                    about_text: val('siteAbout')
                 };
 
                 const r = await db.from('site_settings')
