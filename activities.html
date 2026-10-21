@@ -1211,6 +1211,11 @@ footer {
 
         body.append(link);
 
+      } else if (activity.template_key === "reading_social") {
+        const link = element("a", "btn", "💌 Enter Reading Social ↗");
+        link.href = "activity-social.html?id=" + encodeURIComponent(activity.id);
+        body.append(link);
+
       } else {
         const notice = element(
           "p",
