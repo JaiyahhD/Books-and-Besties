@@ -1147,7 +1147,7 @@
             <div class="panel"><div class="panel-head">🎀 CROWN CONTROL ROOM</div><div class="panel-body">
               <label class="field"><span>Choose Monthly Crown Season</span><select id="c83Season"><option value="">Loading seasons...</option></select></label>
               <p class="mini" id="c83Status" role="status" aria-live="polite">Connecting to official Crown records...</p>
-              <div class="actions"><button class="btn secondary" id="c83Refresh" type="button">🔄 Refresh Command Center</button><button class="btn light" type="button" data-jump="dorm-assignments">🏡 Team Assignments & Rosters</button><a class="btn light" href="monthly-crown.html">📚 Member Crown HQ ↗</a></div>
+              <div class="actions"><button class="btn secondary" id="c83Refresh" type="button">🔄 Refresh Command Center</button><button class="btn light" type="button" data-jump="dorm-assignments">🏡 Team Assignments & Rosters</button><button class="btn light" type="button" data-jump="crown-admin">🗓️ Season Studio</button><a class="btn light" href="monthly-crown.html">📚 Member Crown HQ ↗</a></div>
             </div></div>
             <div class="grid">
               <div class="panel"><div class="panel-head">📊 SEASON SNAPSHOT</div><div class="panel-body"><div id="c83Snapshot" class="mini">Choose a season to view the latest numbers.</div></div></div>
@@ -1158,6 +1158,61 @@
                 <p class="mini" id="c83ReviewStatus"></p><div id="c83Reviews" aria-live="polite"></div>
                 <div class="actions"><a class="btn light" href="crown-review.html">🛡️ Original Review Desk ↗</a></div>
               </div></div>
+            </div>
+          </section>
+
+          <!-- PHASE 8.3E — CROWN SEASON ADMINISTRATION -->
+          <section class="section" id="section-crown-admin">
+            <h2 class="section-heading">🗓️ Monthly Crown Season Studio</h2>
+            <p class="section-description">Prepare future Crown seasons and teams without changing official scoring. Administrator access required.</p>
+            <p class="mini" id="c83AdminGate" role="status">Checking administrator access...</p>
+            <div id="c83AdminContent" hidden>
+              <div class="grid">
+                <div class="panel"><div class="panel-head">👑 CREATE AN UPCOMING SEASON</div><div class="panel-body">
+                  <form id="c83CreateSeasonForm">
+                    <label class="field"><span>Season name</span><input id="c83NewSeasonName" maxlength="100" placeholder="January 2027" required></label>
+                    <div class="form-grid">
+                      <label class="field"><span>Starts on</span><input id="c83NewSeasonStart" type="date" required></label>
+                      <label class="field"><span>Ends on</span><input id="c83NewSeasonEnd" type="date" required></label>
+                    </div>
+                    <button class="btn secondary" type="submit">💗 Create Upcoming Season</button>
+                    <p class="mini" id="c83CreateSeasonFeedback" role="status"></p>
+                  </form>
+                </div></div>
+                <div class="panel"><div class="panel-head">✏️ EDIT AN UPCOMING SEASON</div><div class="panel-body">
+                  <form id="c83EditSeasonForm">
+                    <label class="field"><span>Choose season</span><select id="c83EditSeasonSelect" required></select></label>
+                    <label class="field"><span>Season name</span><input id="c83EditSeasonName" maxlength="100" required></label>
+                    <div class="form-grid">
+                      <label class="field"><span>Starts on</span><input id="c83EditSeasonStart" type="date" required></label>
+                      <label class="field"><span>Ends on</span><input id="c83EditSeasonEnd" type="date" required></label>
+                    </div>
+                    <p class="mini">Only upcoming seasons with no enrollments or submissions can be edited.</p>
+                    <button class="btn secondary" type="submit">💌 Save Season Details</button>
+                    <p class="mini" id="c83EditSeasonFeedback" role="status"></p>
+                  </form>
+                </div></div>
+                <div class="panel"><div class="panel-head">🏡 CREATE A CROWN TEAM</div><div class="panel-body">
+                  <form id="c83CreateTeamForm">
+                    <label class="field"><span>Upcoming season</span><select id="c83NewTeamSeason" required></select></label>
+                    <label class="field"><span>Team name</span><input id="c83NewTeamName" maxlength="100" required placeholder="The Mocha Muses"></label>
+                    <label class="field"><span>Team emoji</span><input id="c83NewTeamEmoji" maxlength="20" value="👑"></label>
+                    <button class="btn secondary" type="submit">🏡 Create Crown Team</button>
+                    <p class="mini" id="c83CreateTeamFeedback" role="status"></p>
+                  </form>
+                </div></div>
+                <div class="panel"><div class="panel-head">🎀 RENAME OR RESTYLE A TEAM</div><div class="panel-body">
+                  <form id="c83EditTeamForm">
+                    <label class="field"><span>Upcoming season</span><select id="c83EditTeamSeason" required></select></label>
+                    <label class="field"><span>Team</span><select id="c83EditTeamSelect" required></select></label>
+                    <label class="field"><span>Team name</span><input id="c83EditTeamName" maxlength="100" required></label>
+                    <label class="field"><span>Team emoji</span><input id="c83EditTeamEmoji" maxlength="20"></label>
+                    <button class="btn secondary" type="submit">✨ Save Team Details</button>
+                    <p class="mini" id="c83EditTeamFeedback" role="status"></p>
+                  </form>
+                </div></div>
+              </div>
+              <div class="panel"><div class="panel-head">📋 EXISTING CROWN SEASONS</div><div class="panel-body"><div id="c83AdminSeasons" class="mini"></div><div class="actions"><button id="c83AdminReload" class="btn light" type="button">🔄 Refresh Seasons & Teams</button><button class="btn light" type="button" data-jump="crown">👑 Open Command Center</button></div></div></div>
             </div>
           </section>
 
@@ -2047,7 +2102,22 @@
           '.nav-btn[data-section="' +
           node.dataset.jump + '"]'
         );
-        if (target) target.click();
+        if (target) {
+          target.click();
+        } else {
+          // Some sub-pages are reached by an in-page shortcut rather
+          // than a dedicated sidebar button (e.g. Crown Season Studio).
+          const section = document.getElementById("section-" + node.dataset.jump);
+          if (!section) return;
+          document.querySelectorAll(".section").forEach(item => {
+            item.classList.toggle("active", item === section);
+          });
+          document.querySelectorAll(".nav-btn[data-section]").forEach(button => {
+            button.classList.remove("active");
+            button.setAttribute("aria-current", "false");
+          });
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       });
     });
   }
@@ -2209,6 +2279,107 @@
     $('c83Refresh').addEventListener('click',load);
     $('c83Filter').addEventListener('change',renderReviews);
     try{await loadSeasons();await load();}catch(error){text('c83Status','⚠️ '+errorMessage(error));}
+  }
+  document.addEventListener('bb:campus-hq-ready',init,{once:true});
+})();
+</script>
+
+<script>
+/* PHASE 8.3E — Uses only the four existing admin RPCs. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let client, seasons=[], teams=[];
+  const status=(id,message)=>{ $(id).textContent=message; };
+  const err=e=>e?.message||String(e);
+  const select=(id,items,placeholder,label)=>{
+    const el=$(id),old=el.value;
+    el.replaceChildren(new Option(placeholder,''));
+    for(const item of items) el.add(new Option(label(item),item.id));
+    el.value=items.some(item=>item.id===old)?old:(items[0]?.id||'');
+  };
+  function showSeason(){
+    const s=seasons.find(s=>s.id===$('c83EditSeasonSelect').value);
+    $('c83EditSeasonName').value=s?.name||'';
+    $('c83EditSeasonStart').value=s?.starts_on||'';
+    $('c83EditSeasonEnd').value=s?.ends_on||'';
+  }
+  function showTeam(){
+    const t=teams.find(t=>t.id===$('c83EditTeamSelect').value);
+    $('c83EditTeamName').value=t?.name||'';
+    $('c83EditTeamEmoji').value=t?.emoji||'👑';
+  }
+  function populateTeams(){
+    const sid=$('c83EditTeamSeason').value;
+    select('c83EditTeamSelect',teams.filter(t=>t.season_id===sid),'Choose a team',t=>`${t.emoji||'👑'} ${t.name}`);
+    showTeam();
+  }
+  async function reload(){
+    const [s,t]=await Promise.all([
+      client.from('crown_seasons').select('id,name,starts_on,ends_on,status').order('starts_on',{ascending:false}),
+      client.from('crown_teams').select('id,season_id,name,emoji').order('name')
+    ]);
+    if(s.error)throw s.error;
+    if(t.error)throw t.error;
+    seasons=s.data||[];teams=t.data||[];
+    const upcoming=seasons.filter(s=>s.status==='upcoming');
+    select('c83EditSeasonSelect',upcoming,'No upcoming seasons',s=>s.name);
+    select('c83NewTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
+    select('c83EditTeamSeason',upcoming,'No upcoming seasons',s=>s.name);
+    showSeason();populateTeams();
+    const box=$('c83AdminSeasons');box.replaceChildren();
+    if(!seasons.length)box.textContent='No Crown seasons found.';
+    for(const s of seasons){
+      const row=document.createElement('p');
+      row.textContent=`👑 ${s.name} · ${s.status} · ${s.starts_on} to ${s.ends_on} · ${teams.filter(t=>t.season_id===s.id).length} team(s)`;
+      box.append(row);
+    }
+  }
+  function bindForm(id,feedback,fn){
+    $(id).addEventListener('submit',async event=>{
+      event.preventDefault();
+      const form=$(id),button=form.querySelector('button[type="submit"]');
+      button.disabled=true;status(feedback,'Saving to Monthly Crown...');
+      try{
+        await fn();
+        status(feedback,'💗 Saved successfully!');
+        await reload();
+      }catch(e){console.error('Crown administration:',e);status(feedback,'⚠️ '+err(e));}
+      finally{button.disabled=false;}
+    });
+  }
+  async function call(name,args){
+    const {data,error}=await client.rpc(name,args);
+    if(error)throw error;
+    if(data===false||data===null)throw new Error('Supabase did not confirm this change.');
+    return data;
+  }
+  async function init(){
+    client=window.BB_CAMPUS_CLIENT;
+    if(!client){status('c83AdminGate','⚠️ Campus database connection unavailable.');return;}
+    const {data,error}=await client.rpc('is_campus_admin');
+    if(error||data!==true){status('c83AdminGate','🔒 Season administration is reserved for campus administrators.');return;}
+    $('c83AdminContent').hidden=false;
+    status('c83AdminGate','💗 Administrator controls ready. New seasons start as upcoming.');
+    $('c83EditSeasonSelect').addEventListener('change',showSeason);
+    $('c83EditTeamSeason').addEventListener('change',populateTeams);
+    $('c83EditTeamSelect').addEventListener('change',showTeam);
+    $('c83AdminReload').addEventListener('click',async()=>{try{await reload();status('c83AdminGate','💗 Season and team lists refreshed.');}catch(e){status('c83AdminGate','⚠️ '+err(e));}});
+    bindForm('c83CreateSeasonForm','c83CreateSeasonFeedback',async()=>{
+      await call('admin_create_crown_season',{p_name:$('c83NewSeasonName').value.trim(),p_starts_on:$('c83NewSeasonStart').value,p_ends_on:$('c83NewSeasonEnd').value});
+      $('c83CreateSeasonForm').reset();
+    });
+    bindForm('c83EditSeasonForm','c83EditSeasonFeedback',async()=>{
+      await call('admin_update_crown_season',{p_season_id:$('c83EditSeasonSelect').value,p_name:$('c83EditSeasonName').value.trim(),p_starts_on:$('c83EditSeasonStart').value,p_ends_on:$('c83EditSeasonEnd').value});
+    });
+    bindForm('c83CreateTeamForm','c83CreateTeamFeedback',async()=>{
+      await call('admin_create_crown_team',{p_season_id:$('c83NewTeamSeason').value,p_name:$('c83NewTeamName').value.trim(),p_emoji:$('c83NewTeamEmoji').value.trim()||'👑'});
+      $('c83NewTeamName').value='';
+    });
+    bindForm('c83EditTeamForm','c83EditTeamFeedback',async()=>{
+      await call('admin_update_crown_team',{p_team_id:$('c83EditTeamSelect').value,p_name:$('c83EditTeamName').value.trim(),p_emoji:$('c83EditTeamEmoji').value.trim()||'👑'});
+    });
+    try{await reload();}catch(e){status('c83AdminGate','⚠️ '+err(e));}
   }
   document.addEventListener('bb:campus-hq-ready',init,{once:true});
 })();
