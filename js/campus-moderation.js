@@ -292,6 +292,60 @@
       if (error) throw error;
     }
 
+        // -------------------------------------------------
+    // ADMIN-ONLY REPORT DELETION
+    // -------------------------------------------------
+
+    async function deleteCompletedReport(report) {
+      const isAdmin =
+        window.BB_CAMPUS_STAFF?.role === "admin";
+
+      if (!isAdmin) {
+        window.alert(
+          "Only campus administrators can delete moderation reports."
+        );
+        return;
+      }
+
+      if (
+        report.status !== "resolved" &&
+        report.status !== "dismissed"
+      ) {
+        window.alert(
+          "Only resolved or dismissed reports can be deleted."
+        );
+        return;
+      }
+
+      const confirmed = window.confirm(
+        "🛑 PERMANENT REPORT DELETION\n\n" +
+        "This will permanently delete:\n" +
+        "• The selected Commons moderation report\n" +
+        "• All associated moderation action history\n\n" +
+        "Original Commons posts, comments, and chat messages " +
+        "will NOT be deleted.\n\n" +
+        "This action cannot be undone.\n\n" +
+        "Delete this report?"
+      );
+
+      if (!confirmed) return;
+
+      const { error } = await client.rpc(
+        "admin_delete_commons_report",
+        {
+          p_report_id: report.id
+        }
+      );
+
+      if (error) throw error;
+
+      window.alert(
+        "💗 Moderation report and associated history deleted successfully!"
+      );
+
+      await loadReports();
+    }
+
     // -------------------------------------------------
     // HISTORY VIEW
     // -------------------------------------------------
@@ -807,7 +861,7 @@
           }
         );
 
-        card.append(
+                card.append(
           heading,
           statusTag,
           summary,
@@ -815,6 +869,48 @@
           detailsButton,
           detailsContainer
         );
+
+        // Administrators may delete completed reports only.
+        const isAdmin =
+          window.BB_CAMPUS_STAFF?.role === "admin";
+
+        const isCompleted =
+          report.status === "resolved" ||
+          report.status === "dismissed";
+
+        if (isAdmin && isCompleted) {
+          const deleteButton = makeButton(
+            "🗑️ Delete Report",
+            "btn danger"
+          );
+
+          deleteButton.addEventListener(
+            "click",
+            async () => {
+              deleteButton.disabled = true;
+
+              try {
+                await deleteCompletedReport(report);
+              } catch (error) {
+                console.error(
+                  "Delete Commons moderation report:",
+                  error
+                );
+
+                window.alert(
+                  "Couldn't delete report: " +
+                  errorMessage(error)
+                );
+              } finally {
+                deleteButton.disabled = false;
+              }
+            }
+          );
+
+          card.append(deleteButton);
+        }
+
+        root.append(card);
 
         root.append(card);
       }
