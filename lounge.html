@@ -321,25 +321,57 @@
         return;
       }
 
-      const { data: enrollment, error: enrollmentError } = await client
-        .from("crown_enrollments")
-        .select("id")
-        .eq("user_id", result.user.id)
-        .eq("team_id", team.id)
-        .eq("status", "approved")
-        .maybeSingle();
+      
+      // ==========================================
+      // LOUNGE ACCESS — RESIDENTS OR CAMPUS STAFF
+      // ==========================================
 
-      if (enrollmentError || !enrollment) {
-        deny("🔒 This lounge is reserved for assigned residents.");
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Staff verification error:", staffError);
+        deny("Unable to verify lounge permissions.");
         return;
       }
 
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("id")
+          .eq("user_id", result.user.id)
+          .eq("team_id", team.id)
+          .eq("status", "approved")
+          .maybeSingle();
+
+      if (enrollmentError) {
+        console.error("Lounge enrollment error:", enrollmentError);
+        deny("Unable to verify lounge permissions.");
+        return;
+      }
+
+      
+      const isResident = !!enrollment;
+
+      if (!isResident && isStaff !== true) {
+        deny("🔒 This lounge is reserved for assigned residents and campus staff.");
+        return;
+      }
+
+      // Staff can oversee other dorms without becoming residents.
+      const isVisitingStaff = isStaff === true && !isResident;
+
       document.getElementById("loungeTitle").textContent =
         `${team.emoji || "🏡"} ${room.name}`;
+
       document.getElementById("loungeSubtitle").textContent =
-        `${team.name} · Private team chat`;
+        isVisitingStaff
+          ? `${team.name} · Staff oversight access`
+          : `${team.name} · Private team chat`;
+
       document.querySelector(".hero").style.background =
         dorm.primary_color || "#e8b4c8";
+
       document.getElementById("backToDorm").href =
         `dorm.html?team=${encodeURIComponent(team.id)}`;
 
@@ -348,13 +380,10 @@
       content.hidden = false;
       content.style.display = "block";
 
-      
-    const { data: isStaff, error: staffError } =
-    await client.rpc("is_campus_staff");
-
-    if (staffError) {
-    console.error("Staff verification error:", staffError);
-    }
+      // Visiting staff can read and moderate without sending messages.
+      if (isVisitingStaff) {
+        form.style.display = "none";
+      }
 
       const names = new Map();
       let currentMessages = [];
@@ -375,6 +404,7 @@
         }
 
         currentMessages = data || [];
+
         
 const reactionsByMessage = new Map();
 
@@ -441,56 +471,6 @@ if (currentMessages.length) {
           const bubble = document.createElement("div");
           bubble.className = "message-bubble";
           bubble.textContent = message.content;
-
-          
-if (message.sender_id === result.user.id) {
-  const editButton = document.createElement("button");
-  editButton.type = "button";
-  editButton.className = "message-edit-button";
-  editButton.textContent = "✏️ Edit";
-
-  editButton.addEventListener("click", async () => {
-    const updated = prompt("Edit your message:", message.content);
-
-    if (updated === null) return;
-
-    const newContent = updated.trim();
-
-    if (!newContent || newContent === message.content) return;
-
-    if (newContent.length > 2000) {
-      alert("Messages cannot exceed 2000 characters.");
-      return;
-    }
-
-    editButton.disabled = true;
-
-    
-    const { data: removed, error } = await client
-    .rpc("remove_own_housing_message", {
-        p_message_id: message.id
-    });
-
-    if (!error && removed !== true) {
-    alert("This message could not be removed.");
-    removeButton.disabled = false;
-    return;
-    }
-
-
-    if (error) {
-      console.error("Message edit error:", error);
-      alert("Couldn't update your message.");
-      editButton.disabled = false;
-      return;
-    }
-
-    await loadMessages();
-  });
-
-  article.appendChild(editButton);
-}
-
           
 if (message.sender_id === result.user.id) {
   const removeButton = document.createElement("button");
@@ -503,18 +483,19 @@ if (message.sender_id === result.user.id) {
 
     removeButton.disabled = true;
 
-    const { error } = await client
-      .from("housing_messages")
-      .update({ is_removed: true })
-      .eq("id", message.id)
-      .eq("sender_id", result.user.id);
+    
+    const { data: removed, error } = await client
+      .rpc("remove_own_housing_message", {
+        p_message_id: message.id
+      });
 
-    if (error) {
+    if (error || removed !== true) {
       console.error("Message removal error:", error);
       alert("Unable to remove this message.");
       removeButton.disabled = false;
       return;
     }
+
 
     await loadMessages();
   });
@@ -675,7 +656,11 @@ if (reactionCounts.size > 0) {
   article.appendChild(reactionDisplay);
 }
 
-article.appendChild(reactionPicker);
+
+if (!isVisitingStaff) {
+  article.appendChild(reactionPicker);
+}
+
 messagesEl.appendChild(article);
         }
 

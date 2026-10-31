@@ -475,8 +475,8 @@
 
     <div class="notice">
       💗 Your dorm belongs to your Monthly Crown team.
-      Your conversations and shared spaces stay private
-      to your approved teammates.
+        Shared spaces are reserved for approved residents
+        and authorized campus staff.
     </div>
 
   </main>
@@ -543,18 +543,17 @@
         return;
       }
 
-      // Verify the signed-in member belongs to this team.
-      const { data: enrollment, error: enrollmentError } =
-        await client
-          .from("crown_enrollments")
-          .select("team_id, status, season_id")
-          .eq("user_id", result.user.id)
-          .eq("team_id", teamId)
-          .eq("status", "approved")
-          .maybeSingle();
+      
+      // ==========================================
+      // DORM ACCESS — RESIDENTS OR CAMPUS STAFF
+      // ==========================================
 
-      if (enrollmentError || !enrollment) {
-        deny("🔒 This dorm is reserved for its assigned residents.");
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Staff verification error:", staffError);
+        deny("Unable to verify dorm permissions.");
         return;
       }
 
@@ -563,11 +562,34 @@
           .from("crown_teams")
           .select("id, name, emoji, season_id")
           .eq("id", teamId)
-          .eq("season_id", enrollment.season_id)
           .maybeSingle();
 
       if (teamError || !team) {
         deny("This dorm could not be found.");
+        return;
+      }
+
+      const { data: enrollment, error: enrollmentError } =
+        await client
+          .from("crown_enrollments")
+          .select("team_id, status, season_id")
+          .eq("user_id", result.user.id)
+          .eq("team_id", team.id)
+          .eq("season_id", team.season_id)
+          .eq("status", "approved")
+          .maybeSingle();
+
+      if (enrollmentError) {
+        console.error("Dorm enrollment error:", enrollmentError);
+        deny("Unable to verify dorm permissions.");
+        return;
+      }
+
+      const isResident = !!enrollment;
+      const canEnterDorm = isResident || isStaff === true;
+
+      if (!canEnterDorm) {
+        deny("🔒 This dorm is reserved for assigned residents and campus staff.");
         return;
       }
 

@@ -53,12 +53,13 @@
         message.timer = setTimeout(() => t.style.display = 'none', 4200);
     };
 
+    
     const defaults = {
-        current_theme: 'Boo & Boujee',
-        next_theme: 'The Velvet Latte Lounge',
-        featured_book: 'Misery',
-        featured_author: 'Stephen King',
-        theme_name: 'Boo & Boujee',
+        current_theme: 'Velvet Lattes',
+        next_theme: 'TBD',
+        featured_book: 'The Witch',
+        featured_author: 'Freida McFadden',
+        theme_name: 'Velvet Lattes',
         theme_hero: '',
         theme_accent: '#b96e8d',
         theme_hero_color: '#f4e3e9',
@@ -85,29 +86,54 @@
     const admin = () => profile?.role === 'admin' || profile?.role === 'owner';
     const owner = () => profile?.role === 'owner';
 
-    async function loadPublic() {
-        settings = { ...defaults };
-        if (!db) return;
+    
+async function loadPublic() {
+    settings = { ...defaults };
+    season = null;
+    poll = null;
+    teams = [];
 
-        const [s, t, p] = await Promise.all([
-            db.from('site_settings').select('*').eq('id', 1).maybeSingle(),
-            db.from('seasons').select('*').eq('status', 'active').limit(1).maybeSingle(),
-            db.from('polls').select('*,poll_options(*)').eq('status', 'open')
-                .order('created_at', { ascending: false }).limit(1).maybeSingle()
-        ]);
+    if (!db) return;
 
-        if (s.data) settings = { ...defaults, ...s.data };
-        season = t.data || null;
-        poll = p.data || null;
+    const [t, p] = await Promise.all([
+        db.from('seasons')
+            .select('*')
+            .eq('status', 'active')
+            .limit(1)
+            .maybeSingle(),
 
-        if (season) {
-            const r = await db.from('teams')
-                .select('*')
-                .eq('season_id', season.id)
-                .order('name');
-            teams = r.data || [];
-        }
+        db.from('polls')
+            .select('*,poll_options(*)')
+            .eq('status', 'open')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+    ]);
+
+    if (t.error) {
+        console.warn('Legacy season lookup:', t.error.message);
     }
+
+    if (p.error) {
+        console.warn('Legacy poll lookup:', p.error.message);
+    }
+
+    season = t.data || null;
+    poll = p.data || null;
+
+    if (season) {
+        const r = await db.from('teams')
+            .select('*')
+            .eq('season_id', season.id)
+            .order('name');
+
+        if (r.error) {
+            console.warn('Legacy team lookup:', r.error.message);
+        }
+
+        teams = r.data || [];
+    }
+}
 
     async function loadUser() {
         if (!db) return;
@@ -210,19 +236,21 @@
     }
 
     function home() {
-        const names = teams.length
-            ? teams.map(t => escape(t.name))
-            : ['Vicious Vixens', 'The Ghoulfriends', 'Pretty Little Hexes'];
+        
+        const housingTeams = [
+            { name: 'The Cullen Coven', emoji: '🩸' },
+            { name: 'The Quileute Queens', emoji: '🐺' },
+            { name: 'The Volturi Vixens', emoji: '🌙' }
+        ];
 
-        const em = ['💋', '👻', '🔮'];
-
-        const teamCards = names.slice(0, 3).map((name, i) => `
+        const teamCards = housingTeams.map((team, i) => `
             <div class="glam-hall hall-${i + 1}">
-                <span class="hall-emblem">${em[i]}</span>
-                <strong>${name}</strong>
+                <span class="hall-emblem">${team.emoji}</span>
+                <strong>${team.emoji} ${escape(team.name)}</strong>
                 <small>Residence Hall ${i + 1}</small>
             </div>
         `).join('');
+
 
         const community = escape(fb());
 
@@ -263,15 +291,28 @@
                             <span>♡ CURRENT BESTIE BOOK PICK</span>
                             <span>✦</span>
                         </div>
-                        <div class="glam-feature-body">
-                            <div class="glam-cover">
-                                <small>STEPHEN KING</small>
-                                <strong>MISERY</strong>
-                                <span>✦</span>
-                            </div>
+                        <div class="glam-feature-body">                            
+                        
+                    <a href="book-club.html"
+                    class="glam-cover"
+                    aria-label="Visit the Book Club for The Witch by Freida McFadden"
+                    style="display:block;overflow:hidden;text-decoration:none;">
+                        <img
+                            src="assets/the-witch-cover.jpg"
+                            alt="The Witch by Freida McFadden book cover"
+                            loading="lazy"
+                            style="display:block;width:100%;height:100%;object-fit:contain;">
+                    </a>
+
                             <div>
-                                <span class="glam-kicker">THE CAMPUS READ</span>
-                                <h2>${escape(settings.featured_book)}</h2>
+                                <span class="glam-kicker">THE CAMPUS READ</span>                                
+                            <h2>
+                                <a href="book-club.html"
+                                style="color:inherit;text-decoration:none;cursor:pointer;"
+                                title="Visit the Bestie Book Club">
+                                    ${escape(settings.featured_book)}
+                                </a>
+                            </h2>
                                 <p class="glam-author">by ${escape(settings.featured_author)}</p>
                                 <p>One book. A whole campus of opinions. Come read and discuss with your Besties!</p>
                                 <a href="#book-pick" class="glam-small-btn">Explore Book Pick ↗</a>
@@ -279,30 +320,31 @@
                         </div>
                     </article>
 
+                    
                     <article class="glam-panel glam-theme">
                         <div class="glam-panel-heading">
-                            <span>👻 THIS MONTH ON CAMPUS</span>
-                            <span>OCTOBER</span>
+                            <span>☕ THIS MONTH ON CAMPUS</span>
+                            <span>NOVEMBER</span>
                         </div>
                         <div class="glam-theme-body">
                             <span class="glam-theme-star">✧</span>
                             <small>CURRENT CAMPUS THEME</small>
                             <h2>${escape(settings.current_theme)}</h2>
-                            <p>Spooky season, but make it Bestie University.</p>
-                            <span class="glam-ghosts" aria-hidden="true">👻 🎀 🕯️</span>
+                            <p>Espresso moods, velvet afternoons, cozy chapters, and a whole latte Bestie love.</p>
+                            <span class="glam-ghosts" aria-hidden="true">☕ 🤎 📚</span>
                         </div>
                     </article>
 
                     <article class="glam-panel glam-upcoming">
                         <div class="glam-panel-heading">
-                            <span>☕ COMING TO CAMPUS</span>
+                            <span>✨ COMING TO CAMPUS</span>
                             <span>NEXT MONTH</span>
                         </div>
                         <div class="glam-upcoming-body">
-                            <small>NOVEMBER THEME</small>
+                            <small>DECEMBER THEME</small>
                             <h2>${escape(settings.next_theme)}</h2>
-                            <p>Warm drinks, velvet vibes, and pages worth staying up for.</p>
-                            <span aria-hidden="true">☕ 📚 ✨</span>
+                            <p>A brand-new chapter is brewing. December's theme will be revealed soon!</p>
+                            <span aria-hidden="true">🎀 ✨ 📖</span>
                         </div>
                     </article>
                 </div>
@@ -475,9 +517,25 @@
                 <div class="card">
                     <span class="pill">📖 Current Club Read</span>
                     <div class="book-display" style="margin-top:22px">
-                        <div class="book-cover">${escape(settings.featured_book)}</div>
-                        <div>
-                            <h2>${escape(settings.featured_book)}</h2>
+                        
+                    <a href="book-club.html"
+                    aria-label="Visit the Book Club for The Witch by Freida McFadden"
+                    style="display:block;text-decoration:none;">
+                        <img
+                            src="assets/the-witch-cover.jpg"
+                            alt="The Witch by Freida McFadden book cover"
+                            loading="lazy"
+                            style="display:block;width:100%;max-width:230px;height:auto;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.15);">
+                    </a>
+
+                        <div>                            
+                        <h2>
+                            <a href="book-club.html"
+                            style="color:inherit;text-decoration:none;cursor:pointer;"
+                            title="Visit the Bestie Book Club">
+                                ${escape(settings.featured_book)}
+                            </a>
+                        </h2>
                             <p class="muted">${escape(settings.featured_author)}</p>
                             <p>Our current Bestie Book Pick! Join the discussion with the group on Facebook.</p>
                         </div>

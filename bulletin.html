@@ -368,6 +368,20 @@
         return;
       }
 
+      
+      // ==========================================
+      // BULLETIN BOARD — RESIDENTS OR CAMPUS STAFF
+      // ==========================================
+
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Staff verification error:", staffError);
+        deny("Unable to verify Bulletin Board permissions.");
+        return;
+      }
+
       const { data: enrollment, error: enrollmentError } =
         await client
           .from("crown_enrollments")
@@ -377,16 +391,28 @@
           .eq("status", "approved")
           .maybeSingle();
 
-      if (enrollmentError || !enrollment) {
-        deny("🔒 This board belongs to assigned residents.");
+      if (enrollmentError) {
+        console.error("Bulletin Board enrollment error:", enrollmentError);
+        deny("Unable to verify Bulletin Board permissions.");
         return;
       }
+
+      const isResident = !!enrollment;
+
+      if (!isResident && isStaff !== true) {
+        deny("🔒 This board belongs to assigned residents and campus staff.");
+        return;
+      }
+
+      const isVisitingStaff = isStaff === true && !isResident;
 
       document.getElementById("boardTitle").textContent =
         `${team.emoji || "🏡"} Bulletin Board`;
 
       document.getElementById("boardSubtitle").textContent =
-        `${team.name} · Your private team feed`;
+        isVisitingStaff
+          ? `${team.name} · Staff oversight access`
+          : `${team.name} · Your private team feed`;
 
       document.querySelector(".hero").style.background =
         dorm.primary_color || "#e8b4c8";
@@ -399,13 +425,11 @@
       content.hidden = false;
       content.style.display = "block";
 
+      // Visiting staff can read and moderate, but cannot create posts.
       
-        const { data: isStaff, error: staffError } =
-        await client.rpc("is_campus_staff");
-
-        if (staffError) {
-        console.error("Staff verification error:", staffError);
-        }
+      if (isVisitingStaff) {
+        form.closest(".panel").style.display = "none";
+      }
 
       const names = new Map();
 
@@ -489,9 +513,16 @@ for (const emoji of reactionEmojis) {
     reaction => reaction.user_id === result.user.id
   );
 
+  
   const button = document.createElement("button");
   button.type = "button";
   button.textContent = `${emoji} ${matching.length || ""}`;
+
+  if (isVisitingStaff) {
+    button.disabled = true;
+    button.title = "Staff oversight: reactions are residents-only.";
+  }
+
   button.setAttribute("aria-pressed", String(Boolean(mine)));
 
   if (mine) {
@@ -808,9 +839,16 @@ for (const emoji of ["💗", "☕", "😂", "🔥", "🥹", "👑"]) {
     reaction => reaction.user_id === result.user.id
   );
 
+  
   const reactionButton = document.createElement("button");
   reactionButton.type = "button";
   reactionButton.textContent = `${emoji} ${matching.length || ""}`;
+
+  if (isVisitingStaff) {
+    reactionButton.disabled = true;
+    reactionButton.title = "Staff oversight: reactions are residents-only.";
+  }
+
   reactionButton.setAttribute("aria-pressed", String(Boolean(mine)));
 
   if (mine) {
@@ -905,8 +943,13 @@ commentForm.addEventListener("submit", async event => {
   await loadPosts();
 });
 
-commentsSection.appendChild(commentForm);
+
+if (!isVisitingStaff) {
+  commentsSection.appendChild(commentForm);
+}
+
 card.appendChild(commentsSection);
+
 
           if (post.is_pinned) {
             const pinned = document.createElement("p");

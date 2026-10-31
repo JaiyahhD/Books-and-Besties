@@ -457,6 +457,20 @@
         return;
       }
 
+      
+      // ==========================================
+      // READING NOOK — RESIDENTS OR CAMPUS STAFF
+      // ==========================================
+
+      const { data: isStaff, error: staffError } =
+        await client.rpc("is_campus_staff");
+
+      if (staffError) {
+        console.error("Staff verification error:", staffError);
+        deny("Unable to verify Reading Nook permissions.");
+        return;
+      }
+
       const { data: enrollment, error: enrollmentError } =
         await client
           .from("crown_enrollments")
@@ -466,13 +480,25 @@
           .eq("status", "approved")
           .maybeSingle();
 
-      if (enrollmentError || !enrollment) {
-        deny("🔒 This nook belongs to assigned residents.");
+      if (enrollmentError) {
+        console.error("Reading Nook enrollment error:", enrollmentError);
+        deny("Unable to verify Reading Nook permissions.");
         return;
       }
 
+      const isResident = !!enrollment;
+
+      if (!isResident && isStaff !== true) {
+        deny("🔒 This nook belongs to assigned residents and campus staff.");
+        return;
+      }
+
+      const isVisitingStaff = isStaff === true && !isResident;
+
       document.getElementById("nookSubtitle").textContent =
-        `${team.emoji || "📚"} ${team.name} · Your cozy bookish corner`;
+        isVisitingStaff
+          ? `${team.emoji || "📚"} ${team.name} · Staff oversight access`
+          : `${team.emoji || "📚"} ${team.name} · Your cozy bookish corner`;
 
       document.querySelector(".hero").style.background =
         dorm.primary_color || "#e8b4c8";
@@ -485,13 +511,10 @@
       content.hidden = false;
       content.style.display = "block";
 
-      
-    const { data: isStaff, error: staffError } =
-    await client.rpc("is_campus_staff");
-
-    if (staffError) {
-    console.error("Staff verification error:", staffError);
-    }
+      // Visiting staff can read and moderate, but not create discussions.
+      if (isVisitingStaff) {
+        form.style.display = "none";
+      }
 
       const names = new Map();
       
@@ -528,8 +551,15 @@
           );
 
           const button = document.createElement("button");
+          
           button.type = "button";
           button.textContent = `${emoji} ${matching.length || ""}`;
+
+          if (isVisitingStaff) {
+            button.disabled = true;
+            button.title = "Staff oversight: reactions are residents-only.";
+          }
+
           button.setAttribute(
             "aria-pressed",
             String(Boolean(mine))
@@ -980,11 +1010,16 @@ if (reply.author_id === result.user.id) {
             await loadThreads();
           });
 
+          
           repliesSection.append(
             repliesHeading,
-            repliesList,
-            replyForm
+            repliesList
           );
+
+          if (!isVisitingStaff) {
+            repliesSection.appendChild(replyForm);
+          }
+
 
           card.appendChild(repliesSection);
 

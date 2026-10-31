@@ -492,8 +492,11 @@
         const button = document.createElement("button");
         button.className = "dorm-button";
 
-        if (isResident) {
-          button.textContent = "ENTER YOUR DORM →";
+        
+        if (isResident || isStaff === true) {
+          button.textContent = isResident
+            ? "ENTER YOUR DORM →"
+            : "ENTER DORM · STAFF 🛡️";
 
           button.addEventListener("click", () => {
             window.location.href =
@@ -504,6 +507,7 @@
           button.textContent = "RESIDENTS ONLY 🔒";
           button.disabled = true;
         }
+
 
         content.append(
           heading,

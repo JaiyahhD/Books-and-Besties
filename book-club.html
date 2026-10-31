@@ -713,26 +713,26 @@
         }
 
         .feature-cover {
-    display: block;
-    width: 110px;
-    height: 158px;
-    max-width: 100%;
-    flex-shrink: 0;
-    object-fit: contain;
-    border-radius: 13px;
-    background: #f4c9dd;
-}
+            display: block;
+            width: 110px;
+            height: 158px;
+            max-width: 100%;
+            flex-shrink: 0;
+            object-fit: contain;
+            border-radius: 13px;
+            background: #f4c9dd;
+        }
 
-@media (max-width: 780px) {
-    .feature-cover {
-        display: block;
-        width: 130px;
-        height: 190px;
-        max-width: 100%;
-        object-fit: contain;
-        margin: 0 auto 15px;
-    }
-}
+        @media (max-width: 780px) {
+            .feature-cover {
+                display: block;
+                width: 130px;
+                height: 190px;
+                max-width: 100%;
+                object-fit: contain;
+                margin: 0 auto 15px;
+            }
+        }
 
         .thread {
             border: 2px solid #efc8da;
@@ -831,13 +831,41 @@
             margin-top: 10px
         }
 
-        .catalog-add { margin-top:20px; border:2px dashed #e4a7c5; border-radius:18px; background:linear-gradient(125deg,#fff7fb,#f1faf7); padding:18px; }
-        .catalog-add summary { font-size:17px; color:var(--teal); }
-        .catalog-add[open] summary { margin-bottom:12px; }
-        .catalog-help { font-size:13px; color:#756978; margin:5px 0 12px; }
-        .catalog-add .field { min-width:0; }
-        .catalog-add .field textarea { min-height:145px; }
-        .catalog-add .field input { min-width:0; }
+        .catalog-add {
+            margin-top: 20px;
+            border: 2px dashed #e4a7c5;
+            border-radius: 18px;
+            background: linear-gradient(125deg, #fff7fb, #f1faf7);
+            padding: 18px;
+        }
+
+        .catalog-add summary {
+            font-size: 17px;
+            color: var(--teal);
+        }
+
+        .catalog-add[open] summary {
+            margin-bottom: 12px;
+        }
+
+        .catalog-help {
+            font-size: 13px;
+            color: #756978;
+            margin: 5px 0 12px;
+        }
+
+        .catalog-add .field {
+            min-width: 0;
+        }
+
+        .catalog-add .field textarea {
+            min-height: 145px;
+        }
+
+        .catalog-add .field input {
+            min-width: 0;
+        }
+
         @media(max-width:780px) {
             .club-layout {
                 grid-template-columns: 1fr
@@ -897,48 +925,43 @@
                 </form>
                 <details class="catalog-add" id="addBookDetails">
                     <summary>✨ Book missing? Add a new book to the Campus Library</summary>
-                    <p class="catalog-help">Add the book here without leaving Book Club. It will also appear in the shared Campus Library catalog, and we'll select it for your monthly pick automatically.</p>
+                    <p class="catalog-help">Add the book here without leaving Book Club. It will also appear in the
+                        shared Campus Library catalog, and we'll select it for your monthly pick automatically.</p>
                     <form id="addBookForm">
                         <div class="form-grid">
-    <label class="field">
-        <span>Book title *</span>
-        <input id="newBookTitle" required maxlength="250" placeholder="The Witch">
-    </label>
+                            <label class="field">
+                                <span>Book title *</span>
+                                <input id="newBookTitle" required maxlength="250" placeholder="The Witch">
+                            </label>
 
-    <label class="field">
-        <span>Author *</span>
-        <input id="newBookAuthor" required maxlength="200" placeholder="Freida McFadden">
-    </label>
+                            <label class="field">
+                                <span>Author *</span>
+                                <input id="newBookAuthor" required maxlength="200" placeholder="Freida McFadden">
+                            </label>
 
-    <label class="field" style="grid-column:1/-1">
-    <span>Book cover image URL (HTTPS)</span>
-    <input
-        id="newBookCover"
-        type="url"
-        maxlength="2000"
-        value="https://booksandbesties.netlify.app/assets/the-witch.jpg"
-    >
-</label>
+                            <label class="field" style="grid-column:1/-1">
+                                <span>Book cover image URL (HTTPS)</span>
+                                <input id="newBookCover" type="url" maxlength="2000"
+                                    value="https://booksandbesties.netlify.app/assets/the-witch.jpg">
+                            </label>
 
-    <label class="field">
-        <span>Genre (optional)</span>
-        <input id="newBookGenre" maxlength="100" placeholder="Thriller">
-    </label>
+                            <label class="field">
+                                <span>Genre (optional)</span>
+                                <input id="newBookGenre" maxlength="100" placeholder="Thriller">
+                            </label>
 
-    <label class="field">
-        <span>Page count (optional)</span>
-        <input id="newBookPages" type="number" min="1" max="100000" step="1" placeholder="Enter page count">
-    </label>
+                            <label class="field">
+                                <span>Page count (optional)</span>
+                                <input id="newBookPages" type="number" min="1" max="100000" step="1"
+                                    placeholder="Enter page count">
+                            </label>
 
-    <label class="field" style="grid-column:1/-1">
-        <span>Book description / synopsis (optional)</span>
-        <textarea
-            id="newBookDescription"
-            maxlength="2000"
-            placeholder="Paste the publisher's book synopsis here..."
-        ></textarea>
-    </label>
-</div>
+                            <label class="field" style="grid-column:1/-1">
+                                <span>Book description / synopsis (optional)</span>
+                                <textarea id="newBookDescription" maxlength="2000"
+                                    placeholder="Paste the publisher's book synopsis here..."></textarea>
+                            </label>
+                        </div>
                         <button class="btn secondary" id="newBookSave" type="submit">📚 Add Book to Library</button>
                         <p id="newBookStatus" class="status" role="status"></p>
                     </form>
@@ -1034,7 +1057,12 @@
             async function checkStaff() { const { data, error } = await db.rpc('is_campus_admin'); if (!error && data === true) { $('staffPanel').hidden = false; await loadCatalog(); } }
             async function loadClubs(keepSelection = true) { msg('clubStatus', 'Loading the featured reads...'); const { data, error } = await db.from('library_book_clubs').select('id,month_key,book_id,intro_text,created_at,library_books(title,author,cover_url,genre)').order('month_key', { ascending: false }); if (error) { msg('clubStatus', error.message, true); return; } clubs = data || []; const previous = keepSelection ? selected : null; const s = $('clubSelect'); s.replaceChildren(); if (!clubs.length) { selected = null; s.add(new Option('No monthly picks yet', '')); $('featured').replaceChildren(el('div', 'The shelves are ready! Campus HQ will announce the first featured book soon.', 'empty-state')); $('threadComposer').hidden = true; $('threads').replaceChildren(); $('clubDetails').replaceChildren(); msg('clubStatus', 'No monthly featured reads have been published yet.'); return; } clubs.forEach(c => s.add(new Option(monthLabel(c.month_key) + ' · ' + (c.library_books?.title || 'Featured Read'), c.id))); selected = clubs.some(c => c.id === previous) ? previous : clubs[0].id; s.value = selected; await refreshSelected(); msg('clubStatus', clubs.length + ' featured month' + (clubs.length === 1 ? '' : 's') + ' available.'); }
             async function refreshSelected() { const c = clubs.find(x => x.id === selected); if (!c) return; const { data: members, error: membersError } = await db.from('library_club_memberships').select('user_id').eq('club_id', c.id); if (membersError) { msg('clubStatus', membersError.message, true); return; } memberIds = new Set((members || []).map(x => x.user_id)); renderFeature(c); await loadThreads(c.id); }
-            function renderFeature(c) { const container = $('featured'); container.replaceChildren(); const box = el('div', undefined, 'feature'), inner = el('div', undefined, 'feature-inner'), book = c.library_books || {}; if (book.cover_url && /^https:\/\//.test(book.cover_url)) { const im = el('img'); im.className = 'feature-cover'; im.src = book.cover_url; im.alt = 'Cover of ' + (book.title || 'featured book'); im.onerror = () => im.replaceWith(el('div', '📚', 'feature-cover')); inner.append(im); } else inner.append(el('div', '📚', 'feature-cover')); const info = el('div'); info.append(el('span', '✦ ' + monthLabel(c.month_key) + ' · CAMPUS PICK ✦', 'pill'), el('h2', book.title || 'Featured Read'), el('p', 'by ' + (book.author || 'Unknown author'))); if (c.intro_text) info.append(el('p', c.intro_text)); const following = memberIds.has(uid); info.append(btn(following ? '💗 Following · Unfollow' : '💌 Follow This Club', async () => { const result = following ? await db.from('library_club_memberships').delete().eq('club_id', c.id).eq('user_id', uid) : await db.from('library_club_memberships').insert({ club_id: c.id, user_id: uid }); if (result.error) { alert(result.error.message); return; } await refreshSelected(); }, following ? 'light' : 'secondary')); inner.append(info); box.append(inner); container.append(box); const details = $('clubDetails'); details.replaceChildren(el('p', monthLabel(c.month_key) + ' · ' + (book.title || 'Featured Read')), el('p', memberIds.size + ' Bestie' + (memberIds.size === 1 ? '' : 's') + ' following', 'pill')); }
+            function renderFeature(c) { const container = $('featured'); container.replaceChildren(); const box = el('div', undefined, 'feature'), inner = el('div', undefined, 'feature-inner'), book = c.library_books || {}; if (book.cover_url && /^https:\/\//.test(book.cover_url)) { const im = el('img'); im.className = 'feature-cover'; 
+im.src = book.title?.trim().toLowerCase() === 'the witch'
+    && book.author?.trim().toLowerCase() === 'freida mcfadden'
+    ? 'assets/the-witch-cover.jpg'
+    : book.cover_url;
+; im.alt = 'Cover of ' + (book.title || 'featured book'); im.onerror = () => im.replaceWith(el('div', '📚', 'feature-cover')); inner.append(im); } else inner.append(el('div', '📚', 'feature-cover')); const info = el('div'); info.append(el('span', '✦ ' + monthLabel(c.month_key) + ' · CAMPUS PICK ✦', 'pill'), el('h2', book.title || 'Featured Read'), el('p', 'by ' + (book.author || 'Unknown author'))); if (c.intro_text) info.append(el('p', c.intro_text)); const following = memberIds.has(uid); info.append(btn(following ? '💗 Following · Unfollow' : '💌 Follow This Club', async () => { const result = following ? await db.from('library_club_memberships').delete().eq('club_id', c.id).eq('user_id', uid) : await db.from('library_club_memberships').insert({ club_id: c.id, user_id: uid }); if (result.error) { alert(result.error.message); return; } await refreshSelected(); }, following ? 'light' : 'secondary')); inner.append(info); box.append(inner); container.append(box); const details = $('clubDetails'); details.replaceChildren(el('p', monthLabel(c.month_key) + ' · ' + (book.title || 'Featured Read')), el('p', memberIds.size + ' Bestie' + (memberIds.size === 1 ? '' : 's') + ' following', 'pill')); }
             async function loadThreads(clubId) { msg('threadStatus', ''); $('threadComposer').hidden = false; const { data, error } = await db.from('library_discussions').select('id,club_id,user_id,title,body,has_spoilers,created_at').eq('club_id', clubId).order('created_at', { ascending: false }).limit(100); if (error) { $('threads').replaceChildren(el('p', 'Could not load discussions: ' + error.message, 'error')); return; } threads = data || []; const ids = threads.map(t => t.id); let replies = []; if (ids.length) { const res = await db.from('library_discussion_replies').select('id,discussion_id,user_id,body,has_spoilers,created_at').in('discussion_id', ids).order('created_at', { ascending: true }).limit(1000); if (res.error) { $('threads').replaceChildren(el('p', 'Could not load replies: ' + res.error.message, 'error')); return; } replies = res.data || []; } renderThreads(replies); }
             function renderThreads(replies) { const target = $('threads'); target.replaceChildren(); if (!threads.length) { target.append(el('div', 'No discussions yet. Start the first theory thread, Bestie! 💗', 'empty-state')); return; } threads.forEach(t => { const card = el('article', undefined, 'thread'); card.append(el('h3', t.title), el('p', 'Posted ' + safeDate(t.created_at), 'mutedline'), spoilerBox(t.body, t.has_spoilers)); const actions = el('div', undefined, 'thread-actions'); if (t.user_id === uid) actions.append(btn('Delete thread', async () => { if (!confirm('Delete this thread and its replies?')) return; const { error } = await db.from('library_discussions').delete().eq('id', t.id).eq('user_id', uid); if (error) alert(error.message); else await loadThreads(selected); }, 'danger')); card.append(actions); const rs = replies.filter(r => r.discussion_id === t.id); const replySection = el('details'); const summary = el('summary', rs.length + ' repl' + (rs.length === 1 ? 'y' : 'ies') + ' · Join the conversation'); replySection.append(summary); rs.forEach(r => { const box = el('div', undefined, 'reply'); box.append(el('p', 'Bestie · ' + safeDate(r.created_at), 'mutedline'), spoilerBox(r.body, r.has_spoilers)); if (r.user_id === uid) box.append(btn('Delete reply', async () => { if (!confirm('Delete this reply?')) return; const { error } = await db.from('library_discussion_replies').delete().eq('id', r.id).eq('user_id', uid); if (error) alert(error.message); else await loadThreads(selected); }, 'danger')); replySection.append(box); }); const form = el('form', undefined, 'reply-form'), label = el('label', undefined, 'field'), span = el('span', 'Add your reply'), textarea = el('textarea'); textarea.required = true; textarea.minLength = 2; textarea.maxLength = 2000; textarea.placeholder = 'Share your thoughts...'; label.append(span, textarea); const spoilerLabel = el('label', undefined, 'field'), spoilerText = el('span', 'Spoiler setting'), select = el('select'); select.add(new Option('Spoiler-free', 'false')); select.add(new Option('Contains spoilers', 'true')); spoilerLabel.append(spoilerText, select); const submit = el('button', '💬 Post Reply', 'btn secondary'); submit.type = 'submit'; const feedback = el('p', undefined, 'status'); form.append(label, spoilerLabel, submit, feedback); form.onsubmit = async e => { e.preventDefault(); submit.disabled = true; const { error } = await db.from('library_discussion_replies').insert({ discussion_id: t.id, user_id: uid, body: textarea.value.trim(), has_spoilers: select.value === 'true' }); submit.disabled = false; if (error) { feedback.textContent = error.message; feedback.className = 'status error'; return; } await loadThreads(selected); }; replySection.append(form); card.append(replySection); target.append(card); }); }
             $('featureMonth').value = new Date().toISOString().slice(0, 7); $('featureForm').onsubmit = async e => { e.preventDefault(); const b = $('featureSave'); b.disabled = true; msg('staffStatus', 'Publishing monthly pick...'); const { error } = await db.from('library_book_clubs').upsert({ month_key: $('featureMonth').value, book_id: $('featureBook').value, intro_text: $('featureNote').value.trim(), created_by: uid }, { onConflict: 'month_key' }); b.disabled = false; if (error) { msg('staffStatus', error.message, true); return; } msg('staffStatus', '✨ Monthly pick published!'); await loadClubs(false); };
