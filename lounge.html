@@ -195,6 +195,72 @@
   background: #ead0db;
 }
 
+
+/* ==========================================
+   BESTIE UNIVERSITY — TWILIGHT LOUNGE
+   HIGH-CONTRAST HEADER FIX
+   ========================================== */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #ffffff;
+  background-color: #243a36;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Twilight overlay above the dorm color */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(10, 19, 24, 0.84),
+    rgba(32, 49, 44, 0.74),
+    rgba(39, 18, 29, 0.82)
+  );
+  pointer-events: none;
+}
+
+/* All header lettering stays white */
+.hero,
+.hero h1,
+.hero p,
+.hero > div {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+}
+
+.hero h1 {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  overflow-wrap: anywhere;
+}
+
+.hero > div {
+  font: 700 11px Arial, sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hero p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Twilight-inspired navigation */
+.top-nav a {
+  color: #29483d;
+  font-weight: 700;
+}
+
+.top-nav a:hover {
+  color: #692d3d;
+}
+
   </style>
 </head>
 <body>
