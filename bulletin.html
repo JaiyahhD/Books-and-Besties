@@ -425,11 +425,6 @@
       content.hidden = false;
       content.style.display = "block";
 
-      // Visiting staff can read and moderate, but cannot create posts.
-      
-      if (isVisitingStaff) {
-        form.closest(".panel").style.display = "none";
-      }
 
       const names = new Map();
 
@@ -518,10 +513,6 @@ for (const emoji of reactionEmojis) {
   button.type = "button";
   button.textContent = `${emoji} ${matching.length || ""}`;
 
-  if (isVisitingStaff) {
-    button.disabled = true;
-    button.title = "Staff oversight: reactions are residents-only.";
-  }
 
   button.setAttribute("aria-pressed", String(Boolean(mine)));
 
@@ -844,10 +835,6 @@ for (const emoji of ["💗", "☕", "😂", "🔥", "🥹", "👑"]) {
   reactionButton.type = "button";
   reactionButton.textContent = `${emoji} ${matching.length || ""}`;
 
-  if (isVisitingStaff) {
-    reactionButton.disabled = true;
-    reactionButton.title = "Staff oversight: reactions are residents-only.";
-  }
 
   reactionButton.setAttribute("aria-pressed", String(Boolean(mine)));
 
@@ -944,11 +931,10 @@ commentForm.addEventListener("submit", async event => {
 });
 
 
-if (!isVisitingStaff) {
-  commentsSection.appendChild(commentForm);
-}
+        // Authorized residents and campus staff can reply.
+        commentsSection.appendChild(commentForm);
 
-card.appendChild(commentsSection);
+        card.appendChild(commentsSection);
 
 
           if (post.is_pinned) {

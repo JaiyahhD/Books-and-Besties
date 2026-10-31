@@ -511,10 +511,6 @@
       content.hidden = false;
       content.style.display = "block";
 
-      // Visiting staff can read and moderate, but not create discussions.
-      if (isVisitingStaff) {
-        form.style.display = "none";
-      }
 
       const names = new Map();
       
@@ -555,10 +551,6 @@
           button.type = "button";
           button.textContent = `${emoji} ${matching.length || ""}`;
 
-          if (isVisitingStaff) {
-            button.disabled = true;
-            button.title = "Staff oversight: reactions are residents-only.";
-          }
 
           button.setAttribute(
             "aria-pressed",
@@ -1016,9 +1008,8 @@ if (reply.author_id === result.user.id) {
             repliesList
           );
 
-          if (!isVisitingStaff) {
-            repliesSection.appendChild(replyForm);
-          }
+          // Authorized residents and campus staff can reply.
+          repliesSection.appendChild(replyForm);
 
 
           card.appendChild(repliesSection);

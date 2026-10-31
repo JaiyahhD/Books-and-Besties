@@ -266,152 +266,174 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
 
-  <script>
-    (() => {
-      "use strict";
+  
+<script>
+  (() => {
+    "use strict";
 
-      const config = window.BB_CONFIG;
+    const config = window.BB_CONFIG;
 
-      const form = document.getElementById(
-        "registrationForm"
+    const form = document.getElementById("registrationForm");
+    const button = document.getElementById("registerButton");
+    const messageBox = document.getElementById("registrationMessage");
+
+    function showMessage(text, type) {
+      messageBox.textContent = text;
+      messageBox.className = "admissions-message " + type;
+    }
+
+    if (
+      !config?.SUPABASE_URL ||
+      !config?.SUPABASE_ANON_KEY ||
+      !window.supabase
+    ) {
+      showMessage(
+        "Campus registration is temporarily unavailable.",
+        "error"
       );
+      button.disabled = true;
+      return;
+    }
 
-      const button = document.getElementById(
-        "registerButton"
-      );
+    const supabaseClient = window.supabase.createClient(
+      config.SUPABASE_URL,
+      config.SUPABASE_ANON_KEY
+    );
 
-      const messageBox = document.getElementById(
-        "registrationMessage"
-      );
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-      function showMessage(text, type) {
-        messageBox.textContent = text;
-        messageBox.className =
-          "admissions-message " + type;
-      }
+      const displayName = document
+        .getElementById("displayName")
+        .value.trim();
 
-      if (
-        !config?.SUPABASE_URL ||
-        !config?.SUPABASE_ANON_KEY ||
-        !window.supabase
-      ) {
+      const email = document
+        .getElementById("email")
+        .value.trim()
+        .toLowerCase();
+
+      const password = document
+        .getElementById("password")
+        .value;
+
+      const confirmPassword = document
+        .getElementById("confirmPassword")
+        .value;
+
+      if (displayName.length < 2) {
         showMessage(
-          "Campus registration is temporarily unavailable.",
+          "Please enter a display name of at least 2 characters.",
           "error"
         );
-        button.disabled = true;
         return;
       }
 
-      const supabaseClient =
-        window.supabase.createClient(
-          config.SUPABASE_URL,
-          config.SUPABASE_ANON_KEY
+      if (password.length < 12) {
+        showMessage(
+          "Your password must contain at least 12 characters.",
+          "error"
         );
+        return;
+      }
 
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
+      if (password !== confirmPassword) {
+        showMessage(
+          "Your passwords don't match, Bestie!",
+          "error"
+        );
+        return;
+      }
 
-        const displayName =
-          document.getElementById("displayName")
-            .value.trim();
+      button.disabled = true;
+      button.textContent = "Creating your Bestie account... ♡";
 
-        const email =
-          document.getElementById("email")
-            .value.trim();
-
-        const password =
-          document.getElementById("password")
-            .value;
-
-        const confirmPassword =
-          document.getElementById("confirmPassword")
-            .value;
-
-        if (displayName.length < 2) {
-          showMessage(
-            "Please enter a display name of at least 2 characters.",
-            "error"
-          );
-          return;
-        }
-
-        if (password.length < 12) {
-          showMessage(
-            "Your password must have at least 12 characters.",
-            "error"
-          );
-          return;
-        }
-
-        if (password !== confirmPassword) {
-          showMessage(
-            "Your passwords don't match, Bestie!",
-            "error"
-          );
-          return;
-        }
-
-        button.disabled = true;
-        button.textContent =
-          "Submitting your application... ♡";
-
-        try {
-          const redirectUrl =
-            window.location.origin +
-            "/index.html#login";
-
-          const { data, error } =
-            await supabaseClient.auth.signUp({
-              email,
-              password,
-              options: {
-                data: {
-                  display_name: displayName
-                },
-                emailRedirectTo: redirectUrl
+      try {
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                display_name: displayName
               }
+            }
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        // Email confirmation must be disabled in Supabase
+        // for new accounts to receive a session immediately.
+        let session = data?.session;
+
+        if (!session) {
+          const { data: loginData, error: loginError } =
+            await supabaseClient.auth.signInWithPassword({
+              email,
+              password
             });
 
-          if (error) {
-            throw error;
+          if (loginError) {
+            showMessage(
+              "Your account request was received, but automatic " +
+              "sign-in was unavailable. Please check that email " +
+              "confirmation is disabled or contact campus staff.",
+              "error"
+            );
+            return;
           }
 
+          session = loginData?.session;
+        }
+
+        if (!session) {
           showMessage(
-            "💌 Application received! " +
-            "If this email is eligible for a new account, " +
-            "check your inbox for a verification link. " +
-            "After verification, your account will " +
-            "await campus approval.",
-            "success"
-          );
-
-          form.reset();
-
-          // Do not treat account creation as approval.
-          // Database membership_status remains pending.
-          // No privileged campus access is granted here.
-
-        } catch (error) {
-          console.error(
-            "Registration error:",
-            error
-          );
-
-          showMessage(
-            error.message ||
-            "Something went wrong. Please try again.",
+            "We couldn't establish your login session. " +
+            "Please try signing in from the homepage.",
             "error"
           );
-
-        } finally {
-          button.disabled = false;
-          button.textContent =
-            "Apply for Campus Admission ♡";
+          return;
         }
-      });
-    })();
-  </script>
+
+        showMessage(
+          "🎀 Welcome, Bestie! Your account has been " +
+          "created successfully. Taking you to campus...",
+          "success"
+        );
+
+        form.reset();
+
+        // Signing in does not bypass membership approval.
+        // Existing campus guards still enforce access rules.
+        window.location.replace("locker.html");
+
+      } catch (error) {
+        console.error("Registration error:", error);
+
+        let errorMessage =
+          error.message ||
+          "Something went wrong. Please try again.";
+
+        if (/already registered|already exists/i.test(errorMessage)) {
+          errorMessage =
+            "This email may already have an account. " +
+            "Try signing in instead, Bestie! 💗";
+        } else if (/rate limit/i.test(errorMessage)) {
+          errorMessage =
+            "Too many signup attempts. Please wait a little " +
+            "while before trying again.";
+        }
+
+        showMessage(errorMessage, "error");
+
+      } finally {
+        button.disabled = false;
+        button.textContent = "Apply for Campus Admission ♡";
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>

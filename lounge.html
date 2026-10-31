@@ -380,11 +380,6 @@
       content.hidden = false;
       content.style.display = "block";
 
-      // Visiting staff can read and moderate without sending messages.
-      if (isVisitingStaff) {
-        form.style.display = "none";
-      }
-
       const names = new Map();
       let currentMessages = [];
 
@@ -657,9 +652,8 @@ if (reactionCounts.size > 0) {
 }
 
 
-if (!isVisitingStaff) {
-  article.appendChild(reactionPicker);
-}
+// All authorized residents and campus staff can react.
+article.appendChild(reactionPicker);
 
 messagesEl.appendChild(article);
         }
