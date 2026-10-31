@@ -290,12 +290,15 @@
         BESTIE UNIVERSITY · READING COMPETITION
       </div>
 
-      <h1>👑 Monthly Crown HQ</h1>
+      <h1>🌙 The Twilight Crown 👑</h1>
 
       <p>
-        Every finished book brings your team one step closer
-        to the crown. Log your reads, collect your pages,
-        and watch the leaderboard come alive!
+        Three legendary covens. One coveted crown.
+        Whether you run with the wolves, stand with the Cullens,
+        or rule alongside the Volturi, every finished book
+        brings your team closer to victory.
+        Log your pages, defend your legacy, and let
+        the battle for the Twilight Crown begin! 🩸🐺🌙
       </p>
 
       <div id="seasonPill" class="season-pill">
@@ -452,7 +455,7 @@
       }
 
       $("seasonPill").textContent =
-        `☕ ${season.name.toUpperCase()} · THE VELVET LATTE LOUNGE`;
+        `🌙 ${season.name.toUpperCase()} · THE TWILIGHT SAGA`;
 
       const { data: enrollment, error: enrollmentError } =
         await client
@@ -691,9 +694,71 @@
         ]);
       }
 
+      
       await refreshCrown();
 
+      // ==========================================
+      // MONTHLY CROWN — LIVE LEADERBOARDS 👑
+      // ==========================================
+
+      let crownRefreshInProgress = false;
+      let crownRefreshPending = false;
+
+      async function refreshLiveCrown() {
+        if (crownRefreshInProgress) {
+          crownRefreshPending = true;
+          return;
+        }
+
+        crownRefreshInProgress = true;
+
+        try {
+          do {
+            crownRefreshPending = false;
+            await refreshCrown();
+          } while (crownRefreshPending);
+        } finally {
+          crownRefreshInProgress = false;
+        }
+      }
+
+      const crownLiveChannel = client
+        .channel(`crown-leaderboard-${season.id}`)
+        .on(
+          "broadcast",
+          { event: "leaderboard_changed" },
+          payload => {
+            console.log(
+              "👑 Monthly Crown leaderboard updated:",
+              payload
+            );
+
+            refreshLiveCrown().catch(error => {
+              console.error(
+                "Monthly Crown live refresh error:",
+                error
+              );
+            });
+          }
+        )
+        .subscribe(status => {
+          if (status === "SUBSCRIBED") {
+            console.log(
+              "👑 Monthly Crown live leaderboard connected."
+            );
+          }
+
+          if (status === "CHANNEL_ERROR" ||
+              status === "TIMED_OUT") {
+            console.warn(
+              "Monthly Crown live connection issue:",
+              status
+            );
+          }
+        });
+
       $("bookForm").addEventListener("submit", async event => {
+
         event.preventDefault();
 
         if (!isEnrolled) return;
